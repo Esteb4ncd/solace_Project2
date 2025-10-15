@@ -1,16 +1,23 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, Alert } from 'react-native';
 
 import { HelloWave } from '@/components/hello-wave';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import LargeButton from '../../components/ui/LargeButton';
+
 import { Link } from 'expo-router';
 
 import React from 'react';
 import MyCheckbox from '../../components/ui/MyCheckbox';
 
 export default function HomeScreen() {
+  // define the function
+  const handlePress = () => {
+    Alert.alert('Button pressed!', 'You clicked the large button.');
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -28,6 +35,8 @@ export default function HomeScreen() {
         <MyCheckbox label="Option 2" />
         <MyCheckbox label="Option 3" />
       </ThemedView>
+
+      <LargeButton label="Next" onPress={handlePress} />
 
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
