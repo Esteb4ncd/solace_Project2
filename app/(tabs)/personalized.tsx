@@ -3,6 +3,7 @@ import { ThemedView } from '@/components/themed-view';
 import React from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import LargeButton from '../../components/ui/LargeButton';
+import { Globals } from '../../constants/globals';
 
 // Character placeholder for future SVG
 const CharacterPlaceholder = () => (
@@ -74,24 +75,25 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
   },
   mainHeading: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontFamily: Globals.fonts.weights.bold,
+    fontSize: Globals.fonts.sizes.header1,
     textAlign: 'center',
     marginBottom: 16,
-    color: '#000',
+    color: Globals.colors.textDark,
   },
   subHeading: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontFamily: Globals.fonts.weights.medium,
+    fontSize: Globals.fonts.sizes.header2,
     textAlign: 'center',
     marginBottom: 12,
-    color: '#000',
+    color: Globals.colors.textDark,
   },
   description: {
-    fontSize: 16,
+    fontFamily: Globals.fonts.weights.regular,
+    fontSize: Globals.fonts.sizes.body,
     textAlign: 'center',
     marginBottom: 80,
-    color: '#000',
+    color: Globals.colors.textDark,
     paddingHorizontal: 20,
     lineHeight: 22,
   },
@@ -104,8 +106,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   skipText: {
-    fontSize: 16,
-    color: '#000',
+    fontFamily: Globals.fonts.weights.regular,
+    fontSize: Globals.fonts.sizes.body,
+    color: Globals.colors.textDark,
     textAlign: 'center',
   },
 });

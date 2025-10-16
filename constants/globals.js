@@ -7,8 +7,22 @@ export const Globals = {
       textDark: '#000000',
     },
     fonts: {
-      rounded: 'YourRoundedFontName',
-      mono: 'YourMonoFontName',
+      family: 'Poppins_400Regular',
+      weights: {
+        regular: 'Poppins_400Regular',
+        medium: 'Poppins_500Medium',
+        bold: 'Poppins_700Bold',
+      },
+      sizes: {
+        header1: 28,
+        header2: 20,
+        header3: 18,
+        header4: 16,
+        body: 16,
+        caption: 14,
+        button: 16,
+        label: 12,
+      },
     },
     spacing: {
       small: 8,

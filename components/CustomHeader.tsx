@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Globals } from '../constants/globals';
 
 const CustomHeader = () => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -116,9 +117,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e0e0e0',
   },
   menuTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000',
+    fontFamily: Globals.fonts.weights.medium,
+    fontSize: Globals.fonts.sizes.header3,
+    color: Globals.colors.textDark,
   },
   menuItem: {
     flexDirection: 'row',
@@ -128,8 +129,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   menuItemText: {
-    fontSize: 16,
-    color: '#000',
+    fontFamily: Globals.fonts.weights.regular,
+    fontSize: Globals.fonts.sizes.body,
+    color: Globals.colors.textDark,
     marginLeft: 12,
   },
 });

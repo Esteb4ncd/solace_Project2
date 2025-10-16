@@ -3,6 +3,7 @@ import { ThemedView } from '@/components/themed-view';
 import React, { useState } from "react";
 import { Alert, StyleSheet, TextInput, View } from "react-native";
 import LargeButton from '../../components/ui/LargeButton';
+import { Globals } from '../../constants/globals';
 
 const AIOnboarding = () => {
   const [step, setStep] = useState(0);
@@ -90,17 +91,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontFamily: Globals.fonts.weights.bold,
+    fontSize: Globals.fonts.sizes.header1,
     marginBottom: 40,
     textAlign: 'center',
+    color: Globals.colors.textDark,
   },
   question: {
-    fontSize: 18,
+    fontFamily: Globals.fonts.weights.regular,
+    fontSize: Globals.fonts.sizes.header3,
     textAlign: 'center',
     marginBottom: 40,
     paddingHorizontal: 20,
     lineHeight: 24,
+    color: Globals.colors.textDark,
   },
   buttonContainer: {
     width: '100%',
@@ -114,9 +118,11 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 8,
     padding: 12,
-    fontSize: 16,
+    fontFamily: Globals.fonts.weights.regular,
+    fontSize: Globals.fonts.sizes.body,
     textAlignVertical: 'top',
     backgroundColor: '#fff',
+    color: Globals.colors.textDark,
   },
 });
 

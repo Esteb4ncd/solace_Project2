@@ -11,6 +11,7 @@
     "lint": "expo lint"
   },
   "dependencies": {
+    "@expo-google-fonts/poppins": "^0.4.1",
     "@expo/vector-icons": "^15.0.2",
     "@react-native-aria/button": "^0.2.10",
     "@react-native-aria/checkbox": "^0.2.10",
