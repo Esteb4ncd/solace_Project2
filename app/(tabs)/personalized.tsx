@@ -43,12 +43,12 @@ export default function PersonalizedScreen() {
       {/* Start Button */}
       <View style={styles.buttonContainer}>
         <LargeButton label="Start" onPress={handleStartPress} />
-      </View>
-      
       {/* Skip Link */}
       <Pressable onPress={handleSkipPress} style={styles.skipContainer}>
         <ThemedText style={styles.skipText}>Skip for now</ThemedText>
       </Pressable>
+      </View>
+      
     </ThemedView>
   );
 }
@@ -96,7 +96,9 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   buttonContainer: {
-    marginBottom: 20,
+    position: 'absolute',
+    bottom: 20,
+
   },
   skipContainer: {
     paddingVertical: 10,
