@@ -16,6 +16,7 @@ function LoginSignInPage() {
     password: "",
     terms: false,
   });
+  const [isLogin, setIsLogin] = useState(false);
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -26,12 +27,8 @@ function LoginSignInPage() {
     console.log("Form submitted:", form);
   };
 
-  return (
-    <View style={styles.container}>
-      <Image
-        source={require("../../assets/images/logo_text.png")}
-        style={styles.logo}
-      />
+  function signInForm() {
+    return (
       <View style={styles.form}>
         <View style={styles.inputContainer}>
           <TextInput
@@ -72,24 +69,78 @@ function LoginSignInPage() {
             {form.terms && <Text style={styles.checkmark}>✓</Text>}
           </View>
           <Text style={styles.checkboxLabel}>
-            I agree to the Terms and Conditions
+            I agree to the
           </Text>
+          <Text style={styles.loginLink}>Terms and Conditions</Text>
         </Pressable>
 
-        <LargeButton label="Create the account" onPress={handleSubmit} />
-      </View>
+        <View style={styles.button}>
+          <LargeButton label="Create the account" onPress={handleSubmit} />
+        </View>
 
-      <View style={styles.loginLinkContainer}>
-        <Text style={styles.loginText}>
-          Already have an account?{" "}
-          <Text
-            style={styles.loginLink}
-            onPress={() => console.log("Navigate to login")}
-          >
-            Login
+        <View style={styles.loginLinkContainer}>
+          <Text style={styles.loginText}>
+            Already have an account?{" "}
+            <Text style={styles.loginLink} onPress={() => setIsLogin(true)}>
+              Login
+            </Text>
           </Text>
-        </Text>
+        </View>
       </View>
+    );
+  }
+
+  function logInForm() {
+    return (
+      <View style={styles.form}>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            value={form.email}
+            onChangeText={(value) => handleChange("email", value)}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            placeholder="Email or Username"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            value={form.password}
+            onChangeText={(value) => handleChange("password", value)}
+            secureTextEntry
+            placeholder="Password"
+          />
+        </View>
+
+        <Text>
+          Forgot your password?{" "}
+        </Text>
+
+        <View style={styles.button}>
+          <LargeButton label="Login" onPress={handleSubmit} />
+        </View>
+
+        <View style={styles.loginLinkContainer}>
+          <Text style={styles.loginText}>
+            Don't have an account?{" "}
+            <Text style={styles.loginLink} onPress={() => setIsLogin(false)}>
+              Register Now!
+            </Text>
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <Image
+        source={require("../../assets/images/logo_text.png")}
+        style={styles.logo}
+      />
+      {isLogin ? logInForm() : signInForm()}
     </View>
   );
 }
@@ -110,8 +161,8 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   form: {
+    marginTop: 20,
     flex: 1,
-
   },
   inputContainer: {
     marginBottom: 10,
@@ -128,7 +179,6 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 70,
   },
   checkbox: {
     width: 20,
@@ -152,20 +202,24 @@ const styles = StyleSheet.create({
   checkboxLabel: {
     fontSize: 14,
     color: "#333",
-    flex: 1,
+    marginRight: 5,
   },
   loginLinkContainer: {
     alignItems: "center",
     paddingTop: 20,
   },
   loginText: {
+    fontWeight: "bold", 
     fontSize: 16,
-    color: "#333",
+    
   },
   loginLink: {
     color: "purple",
     fontWeight: "600",
     textDecorationLine: "underline",
+  },
+  button: {
+    marginTop: 70,
   },
 });
 
