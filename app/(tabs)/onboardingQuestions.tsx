@@ -4,46 +4,26 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
-import InteractiveSection from '../../components/ui/InteractiveSection';
+import InteractiveSection, { questions } from '../../components/ui/InteractiveSection';
 import OnboardingMascot from '../../components/ui/OnboardingMascot';
 import { Globals } from '../../constants/globals';
-
-const questions = [
-  {
-    title: "What iron work tasks do you typically do?",
-    options: [
-      "Heavy lifting",
-      "Overhead work", 
-      "Repetitive tool use",
-      "Kneeling"
-    ]
-  },
-  {
-    title: "Where do you usually feel pain or discomfort?",
-    options: [
-      "Left shoulder",
-      "Right Shoulder",
-      "Right Knee",
-      "Central lower back"
-    ]
-  }
-];
 
 export default function OnboardingQuestionsScreen() {
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [textInput, setTextInput] = useState('');
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const { next } = useLocalSearchParams();
+  const { next, findingIndex } = useLocalSearchParams();
 
   useEffect(() => {
-    // If coming from confirmation page, advance to next question
-    if (next === 'true') {
-      setCurrentQuestionIndex(1);
+    // If coming from confirmation page, advance to next finding
+    if (next === 'true' && findingIndex) {
+      const nextIndex = parseInt(findingIndex as string);
+      setCurrentQuestionIndex(nextIndex);
       setSelectedTasks([]);
       setTextInput('');
     }
-  }, [next]);
+  }, [next, findingIndex]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -68,8 +48,8 @@ export default function OnboardingQuestionsScreen() {
   };
 
   const handleVoiceInput = () => {
-    // Navigate to confirmation page
-    router.push('/(tabs)/confirmation');
+    // Navigate to confirmation page with current finding index
+    router.push(`/(tabs)/confirmation?findingIndex=${currentQuestionIndex}`);
   };
 
   const handleNextQuestion = () => {

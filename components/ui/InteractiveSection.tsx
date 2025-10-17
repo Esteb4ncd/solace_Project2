@@ -16,8 +16,8 @@ interface InteractiveSectionProps {
   };
 }
 
-const questions = {
-  question1: {
+export const questions = [
+  {
     title: "What iron work tasks do you typically do?",
     options: [
       "Heavy lifting",
@@ -26,7 +26,7 @@ const questions = {
       "Kneeling"
     ]
   },
-  question2: {
+  {
     title: "Where do you usually feel pain or discomfort?",
     options: [
       "Left shoulder",
@@ -35,7 +35,7 @@ const questions = {
       "Central lower back"
     ]
   }
-};
+];
 
 const InteractiveSection: React.FC<InteractiveSectionProps> = ({
   selectedTasks,

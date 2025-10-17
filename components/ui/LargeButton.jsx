@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     paddingRight: 63.059,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: 24,
   },
   text: {
     ...Globals.fonts.styles.header2Bold,
