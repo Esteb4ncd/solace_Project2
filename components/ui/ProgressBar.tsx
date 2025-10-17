@@ -138,17 +138,17 @@ const styles = StyleSheet.create({
   },
   // XP bar styles
   xpContainer: {
-    width: 366, // 50px circle + 316px bar = 366px total
-    height: 50, // Height of the level circle
+    width: 375, // 59px circle + 316px bar = 375px total
+    height: 59, // Height of the level circle
     flexDirection: 'row',
     alignItems: 'center',
     position: 'relative',
   },
   xpLevelCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#8B5CF6', // Dark purple
+    width: 59,
+    height: 59,
+    borderRadius: 29.5,
+    backgroundColor: '#332E62', // Updated color
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
@@ -166,8 +166,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#9CA3AF', // Medium gray
     borderRadius: 13,
     position: 'absolute',
-    left: 25, // Half overlap with circle (50/2 = 25)
-    top: 12, // Center vertically (50-26)/2 = 12
+    left: 29.5, // Half overlap with circle (59/2 = 29.5)
+    top: 16.5, // Center vertically (59-26)/2 = 16.5
     overflow: 'hidden',
   },
   xpProgressFill: {
