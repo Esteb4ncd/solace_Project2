@@ -1,18 +1,44 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import LargeButton from '../../components/ui/LargeButton';
 import OnboardingMascot from '../../components/ui/OnboardingMascot';
 import TextInputWithVoice from '../../components/ui/TextInputWithVoice';
 import { Globals } from '../../constants/globals';
 
+const confirmations = [
+  {
+    thanksText: "Thanks for sharing!",
+    subText: "Just to make sure I got it right.",
+    mainFinding: "Your tasks involve heavy lifting and overhead work.",
+    nextFindingIndex: 1,
+    buttonText: "Yes"
+  },
+  {
+    thanksText: "",
+    subText: "",
+    mainFinding: "Your exercises will target your left shoulder and right knee.\n\nYour exercises will help you with heavy lifting and overhead work.",
+    nextFindingIndex: null, // End of findings
+    buttonText: "Yes, Finish"
+  }
+];
+
 export default function ConfirmationScreen() {
+  const { findingIndex } = useLocalSearchParams();
+  const confirmationIndex = findingIndex ? parseInt(findingIndex as string) : 0;
+  const currentConfirmation = confirmations[confirmationIndex];
+
   const handleYesPress = () => {
-    // Navigate back to onboardingQuestions with question 2
-    // We'll use a query parameter to indicate we should show the next question
-    router.push('/(tabs)/onboardingQuestions?next=true');
+    if (currentConfirmation.nextFindingIndex !== null) {
+      // Navigate back to onboardingQuestions with the next finding
+      router.push(`/(tabs)/onboardingQuestions?next=true&findingIndex=${currentConfirmation.nextFindingIndex}`);
+    } else {
+      // End of findings - navigate to homepage
+      router.push('/(tabs)/homePage');
+    }
   };
 
   const handleBackPress = () => {
@@ -39,25 +65,34 @@ export default function ConfirmationScreen() {
       {/* Confirmation Text */}
       <View style={styles.textContainer}>
         <ThemedText style={styles.thanksText}>
-          Thanks for sharing!
+          {currentConfirmation.thanksText}
         </ThemedText>
         <ThemedText style={styles.subText}>
-          Just to make sure I got it right.
+          {currentConfirmation.subText}
         </ThemedText>
       </View>
 
-      {/* Main Question */}
-      <View style={styles.questionContainer}>
-        <ThemedText style={styles.mainQuestion}>
-          Your tasks involve heavy lifting and overhead work.
-        </ThemedText>
+      {/* Main Finding */}
+      <View style={styles.findingContainer}>
+        {confirmationIndex === 1 ? (
+          <ThemedText style={styles.mainFindingRegular}>
+            Your exercises will target your <ThemedText style={styles.boldText}>left shoulder and right knee</ThemedText>.
+            {'\n\n'}
+            Your exercises will help you with <ThemedText style={styles.boldText}>heavy lifting and overhead work</ThemedText>.
+          </ThemedText>
+        ) : (
+          <ThemedText style={styles.mainFinding}>
+            {currentConfirmation.mainFinding}
+          </ThemedText>
+        )}
       </View>
 
       {/* Yes Button */}
       <View style={styles.buttonContainer}>
-        <Pressable style={styles.yesButton} onPress={handleYesPress}>
-          <ThemedText style={styles.yesButtonText}>Yes</ThemedText>
-        </Pressable>
+        <LargeButton 
+          label={currentConfirmation.buttonText} 
+          onPress={handleYesPress} 
+        />
       </View>
 
       {/* Text Input Section */}
@@ -79,6 +114,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
+    width: 393,
+    alignSelf: 'center',
   },
   backButton: {
     position: 'absolute',
@@ -103,29 +140,32 @@ const styles = StyleSheet.create({
     ...Globals.fonts.styles.body,
     textAlign: 'center',
   },
-  questionContainer: {
+  findingContainer: {
     alignItems: 'center',
     marginBottom: 40,
     paddingHorizontal: 20,
   },
-  mainQuestion: {
+  mainFinding: {
     ...Globals.fonts.styles.header2Bold,
     textAlign: 'center',
   },
+  mainFindingRegular: {
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 20,
+    color: '#000000',
+    textAlign: 'center',
+  },
+  boldText: {
+    fontFamily: 'Poppins_700Bold',
+    fontSize: 20,
+    color: '#000000',
+  },
   buttonContainer: {
-    marginBottom: 40,
-  },
-  yesButton: {
-    backgroundColor: Globals.colors.accentNormal,
-    borderRadius: 24,
-    paddingHorizontal: 40,
-    paddingVertical: 12,
+    position: 'absolute',
+    bottom: 129, // 40px (inputSection bottom) + 60px (button height) + 24px (gap) + 5px (extra spacing)
+    left: 20,
+    right: 20,
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  yesButtonText: {
-    ...Globals.fonts.styles.header2Bold,
-    color: Globals.colors.black,
   },
   inputSection: {
     position: 'absolute',

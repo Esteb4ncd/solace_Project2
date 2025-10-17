@@ -20,6 +20,8 @@ const CustomHeader = () => {
     { name: 'index', title: 'Home', icon: 'home' },
     { name: 'startQuestions', title: 'Start Questions', icon: 'person' },
     { name: 'onboardingQuestions', title: 'Questions', icon: 'help-circle' },
+    { name: 'confirmation', title: 'Confirmation', icon: 'checkmark-circle' },
+    { name: 'homePage', title: 'Home Page', icon: 'home-outline' },
     { name: 'ai_onboarding', title: 'AI Onboarding', icon: 'chatbubbles' },
   ];
 
