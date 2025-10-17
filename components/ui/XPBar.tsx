@@ -39,7 +39,7 @@ const XPBar = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: 375, // 59px circle + 316px bar = 375px total
+    width: 361, // 393px total - 32px margins (16px each side) = 361px
     height: 59, // Height of the level circle
     flexDirection: 'row',
     alignItems: 'center',
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   progressBar: {
-    width: 316,
+    width: 302, // 361px container - 59px circle = 302px
     height: 26,
     backgroundColor: '#9CA3AF', // Medium gray
     borderRadius: 13,
