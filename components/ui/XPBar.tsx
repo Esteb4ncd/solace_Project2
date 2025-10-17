@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     zIndex: 2, // Above the progress bar
   },
   levelText: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#fff',
   },
