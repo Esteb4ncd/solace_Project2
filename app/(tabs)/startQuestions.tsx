@@ -4,14 +4,8 @@ import { router } from 'expo-router';
 import React from 'react';
 import { Alert, Platform, Pressable, StyleSheet, View } from 'react-native';
 import LargeButton from '../../components/ui/LargeButton';
+import OnboardingMascot from '../../components/ui/OnboardingMascot';
 import { Globals } from '../../constants/globals';
-
-// Character placeholder for future SVG
-const CharacterPlaceholder = () => (
-  <View style={styles.characterPlaceholder}>
-    {/* SVG character will be added here later */}
-  </View>
-);
 
 export default function StartQuestionsScreen() {
   const handleStartPress = () => {
@@ -25,7 +19,7 @@ export default function StartQuestionsScreen() {
   return (
     <ThemedView style={styles.container}>
       {/* Character Placeholder */}
-      <CharacterPlaceholder />
+      <OnboardingMascot />
       
       {/* Main heading */}
       <ThemedText type="title" style={styles.mainHeading}>
@@ -69,17 +63,6 @@ const styles = StyleSheet.create({
       marginHorizontal: 'auto',
 
     }),
-  },
-  characterPlaceholder: {
-    width: 190,
-    height: 250,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#ddd',
-    borderStyle: 'dashed',
   },
   mainHeading: {
     ...Globals.fonts.styles.header1,
