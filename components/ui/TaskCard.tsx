@@ -1,6 +1,6 @@
+import { colors } from '@/constants/styles';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { colors } from '@/constants/styles';
 
 type TaskCardProps = {
   title: string;
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     width: 360,
     height: 72,
     borderWidth: 1,
-    borderColor: colors.accent.purple,
+    borderColor: '#9CA3AF', // Grey border
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
