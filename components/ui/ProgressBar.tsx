@@ -138,11 +138,11 @@ const styles = StyleSheet.create({
   },
   // XP bar styles
   xpContainer: {
-    width: 260,
-    height: 59,
+    width: 366, // 50px circle + 316px bar = 366px total
+    height: 50, // Height of the level circle
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    position: 'relative',
   },
   xpLevelCircle: {
     width: 50,
@@ -151,7 +151,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#8B5CF6', // Dark purple
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    position: 'absolute',
+    left: 0,
+    zIndex: 2, // Above the progress bar
   },
   xpLevelText: {
     fontSize: 20,
@@ -159,17 +161,19 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   xpProgressBar: {
-    flex: 1,
-    height: 20,
+    width: 316,
+    height: 26,
     backgroundColor: '#9CA3AF', // Medium gray
-    borderRadius: 10,
-    position: 'relative',
+    borderRadius: 13,
+    position: 'absolute',
+    left: 25, // Half overlap with circle (50/2 = 25)
+    top: 12, // Center vertically (50-26)/2 = 12
     overflow: 'hidden',
   },
   xpProgressFill: {
     height: '100%',
     backgroundColor: '#6B7280', // Darker gray
-    borderRadius: 10,
+    borderRadius: 13,
   },
   xpTextContainer: {
     position: 'absolute',
@@ -179,6 +183,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 1,
   },
   xpProgressText: {
     fontSize: 14,
