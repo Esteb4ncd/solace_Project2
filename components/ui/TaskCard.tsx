@@ -60,8 +60,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
   },
   title: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: 20,
+    fontWeight: 'bold',
+    fontFamily: 'Poppins',
     color: '#000',
     flex: 1,
   },
@@ -70,8 +71,9 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   xpText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: 'bold',
+    fontFamily: 'Poppins',
   },
 });
 
