@@ -6,7 +6,7 @@ type ProgressBarProps = {
   totalProgress?: number;
   level?: number;
   showLevelCircle?: boolean;
-  isHealthBar?: boolean;
+  isXpBar?: boolean;
 };
 
 const ProgressBar = ({ 
@@ -14,24 +14,30 @@ const ProgressBar = ({
   totalProgress = 50, 
   level = 1,
   showLevelCircle = true,
-  isHealthBar = false
+  isXpBar = false
 }: ProgressBarProps) => {
   const progressPercentage = Math.min((currentProgress / totalProgress) * 100, 100);
 
-  if (isHealthBar) {
+  if (isXpBar) {
     return (
-      <View style={styles.healthContainer}>
-        <View style={styles.healthBar}>
+      <View style={styles.xpContainer}>
+        <View style={styles.xpLevelCircle}>
+          <Text style={styles.xpLevelText}>{level}</Text>
+        </View>
+        
+        <View style={styles.xpProgressBar}>
           <View 
             style={[
-              styles.healthFill, 
+              styles.xpProgressFill, 
               { width: `${progressPercentage}%` }
             ]} 
           />
+          <View style={styles.xpTextContainer}>
+            <Text style={styles.xpProgressText}>
+              {currentProgress}/{totalProgress}
+            </Text>
+          </View>
         </View>
-        <Text style={styles.healthText}>
-          Health: {Math.round(progressPercentage)}%
-        </Text>
       </View>
     );
   }
@@ -129,6 +135,55 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#000000',
+  },
+  // XP bar styles
+  xpContainer: {
+    width: 260,
+    height: 59,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+  xpLevelCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#8B5CF6', // Dark purple
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  xpLevelText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  xpProgressBar: {
+    flex: 1,
+    height: 20,
+    backgroundColor: '#9CA3AF', // Medium gray
+    borderRadius: 10,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  xpProgressFill: {
+    height: '100%',
+    backgroundColor: '#6B7280', // Darker gray
+    borderRadius: 10,
+  },
+  xpTextContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  xpProgressText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#fff',
   },
 });
 
