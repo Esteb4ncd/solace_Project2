@@ -1,10 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 type NavItem = {
   id: string;
   label: string;
-  icon: string;
+  iconSource: any;
   isActive?: boolean;
 };
 
@@ -15,10 +15,10 @@ type BottomNavigationProps = {
 
 const BottomNavigation = ({ 
   items = [
-    { id: 'home', label: 'Home', icon: '🏠', isActive: true },
-    { id: 'physical', label: 'Physical', icon: '💪', isActive: false },
-    { id: 'mental', label: 'Mental', icon: '🧠', isActive: false },
-    { id: 'account', label: 'Account', icon: '👤', isActive: false },
+    { id: 'home', label: 'Home', iconSource: require('@/assets/navbarSvgs/Home-Icon.png'), isActive: true },
+    { id: 'physical', label: 'Physical', iconSource: require('@/assets/navbarSvgs/Physical-Icon.png'), isActive: false },
+    { id: 'mental', label: 'Mental', iconSource: require('@/assets/navbarSvgs/Mental-Icon.png'), isActive: false },
+    { id: 'account', label: 'Account', iconSource: require('@/assets/navbarSvgs/Account-Icon.png'), isActive: false },
   ],
   onItemPress
 }: BottomNavigationProps) => {
@@ -31,7 +31,7 @@ const BottomNavigation = ({
           onPress={() => onItemPress?.(item.id)}
           activeOpacity={0.7}
         >
-          <Text style={styles.icon}>{item.icon}</Text>
+          <Image source={item.iconSource} style={styles.icon} />
           <Text style={styles.label}>{item.label}</Text>
         </TouchableOpacity>
       ))}
@@ -54,8 +54,10 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   icon: {
-    fontSize: 20,
+    width: 24,
+    height: 24,
     marginBottom: 4,
+    tintColor: '#fff',
   },
   label: {
     fontSize: 12,
