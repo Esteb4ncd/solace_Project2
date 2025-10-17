@@ -20,11 +20,13 @@ const Header = ({
     <View style={styles.container}>
       {/* Streak Section */}
       <View style={styles.streakSection}>
-        <Image 
-          source={require('@/assets/hompageAssets/lightning_fill.png')} 
-          style={styles.lightningIcon}
-        />
-        <Text style={styles.streakNumber}>{streakCount}</Text>
+        <View style={styles.streakIconContainer}>
+          <Image 
+            source={require('@/assets/hompageAssets/lightning_fill.png')} 
+            style={styles.lightningIcon}
+          />
+          <Text style={styles.streakNumber}>{streakCount}</Text>
+        </View>
         <Text style={styles.streakLabel}>Streak</Text>
       </View>
 
@@ -65,24 +67,29 @@ const styles = StyleSheet.create({
   streakSection: {
     alignItems: 'center',
     flex: 1,
-    flexDirection: 'row',
     justifyContent: 'center',
   },
+  streakIconContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
   lightningIcon: {
-    width: 28,
-    height: 22,
+    width: 40,
+    height: 40,
     marginRight: 4,
   },
   streakNumber: {
     fontSize: 14,
     fontWeight: 'bold',
     color: '#000',
-    marginRight: 4,
   },
   streakLabel: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#000',
+    textAlign: 'center',
   },
   userSection: {
     flex: 2,
