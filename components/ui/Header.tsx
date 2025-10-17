@@ -76,8 +76,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   lightningIcon: {
-    width: 40,
-    height: 40,
+    width: 32,
+    height: 32,
     marginRight: 4,
   },
   streakNumber: {
