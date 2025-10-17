@@ -1,17 +1,49 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import InteractiveSection from '../../components/ui/InteractiveSection';
 import OnboardingMascot from '../../components/ui/OnboardingMascot';
 import { Globals } from '../../constants/globals';
+
+const questions = [
+  {
+    title: "What iron work tasks do you typically do?",
+    options: [
+      "Heavy lifting",
+      "Overhead work", 
+      "Repetitive tool use",
+      "Kneeling"
+    ]
+  },
+  {
+    title: "Where do you usually feel pain or discomfort?",
+    options: [
+      "Left shoulder",
+      "Right Shoulder",
+      "Right Knee",
+      "Central lower back"
+    ]
+  }
+];
 
 export default function OnboardingQuestionsScreen() {
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [textInput, setTextInput] = useState('');
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const { next } = useLocalSearchParams();
+
+  useEffect(() => {
+    // If coming from confirmation page, advance to next question
+    if (next === 'true') {
+      setCurrentQuestionIndex(1);
+      setSelectedTasks([]);
+      setTextInput('');
+    }
+  }, [next]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -36,7 +68,16 @@ export default function OnboardingQuestionsScreen() {
   };
 
   const handleVoiceInput = () => {
-    Alert.alert('Voice Input', 'Voice input functionality would be implemented here');
+    // Navigate to confirmation page
+    router.push('/(tabs)/confirmation');
+  };
+
+  const handleNextQuestion = () => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setSelectedTasks([]);
+      setTextInput('');
+    }
   };
 
   const handleBackPress = () => {
@@ -46,6 +87,8 @@ export default function OnboardingQuestionsScreen() {
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
+
+  const currentQuestion = questions[currentQuestionIndex];
 
   return (
     <ThemedView style={styles.container}>
@@ -69,7 +112,7 @@ export default function OnboardingQuestionsScreen() {
           
           {/* Main Question */}
           <ThemedText style={styles.question}>
-            What iron work tasks do you typically do?
+            {currentQuestion.title}
           </ThemedText>
         </View>
           
@@ -84,6 +127,8 @@ export default function OnboardingQuestionsScreen() {
             onTaskToggle={handleTaskToggle}
             onTextChange={setTextInput}
             onVoiceInput={handleVoiceInput}
+            isKeyboardVisible={isKeyboardVisible}
+            currentQuestion={currentQuestion}
           />
         </View>
         </KeyboardAvoidingView>

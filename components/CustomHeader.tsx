@@ -13,7 +13,7 @@ const CustomHeader = () => {
 
   const navigateToScreen = (screenName: string) => {
     setIsMenuVisible(false);
-    router.push(`/(tabs)/${screenName}`);
+    router.push(`/(tabs)/${screenName}` as any);
   };
 
   const menuItems = [

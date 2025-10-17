@@ -7,7 +7,7 @@ import LargeButton from '../../components/ui/LargeButton';
 
 
 import React from 'react';
-import MyCheckbox from '../../components/ui/MyCheckbox';
+
 
 export default function HomeScreen() {
   // define the function
@@ -21,9 +21,7 @@ export default function HomeScreen() {
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Welcome!</ThemedText>
           <HelloWave />
-          <MyCheckbox label="Option 1" />
-          <MyCheckbox label="Option 2" />
-          <MyCheckbox label="Option 3" />
+
         </ThemedView>
 
         <LargeButton label="Next" onPress={handlePress} />

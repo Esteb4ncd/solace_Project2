@@ -26,15 +26,15 @@ const styles = StyleSheet.create({
   chip: {
     backgroundColor: '#fff',
     borderWidth: 2,
-    borderColor: '#ddd',
-    borderStyle: 'dashed',
+    borderColor: Globals.colors.black,
+    borderStyle: 'dotted',
     borderRadius: 25,
     paddingHorizontal: 20,
     height: 34,
     alignItems: 'center',
     justifyContent: 'center',
     margin: 8,
-  },
+  }, 
   chipSelected: {
     backgroundColor: '#fff',
     borderColor: '#000',
