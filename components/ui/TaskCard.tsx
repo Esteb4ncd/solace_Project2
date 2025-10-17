@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { colors } from '@/constants/styles';
 
 type TaskCardProps = {
   title: string;
@@ -12,7 +13,7 @@ type TaskCardProps = {
 const TaskCard = ({ 
   title, 
   xpAmount, 
-  xpColor = '#8B5CF6',
+  xpColor = colors.accent.purple,
   isCompleted = false,
   onPress 
 }: TaskCardProps) => {
