@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 
 interface OnboardingMascotProps {
   isKeyboardVisible?: boolean;
@@ -11,7 +11,11 @@ const OnboardingMascot: React.FC<OnboardingMascotProps> = ({ isKeyboardVisible =
       styles.mascot,
       isKeyboardVisible && styles.mascotKeyboardVisible
     ]}>
-      {/* SVG character will be added here later */}
+      <Image 
+        source={require('../../assets/onboarding/mascotOnboarding.png')}
+        style={styles.image}
+        resizeMode="contain"
+      />
     </View>
   );
 };
@@ -20,19 +24,16 @@ const styles = StyleSheet.create({
   mascot: {
     width: 190,
     height: 250,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    marginBottom: 30,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#ddd',
-    borderStyle: 'dashed',
   },
   mascotKeyboardVisible: {
     width: 80,
     height: 80,
-    marginBottom: 20,
+  },
+  image: {
+    width: '100%',
+    height: '100%',
   },
 });
 
