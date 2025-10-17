@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
 
 type HeaderProps = {
   userName?: string;
@@ -20,9 +20,10 @@ const Header = ({
     <View style={styles.container}>
       {/* Streak Section */}
       <View style={styles.streakSection}>
-        <View style={styles.lightningIcon}>
-          <Text style={styles.lightningText}>⚡</Text>
-        </View>
+        <Image 
+          source={require('@/assets/hompageAssets/lightning_fill.png')} 
+          style={styles.lightningIcon}
+        />
         <Text style={styles.streakNumber}>{streakCount}</Text>
         <Text style={styles.streakLabel}>Streak</Text>
       </View>
@@ -32,7 +33,10 @@ const Header = ({
         <Text style={styles.userName}>{userName}</Text>
         {showEditIcon && (
           <TouchableOpacity onPress={onEditPress} style={styles.editButton}>
-            <Text style={styles.editIcon}>✏️</Text>
+            <Image 
+              source={require('@/assets/hompageAssets/Edit-Name.png')} 
+              style={styles.editIcon}
+            />
           </TouchableOpacity>
         )}
       </View>
@@ -40,12 +44,10 @@ const Header = ({
       {/* Achievement Icon */}
       {showAchievementIcon && (
         <View style={styles.achievementSection}>
-          <View style={styles.achievementIcon}>
-            <Text style={styles.achievementEmoji}>😊</Text>
-            <View style={styles.starIcon}>
-              <Text style={styles.starText}>⭐</Text>
-            </View>
-          </View>
+          <Image 
+            source={require('@/assets/hompageAssets/Ai Assistant.png')} 
+            style={styles.achievementIcon}
+          />
         </View>
       )}
     </View>
@@ -67,11 +69,6 @@ const styles = StyleSheet.create({
   lightningIcon: {
     width: 24,
     height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  lightningText: {
-    fontSize: 16,
   },
   streakNumber: {
     fontSize: 16,
@@ -98,8 +95,8 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   editIcon: {
-    fontSize: 16,
-    color: '#8B5CF6',
+    width: 16,
+    height: 16,
   },
   achievementSection: {
     flex: 1,
@@ -108,28 +105,6 @@ const styles = StyleSheet.create({
   achievementIcon: {
     width: 40,
     height: 40,
-    backgroundColor: '#8B5CF6',
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  achievementEmoji: {
-    fontSize: 20,
-  },
-  starIcon: {
-    position: 'absolute',
-    top: -2,
-    right: -2,
-    width: 16,
-    height: 16,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  starText: {
-    fontSize: 10,
   },
 });
 

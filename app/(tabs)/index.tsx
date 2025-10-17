@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet, Alert } from 'react-native';
+import { Alert, Platform, StyleSheet } from 'react-native';
 
 import { HelloWave } from '@/components/hello-wave';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
@@ -37,6 +37,12 @@ export default function HomeScreen() {
       </ThemedView>
 
       <LargeButton label="Next" onPress={handlePress} />
+
+      <ThemedView style={styles.stepContainer}>
+        <Link href="/homePage">
+          <ThemedText type="subtitle">View New Home Page</ThemedText>
+        </Link>
+      </ThemedView>
 
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
