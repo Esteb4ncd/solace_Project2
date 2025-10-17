@@ -73,7 +73,7 @@ export default function ConfirmationScreen() {
       </View>
 
       {/* Main Finding */}
-      <View style={styles.findingContainer}>
+      <View style={confirmationIndex === 1 ? styles.findingContainerSecond : styles.findingContainer}>
         {confirmationIndex === 1 ? (
           <ThemedText style={styles.mainFindingRegular}>
             Your exercises will target your <ThemedText style={styles.boldText}>left shoulder and right knee</ThemedText>.
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   mascotContainer: {
-    marginBottom: 30,
+    marginBottom: 5,
   },
   textContainer: {
     alignItems: 'center',
@@ -142,6 +142,12 @@ const styles = StyleSheet.create({
   },
   findingContainer: {
     alignItems: 'center',
+    marginBottom: 40,
+    paddingHorizontal: 20,
+  },
+  findingContainerSecond: {
+    alignItems: 'center',
+    marginTop: -80,
     marginBottom: 40,
     paddingHorizontal: 20,
   },
