@@ -117,8 +117,8 @@ const styles = StyleSheet.create({
     paddingVertical: 32, // 32px margin from element above
   },
   avatar: {
-    width: 120,
-    height: 120,
+    width: 150,
+    height: 150,
     resizeMode: 'contain',
   },
   xpBarContainer: {
