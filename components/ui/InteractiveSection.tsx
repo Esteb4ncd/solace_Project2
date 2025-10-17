@@ -1,8 +1,7 @@
-import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { Globals } from '../../constants/globals';
+import { StyleSheet, View } from 'react-native';
 import AnswerChip from './AnswerChip';
+import TextInputWithVoice from './TextInputWithVoice';
 
 interface InteractiveSectionProps {
   selectedTasks: string[];
@@ -10,6 +9,11 @@ interface InteractiveSectionProps {
   onTaskToggle: (task: string) => void;
   onTextChange: (text: string) => void;
   onVoiceInput: () => void;
+  isKeyboardVisible: boolean;
+  currentQuestion: {
+    title: string;
+    options: string[];
+  };
 }
 
 const questions = {
@@ -39,9 +43,9 @@ const InteractiveSection: React.FC<InteractiveSectionProps> = ({
   onTaskToggle,
   onTextChange,
   onVoiceInput,
+  isKeyboardVisible,
+  currentQuestion,
 }) => {
-  // For now, display question 1
-  const currentQuestion = questions.question1;
   return (
     <View style={styles.interactiveSection}>
       {/* Task Selection Buttons */}
@@ -57,21 +61,16 @@ const InteractiveSection: React.FC<InteractiveSectionProps> = ({
       </View>
       
       {/* Text Input with Voice Button */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.textInput}
-          placeholder="Type or say something"
-          placeholderTextColor="#999"
-          value={textInput}
-          onChangeText={onTextChange}
-          multiline={false}
-          autoFocus={false}
-          blurOnSubmit={false}
-        />
-        <Pressable style={styles.voiceButton} onPress={onVoiceInput}>
-          <Ionicons name="mic" size={16} color="#000" />
-        </Pressable>
-      </View>
+      <TextInputWithVoice
+        placeholder="Type or click to say something..."
+        value={textInput}
+        onChangeText={onTextChange}
+        onVoicePress={onVoiceInput}
+        isKeyboardVisible={isKeyboardVisible}
+        multiline={false}
+        autoFocus={false}
+        blurOnSubmit={false}
+      />
     </View>
   );
 };
@@ -86,31 +85,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     marginBottom: 20,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    maxWidth: 350,
-    backgroundColor: '#f8f8f8',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  textInput: {
-    flex: 1,
-    ...Globals.fonts.styles.body,
-    color: '#000',
-    paddingVertical: 4,
-  },
-  voiceButton: {
-    backgroundColor: '#4CAF50',
-    borderRadius: 20,
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 12,
   },
 });
 

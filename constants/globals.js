@@ -3,8 +3,9 @@ export const Globals = {
     colors: {
       primaryButton: '#C2E273', // black
       secondaryButton: '#2196F3', // blue example
-      textLight: '#fff',
-      textDark: '#000000',
+      white: '#fff',
+      black: '#000000',
+      accentNormal: '#C2E273',
     },
     fonts: {
       family: 'Poppins_400Regular',
