@@ -51,11 +51,13 @@ const HomePage = () => {
             />
           </View>
 
-          <XPBar 
-            currentProgress={0}
-            totalProgress={50}
-            level={1}
-          />
+          <View style={styles.xpBarContainer}>
+            <XPBar 
+              currentProgress={0}
+              totalProgress={50}
+              level={1}
+            />
+          </View>
 
           {/* Daily Checklist Section */}
           <View style={styles.section}>
@@ -118,6 +120,10 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     resizeMode: 'contain',
+  },
+  xpBarContainer: {
+    alignItems: 'center',
+    paddingVertical: 16,
   },
   section: {
     paddingVertical: 16, // 16px margin from element above
