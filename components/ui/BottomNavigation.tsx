@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 type NavItem = {
   id: string;
@@ -20,7 +20,7 @@ const BottomNavigation = ({
     { id: 'mental', label: 'Mental', iconSource: require('@/assets/navbar_svgs/Mental-Icon.png'), isActive: false },
     { id: 'account', label: 'Account', iconSource: require('@/assets/navbar_svgs/Account-Icon.png'), isActive: false },
   ],
-  onItemPress 
+  onItemPress
 }: BottomNavigationProps) => {
   return (
     <View style={styles.container}>
