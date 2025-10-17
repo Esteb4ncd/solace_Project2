@@ -5,6 +5,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -27,6 +28,24 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
+    }
+    
+    // Add web-specific styles
+    if (Platform.OS === 'web') {
+      // Add viewport meta tag for mobile-like behavior
+      const viewport = document.querySelector('meta[name="viewport"]');
+      if (!viewport) {
+        const meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+        document.head.appendChild(meta);
+      }
+      
+      // Add CSS styles
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = '/web-styles.css';
+      document.head.appendChild(link);
     }
   }, [loaded]);
 

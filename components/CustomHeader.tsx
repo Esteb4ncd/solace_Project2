@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Globals } from '../constants/globals';
 
 const CustomHeader = () => {
@@ -18,7 +18,8 @@ const CustomHeader = () => {
 
   const menuItems = [
     { name: 'index', title: 'Home', icon: 'home' },
-    { name: 'personalized', title: 'Personalized', icon: 'person' },
+    { name: 'startQuestions', title: 'Start Questions', icon: 'person' },
+    { name: 'onboardingQuestions', title: 'Questions', icon: 'help-circle' },
     { name: 'ai_onboarding', title: 'AI Onboarding', icon: 'chatbubbles' },
   ];
 
@@ -68,9 +69,14 @@ const CustomHeader = () => {
 const styles = StyleSheet.create({
   floatingMenu: {
     position: 'absolute',
-    top: 50, // Adjust this value based on your status bar height
+    top: Platform.OS === 'web' ? 20 : 50, // Closer to top on web
     right: 20,
     zIndex: 1000,
+    // Ensure proper positioning on web
+    ...(Platform.OS === 'web' && {
+      maxWidth: 393,
+      right: 'calc(50% - 196.5px + 20px)', // Center relative to iPhone 16 width
+    }),
   },
   menuButton: {
     padding: 8,
