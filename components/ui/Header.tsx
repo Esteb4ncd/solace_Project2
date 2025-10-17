@@ -64,14 +64,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   streakSection: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     flex: 1,
     justifyContent: 'center',
   },
   streakIconContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     marginBottom: 4,
   },
   lightningIcon: {
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: '#000',
-    textAlign: 'center',
+    textAlign: 'left',
   },
   userSection: {
     flex: 2,
