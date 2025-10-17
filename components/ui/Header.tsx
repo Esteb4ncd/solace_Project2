@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 type HeaderProps = {
   userName?: string;
@@ -65,18 +65,23 @@ const styles = StyleSheet.create({
   streakSection: {
     alignItems: 'center',
     flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   lightningIcon: {
-    width: 24,
-    height: 24,
+    width: 28,
+    height: 22,
+    marginRight: 4,
   },
   streakNumber: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#000',
+    marginRight: 4,
   },
   streakLabel: {
-    fontSize: 12,
+    fontSize: 14,
+    fontWeight: 'bold',
     color: '#000',
   },
   userSection: {

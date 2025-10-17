@@ -6,15 +6,35 @@ type ProgressBarProps = {
   totalProgress?: number;
   level?: number;
   showLevelCircle?: boolean;
+  isHealthBar?: boolean;
 };
 
 const ProgressBar = ({ 
   currentProgress = 0, 
   totalProgress = 50, 
   level = 1,
-  showLevelCircle = true 
+  showLevelCircle = true,
+  isHealthBar = false
 }: ProgressBarProps) => {
   const progressPercentage = Math.min((currentProgress / totalProgress) * 100, 100);
+
+  if (isHealthBar) {
+    return (
+      <View style={styles.healthContainer}>
+        <View style={styles.healthBar}>
+          <View 
+            style={[
+              styles.healthFill, 
+              { width: `${progressPercentage}%` }
+            ]} 
+          />
+        </View>
+        <Text style={styles.healthText}>
+          Health: {Math.round(progressPercentage)}%
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -70,22 +90,45 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     flex: 1,
-    height: 20,
-    backgroundColor: '#E5E7EB',
-    borderRadius: 10,
+    height: 8,
+    backgroundColor: '#C5C5C5',
+    borderRadius: 4,
     marginRight: 12,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#8B5CF6',
-    borderRadius: 10,
+    backgroundColor: '#7267D9',
+    borderRadius: 4,
   },
   progressText: {
     fontSize: 16,
     fontWeight: '600',
     color: '#000',
     minWidth: 60,
+  },
+  // Health bar styles
+  healthContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  healthBar: {
+    width: 352,
+    height: 42,
+    backgroundColor: '#DEDFDF',
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  healthFill: {
+    height: '100%',
+    backgroundColor: '#1BAA55',
+    borderRadius: 8,
+  },
+  healthText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000000',
   },
 });
 

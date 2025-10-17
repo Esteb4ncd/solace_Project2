@@ -1,5 +1,6 @@
+import { colors } from '@/constants/styles';
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 type NavItem = {
   id: string;
@@ -31,8 +32,13 @@ const BottomNavigation = ({
           onPress={() => onItemPress?.(item.id)}
           activeOpacity={0.7}
         >
-          <Image source={item.iconSource} style={styles.icon} />
-          <Text style={styles.label}>{item.label}</Text>
+          <Image 
+            source={item.iconSource} 
+            style={[
+              styles.icon,
+              item.id === 'physical' && styles.physicalIcon
+            ]} 
+          />
         </TouchableOpacity>
       ))}
     </View>
@@ -42,9 +48,9 @@ const BottomNavigation = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#8B5CF6',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
+    backgroundColor: colors.primary,
+    width: 394,
+    height: 67,
     justifyContent: 'space-around',
     alignItems: 'center',
   },
@@ -54,15 +60,14 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   icon: {
-    width: 24,
-    height: 24,
-    marginBottom: 4,
+    width: 40,
+    height: 40,
     tintColor: '#fff',
   },
-  label: {
-    fontSize: 12,
-    color: '#fff',
-    fontWeight: '500',
+  physicalIcon: {
+    width: 50,
+    height: 50,
+    marginTop: 4,
   },
 });
 
