@@ -62,7 +62,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    fontFamily: 'Poppins',
     color: '#000',
     flex: 1,
   },
@@ -73,7 +72,6 @@ const styles = StyleSheet.create({
   xpText: {
     fontSize: 20,
     fontWeight: 'bold',
-    fontFamily: 'Poppins',
   },
 });
 
