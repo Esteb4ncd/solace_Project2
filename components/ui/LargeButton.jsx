@@ -1,7 +1,7 @@
-import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
 import { useButton } from '@react-native-aria/button';
 import { useToggleState } from '@react-stately/toggle';
+import React from 'react';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import { Globals } from '../../constants/globals'; // adjust path if needed
 
 const LargeButton = ({ label, onPress }) => {
@@ -35,9 +35,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   text: {
-    color: Globals.colors.textDark,
-    fontSize: 20,
-    fontWeight: '700',
+    ...Globals.fonts.styles.header2Bold,
+    textAlign: 'center',
   },
 });
 

@@ -1,7 +1,8 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { router } from 'expo-router';
 import React from 'react';
-import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Platform, Pressable, StyleSheet, View } from 'react-native';
 import LargeButton from '../../components/ui/LargeButton';
 import { Globals } from '../../constants/globals';
 
@@ -12,9 +13,9 @@ const CharacterPlaceholder = () => (
   </View>
 );
 
-export default function PersonalizedScreen() {
+export default function StartQuestionsScreen() {
   const handleStartPress = () => {
-    Alert.alert('Getting Started!', 'Let\'s create your personalized plan!');
+    router.push('/(tabs)/onboardingQuestions');
   };
 
   const handleSkipPress = () => {
@@ -60,14 +61,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    // Force mobile-like appearance on web
+    ...(Platform.OS === 'web' && {
+      maxWidth: 393, // iPhone 16 width
+      width: 393, // Fixed width
+      height: 852, // iPhone 16 height
+      marginHorizontal: 'auto',
+
+    }),
   },
   characterPlaceholder: {
-    width: 120,
-    height: 120,
+    width: 190,
+    height: 250,
     backgroundColor: '#f0f0f0',
     borderRadius: 8,
-    marginBottom: 60,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
@@ -75,40 +82,38 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
   },
   mainHeading: {
-    fontFamily: Globals.fonts.weights.bold,
-    fontSize: Globals.fonts.sizes.header1,
-    textAlign: 'center',
-    marginBottom: 16,
-    color: Globals.colors.textDark,
+    ...Globals.fonts.styles.header1,
+    marginBottom: 24,
+    marginTop: 24,
   },
   subHeading: {
-    fontFamily: Globals.fonts.weights.medium,
-    fontSize: Globals.fonts.sizes.header2,
+    ...Globals.fonts.styles.header4,
     textAlign: 'center',
-    marginBottom: 12,
-    color: Globals.colors.textDark,
+    marginBottom: 10,
   },
   description: {
-    fontFamily: Globals.fonts.weights.regular,
-    fontSize: Globals.fonts.sizes.body,
+    ...Globals.fonts.styles.body,
     textAlign: 'center',
-    marginBottom: 80,
-    color: Globals.colors.textDark,
-    paddingHorizontal: 20,
-    lineHeight: 22,
+    marginBottom: 10,
   },
   buttonContainer: {
     position: 'absolute',
-    bottom: 20,
-
+    bottom: 54,
+    width: '100%',
+    alignItems: 'center',
+    // Ensure proper positioning on web
+    ...(Platform.OS === 'web' && {
+      maxWidth: 393,
+      left: '50%',
+      transform: [{ translateX: -196.5 }], // Half of iPhone 16 width
+    }),
   },
   skipContainer: {
+    marginTop:10,
     paddingVertical: 10,
   },
   skipText: {
-    fontFamily: Globals.fonts.weights.regular,
-    fontSize: Globals.fonts.sizes.body,
-    color: Globals.colors.textDark,
+    ...Globals.fonts.styles.label,
     textAlign: 'center',
   },
 });

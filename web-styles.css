@@ -1,0 +1,65 @@
+/* Web-specific styles to make desktop look like mobile */
+@media (min-width: 768px) {
+  /* Force mobile-like viewport */
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    height: 100vh;
+    max-height: 100vh;
+  }
+  
+  /* Center the app content */
+  #root {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    max-height: 100vh;
+    background-color: #fff;
+  }
+  
+  /* Force mobile dimensions */
+  .expo-container {
+    max-width: 393px !important;
+    width: 393px !important;
+    height: 852px !important; /* iPhone 16 height */
+    min-height: 852px !important;
+    margin: auto !important;
+    background-color: #fff !important;
+    border-radius: 20px !important; /* Rounded corners like a phone */
+    box-shadow: 0 0 20px rgba(0,0,0,0.3) !important; /* Phone-like shadow */
+  }
+  
+  /* Ensure proper mobile-like scaling */
+  .expo-container * {
+    box-sizing: border-box;
+  }
+  
+  /* Hide scrollbars on web to look more mobile-like */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Ensure touch-like interactions */
+  button, [role="button"] {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Hide debug classes and clean up appearance */
+  [class*="css-view-"], [class*="css-text-"] {
+    /* These are React Native Web's generated classes - they're normal */
+  }
+  
+  /* Remove any debug outlines or borders */
+  * {
+    outline: none !important;
+  }
+  
+  /* Clean up any unwanted spacing */
+  .expo-container > * {
+    margin: 0;
+    padding: 0;
+  }
+}
