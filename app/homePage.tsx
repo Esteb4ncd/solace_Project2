@@ -1,8 +1,8 @@
 import BottomNavigation from '@/components/ui/BottomNavigation';
 import Header from '@/components/ui/Header';
-import ProgressBar from '@/components/ui/ProgressBar';
 import StatusBar from '@/components/ui/StatusBar';
 import TaskCard from '@/components/ui/TaskCard';
+import XPBar from '@/components/ui/XPBar';
 import { colors, spacing } from '@/constants/styles';
 import { Colors } from '@/constants/theme';
 import React, { useState } from 'react';
@@ -51,11 +51,10 @@ const HomePage = () => {
             />
           </View>
 
-          <ProgressBar 
+          <XPBar 
             currentProgress={0}
             totalProgress={50}
             level={1}
-            isXpBar={true}
           />
 
           {/* Daily Checklist Section */}
