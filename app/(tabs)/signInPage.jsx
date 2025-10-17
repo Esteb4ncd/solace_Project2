@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   loginLink: {
-    color: "purple",
+    color: "#564DA3",
     fontWeight: "600",
     textDecorationLine: "underline",
   },
