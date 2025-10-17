@@ -2,8 +2,8 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import LargeButton from '../../components/ui/LargeButton';
 import OnboardingMascot from '../../components/ui/OnboardingMascot';
 import TextInputWithVoice from '../../components/ui/TextInputWithVoice';
@@ -30,6 +30,21 @@ export default function ConfirmationScreen() {
   const { findingIndex } = useLocalSearchParams();
   const confirmationIndex = findingIndex ? parseInt(findingIndex as string) : 0;
   const currentConfirmation = confirmations[confirmationIndex];
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setIsKeyboardVisible(true);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setIsKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidShowListener?.remove();
+      keyboardDidHideListener?.remove();
+    };
+  }, []);
 
   const handleYesPress = () => {
     if (currentConfirmation.nextFindingIndex !== null) {
@@ -50,20 +65,36 @@ export default function ConfirmationScreen() {
     router.push('/(tabs)/confirmation');
   };
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   return (
-    <ThemedView style={styles.container}>
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <KeyboardAvoidingView 
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
+        <ThemedView style={styles.container}>
       {/* Back Button */}
       <Pressable style={styles.backButton} onPress={handleBackPress}>
         <Ionicons name="arrow-back" size={24} color="#000" />
       </Pressable>
 
       {/* Mascot */}
-      <View style={styles.mascotContainer}>
-        <OnboardingMascot isKeyboardVisible={false} />
+      <View style={[
+        styles.mascotContainer,
+        isKeyboardVisible && styles.mascotContainerKeyboardVisible
+      ]}>
+        <OnboardingMascot isKeyboardVisible={isKeyboardVisible} />
       </View>
 
       {/* Confirmation Text */}
-      <View style={styles.textContainer}>
+      <View style={[
+        styles.textContainer,
+        isKeyboardVisible && styles.textContainerKeyboardVisible
+      ]}>
         <ThemedText style={styles.thanksText}>
           {currentConfirmation.thanksText}
         </ThemedText>
@@ -73,7 +104,10 @@ export default function ConfirmationScreen() {
       </View>
 
       {/* Main Finding */}
-      <View style={confirmationIndex === 1 ? styles.findingContainerSecond : styles.findingContainer}>
+      <View style={[
+        confirmationIndex === 1 ? styles.findingContainerSecond : styles.findingContainer,
+        isKeyboardVisible && styles.findingContainerKeyboardVisible
+      ]}>
         {confirmationIndex === 1 ? (
           <ThemedText style={styles.mainFindingRegular}>
             Your exercises will target your <ThemedText style={styles.boldText}>left shoulder and right knee</ThemedText>.
@@ -100,10 +134,13 @@ export default function ConfirmationScreen() {
         <TextInputWithVoice
           placeholder="Type or click to say something..."
           onVoicePress={handleVoicePress}
-          isKeyboardVisible={false}
+          isKeyboardVisible={isKeyboardVisible}
+          autoFocus={false}
         />
       </View>
-    </ThemedView>
+        </ThemedView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -127,9 +164,15 @@ const styles = StyleSheet.create({
   mascotContainer: {
     marginBottom: 5,
   },
+  mascotContainerKeyboardVisible: {
+    marginBottom: 20,
+  },
   textContainer: {
     alignItems: 'center',
     marginBottom: 30,
+  },
+  textContainerKeyboardVisible: {
+    marginBottom: 15,
   },
   thanksText: {
     ...Globals.fonts.styles.body,
@@ -142,14 +185,18 @@ const styles = StyleSheet.create({
   },
   findingContainer: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 60,
     paddingHorizontal: 20,
   },
   findingContainerSecond: {
     alignItems: 'center',
     marginTop: -80,
-    marginBottom: 40,
+    marginBottom: 60,
     paddingHorizontal: 20,
+  },
+  findingContainerKeyboardVisible: {
+    marginTop: -120,
+    marginBottom: 40,
   },
   mainFinding: {
     ...Globals.fonts.styles.header2Bold,
