@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   },
   avatarSection: {
     alignItems: 'center',
-    paddingVertical: 32, // 32px margin from element above
+    paddingVertical: 8, // Reduced from 32px to 8px
   },
   avatar: {
     width: 150,
