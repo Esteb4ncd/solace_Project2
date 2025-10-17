@@ -3,7 +3,7 @@ import Header from '@/components/ui/Header';
 import ProgressBar from '@/components/ui/ProgressBar';
 import StatusBar from '@/components/ui/StatusBar';
 import TaskCard from '@/components/ui/TaskCard';
-import { colors, spacing, typography } from '@/constants/styles';
+import { colors, spacing } from '@/constants/styles';
 import { Colors } from '@/constants/theme';
 import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -52,10 +52,10 @@ const HomePage = () => {
           </View>
 
           <ProgressBar 
-            currentProgress={90}
-            totalProgress={100}
+            currentProgress={0}
+            totalProgress={50}
             level={1}
-            isHealthBar={true}
+            isXpBar={true}
           />
 
           {/* Daily Checklist Section */}
