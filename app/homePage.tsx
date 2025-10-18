@@ -3,20 +3,20 @@ import Header from '@/components/ui/Header';
 import StatusBar from '@/components/ui/StatusBar';
 import TaskCard from '@/components/ui/TaskCard';
 import XPBar from '@/components/ui/XPBar';
-import { colors, spacing } from '@/constants/styles';
+import { spacing } from '@/constants/styles';
 import { Colors } from '@/constants/theme';
 import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const HomePage = () => {
   const [dailyTasks, setDailyTasks] = useState([
-    { id: '1', title: 'Back Relief', xpAmount: 10, xpColor: colors.accent.purple, isCompleted: false },
-    { id: '2', title: 'Shoulder Relief', xpAmount: 10, xpColor: colors.accent.green, isCompleted: false },
-    { id: '3', title: 'Joint Relief', xpAmount: 10, xpColor: colors.accent.purple, isCompleted: false },
+    { id: '1', title: 'Back Relief', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
+    { id: '2', title: 'Shoulder Relief', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
+    { id: '3', title: 'Joint Relief', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
   ]);
 
   const [additionalTasks] = useState([
-    { id: '4', title: 'White noise', xpAmount: 10, xpColor: colors.accent.purple, isCompleted: false },
+    { id: '4', title: 'Stress Relief', xpAmount: 5, xpColor: '#7267D9', isCompleted: false },
   ]);
 
   const handleTaskPress = (taskId: string) => {
@@ -38,7 +38,7 @@ const HomePage = () => {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.contentContainer}>
           <Header 
-            userName="Weenie"
+            userName="Solly"
             streakCount={1}
             onEditPress={() => console.log('Edit pressed')}
           />
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16, // 16px margin from element above
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#000000',
     marginBottom: 8, // 8px margin between checklist items
