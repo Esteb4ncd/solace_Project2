@@ -1,4 +1,3 @@
-import { colors } from '@/constants/styles';
 import React from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 
@@ -48,7 +47,7 @@ const BottomNavigation = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: colors.primary,
+    backgroundColor: '#443E82',
     width: 394,
     height: 67,
     justifyContent: 'space-around',

@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    marginBottom: 8, // Only bottom margin for spacing between cards
+    marginBottom: 16, // 16px spacing between cards
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

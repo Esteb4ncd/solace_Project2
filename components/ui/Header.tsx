@@ -80,13 +80,13 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   streakNumber: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#000',
   },
   streakLabel: {
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: '500', // Medium weight
     color: '#000',
     textAlign: 'left',
   },
@@ -97,17 +97,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   userName: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#000',
-    marginRight: 8,
+    textAlign: 'center',
   },
   editButton: {
     padding: 4,
+    marginLeft: 8,
   },
   editIcon: {
-    width: 16,
-    height: 16,
+    width: 20,
+    height: 20,
   },
   achievementSection: {
     flex: 1,
