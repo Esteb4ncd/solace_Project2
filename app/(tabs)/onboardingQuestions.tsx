@@ -121,14 +121,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    // Force mobile-like appearance on web
-    ...(Platform.OS === 'web' && {
-      maxWidth: 393, // iPhone 16 width
-      width: 393, // Fixed width
-      height: 852, // iPhone 16 height
-      marginHorizontal: 'auto',
-      marginVertical: 'auto',
-    }),
+    width: 393,
+    height: 852,
   },
   keyboardAvoidingView: {
     flex: 1,

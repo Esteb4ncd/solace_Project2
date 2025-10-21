@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 20,
     width: 393,
-    alignSelf: 'center',
+    height: 852,
   },
   backButton: {
     position: 'absolute',
