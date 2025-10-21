@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Animated, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, Image, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import CircularBackArrowButton from "../../components/ui/CircularBackArrowButton";
 import CircularNextArrowButton from "../../components/ui/CircularNextArrowButton";
 
@@ -226,18 +226,15 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   skip: {
-    position: "absolute",
-    top: 86,
-    right: 30,
     fontSize: 12,
     color: "black",
     fontWeight: "bold",
   },
   skipButtonContainer: {
-    position: "absolute",
-    top: 86,
-    right: 30,
-    zIndex: 10,
+    position: 'absolute',
+    top: Platform.OS === 'web' ? 20 : 50, // Match PagesMenu positioning
+    right: 20,
+    zIndex: 1000,
     padding: 8,
   },
   stepContainer: {
