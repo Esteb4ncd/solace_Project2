@@ -14,7 +14,11 @@ const LargeButton = ({ label, onPress }) => {
   return (
     <Pressable
       {...buttonProps}
-      style={[styles.button, { backgroundColor: Globals.colors.primaryButton }]}
+      style={({ pressed }) => [
+        styles.button, 
+        { backgroundColor: Globals.colors.primaryButton },
+        pressed && styles.buttonPressed
+      ]}
     >
       <Text style={styles.text}>{label}</Text>
     </Pressable>
@@ -33,6 +37,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 24,
+    borderBottomWidth: 2,
+    borderBottomColor: Globals.colors.buttonStroke,
+  },
+  buttonPressed: {
+    borderBottomWidth: 0,
   },
   text: {
     ...Globals.fonts.styles.header2Bold,

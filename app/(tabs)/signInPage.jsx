@@ -1,13 +1,15 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import {
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+    Image,
+    Keyboard,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableWithoutFeedback,
+    View,
 } from "react-native";
-import { router } from "expo-router";
 import LargeButton from "../../components/ui/LargeButton";
 
 function LoginSignInPage() {
@@ -64,6 +66,10 @@ function LoginSignInPage() {
       // Navigate to tutorial after successful form validation
       router.push('/(tabs)/tutorial');
     }
+  };
+
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
   };
 
   function signInForm() {
@@ -182,13 +188,15 @@ function LoginSignInPage() {
   }
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={require("../../assets/images/logo_text.png")}
-        style={styles.logo}
-      />
-      {isLogin ? logInForm() : signInForm()}
-    </View>
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <View style={styles.container}>
+        <Image
+          source={require("../../assets/images/logo_text.png")}
+          style={styles.logo}
+        />
+        {isLogin ? logInForm() : signInForm()}
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 

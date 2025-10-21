@@ -2,9 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Globals } from '../constants/globals';
 
-const CustomHeader = () => {
+const PagesMenu = () => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
 
   const toggleMenu = () => {
@@ -17,12 +16,12 @@ const CustomHeader = () => {
   };
 
   const menuItems = [
-    { name: 'index', title: 'Home', icon: 'home' },
+    { name: 'signInPage', title: 'Sign In Page', icon: 'log-in' },
+    { name: 'tutorial', title: 'Tutorial', icon: 'school' },
     { name: 'startQuestions', title: 'Start Questions', icon: 'person' },
-    { name: 'onboardingQuestions', title: 'Questions', icon: 'help-circle' },
+    { name: 'onboardingQuestions', title: 'Onboarding Questions', icon: 'help-circle' },
     { name: 'confirmation', title: 'Confirmation', icon: 'checkmark-circle' },
     { name: 'homePage', title: 'Home Page', icon: 'home-outline' },
-    { name: 'ai_onboarding', title: 'AI Onboarding', icon: 'chatbubbles' },
   ];
 
   return (
@@ -77,7 +76,7 @@ const styles = StyleSheet.create({
     // Ensure proper positioning on web
     ...(Platform.OS === 'web' && {
       maxWidth: 393,
-      right: 'calc(50% - 196.5px + 20px)', // Center relative to iPhone 16 width
+      right: 20,
     }),
   },
   menuButton: {
@@ -125,9 +124,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e0e0e0',
   },
   menuTitle: {
-    fontFamily: Globals.fonts.weights.medium,
-    fontSize: Globals.fonts.sizes.header3,
-    color: Globals.colors.textDark,
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#000000',
   },
   menuItem: {
     flexDirection: 'row',
@@ -137,11 +136,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   menuItemText: {
-    fontFamily: Globals.fonts.weights.regular,
-    fontSize: Globals.fonts.sizes.body,
-    color: Globals.colors.textDark,
+    fontSize: 16,
+    fontWeight: '400',
+    color: '#000000',
     marginLeft: 12,
   },
 });
 
-export default CustomHeader;
+export default PagesMenu;
