@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 type HeaderProps = {
   userName?: string;
@@ -7,6 +7,11 @@ type HeaderProps = {
   showEditIcon?: boolean;
   showAchievementIcon?: boolean;
   onEditPress?: () => void;
+  isEditingName?: boolean;
+  tempUserName?: string;
+  onUserNameChange?: (name: string) => void;
+  onSaveName?: () => void;
+  onCancelEdit?: () => void;
 };
 
 const Header = ({ 
@@ -14,7 +19,12 @@ const Header = ({
   streakCount = 1, 
   showEditIcon = true, 
   showAchievementIcon = true,
-  onEditPress 
+  onEditPress,
+  isEditingName = false,
+  tempUserName = "",
+  onUserNameChange,
+  onSaveName,
+  onCancelEdit
 }: HeaderProps) => {
   return (
     <View style={styles.container}>
@@ -32,14 +42,29 @@ const Header = ({
 
       {/* User Name Section */}
       <View style={styles.userSection}>
-        <Text style={styles.userName}>{userName}</Text>
-        {showEditIcon && (
-          <TouchableOpacity onPress={onEditPress} style={styles.editButton}>
-            <Image 
-              source={require('@/assets/hompageAssets/Edit-Name.png')} 
-              style={styles.editIcon}
-            />
-          </TouchableOpacity>
+        {isEditingName ? (
+          <TextInput
+            style={styles.nameInput}
+            value={tempUserName}
+            onChangeText={onUserNameChange}
+            placeholder="Enter your name"
+            autoFocus={true}
+            maxLength={20}
+            onSubmitEditing={onSaveName}
+            onBlur={onSaveName}
+          />
+        ) : (
+          <>
+            <Text style={styles.userName}>{userName}</Text>
+            {showEditIcon && (
+              <TouchableOpacity onPress={onEditPress} style={styles.editButton}>
+                <Image 
+                  source={require('@/assets/hompageAssets/Edit-Name.png')} 
+                  style={styles.editIcon}
+                />
+              </TouchableOpacity>
+            )}
+          </>
         )}
       </View>
 
@@ -117,6 +142,19 @@ const styles = StyleSheet.create({
   achievementIcon: {
     width: 40,
     height: 40,
+  },
+  nameInput: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#000',
+    textAlign: 'center',
+    borderWidth: 1,
+    borderColor: '#7267D9',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    minWidth: 100,
+    maxWidth: 200,
   },
 });
 

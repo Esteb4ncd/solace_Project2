@@ -6,9 +6,13 @@ import XPBar from '@/components/ui/XPBar';
 import { spacing } from '@/constants/styles';
 import { Colors } from '@/constants/theme';
 import React, { useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Keyboard, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 
 const HomePage = () => {
+  const [userName, setUserName] = useState("Solly");
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempUserName, setTempUserName] = useState("Solly");
+  
   const [dailyTasks, setDailyTasks] = useState([
     { id: '1', title: 'Back Relief', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
     { id: '2', title: 'Shoulder Relief', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
@@ -31,17 +35,44 @@ const HomePage = () => {
     console.log(`Navigating to ${itemId}`);
   };
 
+  const handleEditPress = () => {
+    setIsEditingName(true);
+    setTempUserName(userName);
+  };
+
+  const handleSaveName = () => {
+    setUserName(tempUserName);
+    setIsEditingName(false);
+    Keyboard.dismiss();
+  };
+
+  const handleCancelEdit = () => {
+    setTempUserName(userName);
+    setIsEditingName(false);
+    Keyboard.dismiss();
+  };
+
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   return (
-    <View style={styles.container}>
-      <StatusBar />
-      
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        <View style={styles.contentContainer}>
-          <Header 
-            userName="Solly"
-            streakCount={1}
-            onEditPress={() => console.log('Edit pressed')}
-          />
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <View style={styles.container}>
+        <StatusBar />
+        
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          <View style={styles.contentContainer}>
+            <Header 
+              userName={userName}
+              streakCount={1}
+              onEditPress={handleEditPress}
+              isEditingName={isEditingName}
+              tempUserName={tempUserName}
+              onUserNameChange={setTempUserName}
+              onSaveName={handleSaveName}
+              onCancelEdit={handleCancelEdit}
+            />
 
           {/* Avatar Section */}
           <View style={styles.avatarSection}>
@@ -96,6 +127,7 @@ const HomePage = () => {
 
       <BottomNavigation onItemPress={handleNavPress} />
     </View>
+    </TouchableWithoutFeedback>
   );
 };
 
