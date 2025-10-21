@@ -1,6 +1,6 @@
-import { Alert, Platform, StyleSheet, View } from 'react-native';
 import { Link } from 'expo-router';
 import React from 'react';
+import { Alert, Platform, StyleSheet, View } from 'react-native';
 
 import { HelloWave } from '@/components/hello-wave';
 import { ThemedText } from '@/components/themed-text';
