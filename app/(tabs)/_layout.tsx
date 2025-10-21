@@ -3,7 +3,7 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { View } from 'react-native';
 
-import CustomHeader from '@/components/PagesMenu';
+import PagesMenu from '@/components/PagesMenu';
 import { HapticTab } from '@/components/haptic-tab';
 
 import { Colors } from '@/constants/theme';
@@ -15,7 +15,7 @@ export default function TabLayout() {
 
   return (
     <View style={{ flex: 1 }}>
-      <CustomHeader />
+      <PagesMenu />
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
