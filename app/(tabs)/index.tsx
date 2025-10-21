@@ -1,12 +1,11 @@
-import { Image } from 'expo-image';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
+import { Link } from 'expo-router';
+import React from 'react';
 
 import { HelloWave } from '@/components/hello-wave';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import LargeButton from '../../components/ui/LargeButton';
-import { Link } from 'expo-router';
-import React from 'react';
 
 export default function HomeScreen() {
   const handlePress = () => {
@@ -21,10 +20,8 @@ export default function HomeScreen() {
           <HelloWave />
         </ThemedView>
 
-        {/* Button from your branch */}
         <LargeButton label="Next" onPress={handlePress} />
 
-        {/* Link from homePage branch */}
         <ThemedView style={styles.stepContainer}>
           <Link href="/homePage">
             <ThemedText type="subtitle">View New Home Page</ThemedText>
