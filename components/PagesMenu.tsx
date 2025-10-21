@@ -3,8 +3,10 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
-const PagesMenu = () => {
+const PagesMenu = ({ hideOnTutorial = false }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  
+  console.log('PagesMenu hideOnTutorial:', hideOnTutorial);
 
   const toggleMenu = () => {
     setIsMenuVisible(!isMenuVisible);
@@ -26,11 +28,13 @@ const PagesMenu = () => {
 
   return (
     <>
-      <View style={styles.floatingMenu}>
-        <Pressable onPress={toggleMenu} style={styles.menuButton}>
-          <Ionicons name="menu" size={24} color="#000" />
-        </Pressable>
-      </View>
+      {!hideOnTutorial && (
+        <View style={styles.floatingMenu}>
+          <Pressable onPress={toggleMenu} style={styles.menuButton}>
+            <Ionicons name="menu" size={24} color="#000" />
+          </Pressable>
+        </View>
+      )}
 
       <Modal
         visible={isMenuVisible}

@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
+import { Tabs, usePathname } from 'expo-router';
 import React from 'react';
 import { View } from 'react-native';
 
@@ -12,10 +12,15 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const pathname = usePathname();
+  const isTutorialPage = pathname.includes('tutorial');
+  
+  console.log('Current pathname:', pathname);
+  console.log('Is tutorial page:', isTutorialPage);
 
   return (
     <View style={{ flex: 1 }}>
-      <PagesMenu />
+      <PagesMenu hideOnTutorial={isTutorialPage} />
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
