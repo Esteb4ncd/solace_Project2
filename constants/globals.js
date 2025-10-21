@@ -6,6 +6,7 @@ export const Globals = {
       white: '#fff',
       black: '#000000',
       accentNormal: '#C2E273',
+      buttonStroke: '#61713A',
     },
     fonts: {
       family: 'Poppins_400Regular',

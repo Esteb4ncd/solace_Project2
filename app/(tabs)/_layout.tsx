@@ -3,7 +3,7 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { View } from 'react-native';
 
-import CustomHeader from '@/components/CustomHeader';
+import CustomHeader from '@/components/PagesMenu';
 import { HapticTab } from '@/components/haptic-tab';
 
 import { Colors } from '@/constants/theme';
