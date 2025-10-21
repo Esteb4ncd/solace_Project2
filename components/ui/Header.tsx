@@ -43,16 +43,21 @@ const Header = ({
       {/* User Name Section */}
       <View style={styles.userSection}>
         {isEditingName ? (
-          <TextInput
-            style={styles.nameInput}
-            value={tempUserName}
-            onChangeText={onUserNameChange}
-            placeholder="Enter your name"
-            autoFocus={true}
-            maxLength={20}
-            onSubmitEditing={onSaveName}
-            onBlur={onSaveName}
-          />
+          <View style={styles.editContainer}>
+            <TextInput
+              style={styles.nameInput}
+              value={tempUserName}
+              onChangeText={onUserNameChange}
+              placeholder="Enter your name"
+              autoFocus={true}
+              maxLength={10}
+              onSubmitEditing={onSaveName}
+              onBlur={onSaveName}
+            />
+            {tempUserName.length >= 10 && (
+              <Text style={styles.warningText}>Cannot exceed 10 characters</Text>
+            )}
+          </View>
         ) : (
           <>
             <Text style={styles.userName}>{userName}</Text>
@@ -143,6 +148,10 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
   },
+  editContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   nameInput: {
     fontSize: 28,
     fontWeight: 'bold',
@@ -155,6 +164,13 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     minWidth: 100,
     maxWidth: 200,
+  },
+  warningText: {
+    fontSize: 12,
+    color: '#ff4444',
+    marginTop: 4,
+    textAlign: 'center',
+    fontWeight: '500',
   },
 });
 
