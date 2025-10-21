@@ -7,6 +7,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { router } from "expo-router";
 import LargeButton from "../../components/ui/LargeButton";
 
 function LoginSignInPage() {
@@ -60,8 +61,8 @@ function LoginSignInPage() {
 
   const handleSubmit = () => {
     if (validateForm()) {
-      // Handle sign in logic here
-      console.log("Form submitted:", form);
+      // Navigate to tutorial after successful form validation
+      router.push('/(tabs)/tutorial');
     }
   };
 
@@ -198,6 +199,8 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     backgroundColor: "#fff",
     alignItems: "center",
+    width: 393,
+    height: 852,
   },
   logo: {
     marginTop: 150,

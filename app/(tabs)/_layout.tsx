@@ -65,6 +65,20 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <Ionicons name="checkmark-circle" size={24} color={color} />,
           }}
         />
+        <Tabs.Screen
+          name="tutorial"
+          options={{
+            title: 'Tutorial',
+            tabBarIcon: ({ color }) => <Ionicons name="school" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="signInPage"
+          options={{
+            title: 'Sign In',
+            tabBarIcon: ({ color }) => <Ionicons name="log-in" size={24} color={color} />,
+          }}
+        />
       </Tabs>
     </View>
   );

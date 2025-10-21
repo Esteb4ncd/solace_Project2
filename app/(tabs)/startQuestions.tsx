@@ -13,7 +13,7 @@ export default function StartQuestionsScreen() {
   };
 
   const handleSkipPress = () => {
-    Alert.alert('Skipped', 'You can always set up your personalized plan later.');
+    router.push('/(tabs)/homePage');
   };
 
   return (
@@ -55,14 +55,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    // Force mobile-like appearance on web
-    ...(Platform.OS === 'web' && {
-      maxWidth: 393, // iPhone 16 width
-      width: 393, // Fixed width
-      height: 852, // iPhone 16 height
-      marginHorizontal: 'auto',
-
-    }),
+    width: 393,
+    height: 852,
   },
   mainHeading: {
     ...Globals.fonts.styles.header1,
@@ -84,12 +78,6 @@ const styles = StyleSheet.create({
     bottom: 54,
     width: '100%',
     alignItems: 'center',
-    // Ensure proper positioning on web
-    ...(Platform.OS === 'web' && {
-      maxWidth: 393,
-      left: '50%',
-      transform: [{ translateX: -196.5 }], // Half of iPhone 16 width
-    }),
   },
   skipContainer: {
     marginTop:10,

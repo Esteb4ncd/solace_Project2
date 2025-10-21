@@ -1,5 +1,6 @@
+import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Animated, Image, StyleSheet, Text, View } from "react-native";
+import { Animated, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import CircularBackArrowButton from "../../components/ui/CircularBackArrowButton";
 import CircularNextArrowButton from "../../components/ui/CircularNextArrowButton";
 
@@ -56,8 +57,8 @@ function tutorial() {
     if (currentStep < totalSteps - 1) {
       animateStepTransition(() => setCurrentStep(currentStep + 1));
     } else {
-      // Handle completion of tutorial (e.g., navigate to next screen)
-      console.log("Tutorial completed!");
+      // Navigate to start questions at the end of the tutorial
+      router.push('/(tabs)/startQuestions');
     }
   }
 
@@ -65,6 +66,10 @@ function tutorial() {
     if (currentStep > 0) {
       animateStepTransition(() => setCurrentStep(currentStep - 1));
     }
+  }
+
+  function handleSkip() {
+    router.push('/(tabs)/startQuestions');
   }
 
   function renderStepContent() {
@@ -148,7 +153,9 @@ function tutorial() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.skip}>Skip</Text>
+      <Pressable onPress={handleSkip} style={styles.skipButtonContainer}>
+        <Text style={styles.skip}>Skip</Text>
+      </Pressable>
       <Animated.View style={[styles.stepContainer, { opacity: fadeAnim }]}>
         {renderStepContent()}
       </Animated.View>
@@ -212,7 +219,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    height: "100%",
+    height: 852,
+    width: 393,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "column",
@@ -224,6 +232,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "black",
     fontWeight: "bold",
+  },
+  skipButtonContainer: {
+    position: "absolute",
+    top: 86,
+    right: 30,
+    zIndex: 10,
+    padding: 8,
   },
   stepContainer: {
     justifyContent: "center",
