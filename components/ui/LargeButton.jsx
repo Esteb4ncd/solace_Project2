@@ -1,7 +1,7 @@
-import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
 import { useButton } from '@react-native-aria/button';
 import { useToggleState } from '@react-stately/toggle';
+import React from 'react';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import { Globals } from '../../constants/globals'; // adjust path if needed
 
 const LargeButton = ({ label, onPress }) => {
@@ -14,7 +14,11 @@ const LargeButton = ({ label, onPress }) => {
   return (
     <Pressable
       {...buttonProps}
-      style={[styles.button, { backgroundColor: Globals.colors.primaryButton }]}
+      style={({ pressed }) => [
+        styles.button, 
+        { backgroundColor: Globals.colors.primaryButton },
+        pressed && styles.buttonPressed
+      ]}
     >
       <Text style={styles.text}>{label}</Text>
     </Pressable>
@@ -32,12 +36,16 @@ const styles = StyleSheet.create({
     paddingRight: 63.059,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: 24,
+    borderBottomWidth: 2,
+    borderBottomColor: Globals.colors.buttonStroke,
+  },
+  buttonPressed: {
+    borderBottomWidth: 0,
   },
   text: {
-    color: Globals.colors.textDark,
-    fontSize: 20,
-    fontWeight: '700',
+    ...Globals.fonts.styles.header2Bold,
+    textAlign: 'center',
   },
 });
 
