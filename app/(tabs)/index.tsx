@@ -1,16 +1,14 @@
+import { Image } from 'expo-image';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
 
 import { HelloWave } from '@/components/hello-wave';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import LargeButton from '../../components/ui/LargeButton';
-
-
+import { Link } from 'expo-router';
 import React from 'react';
 
-
 export default function HomeScreen() {
-  // define the function
   const handlePress = () => {
     Alert.alert('Button pressed!', 'You clicked the large button.');
   };
@@ -21,16 +19,22 @@ export default function HomeScreen() {
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Welcome!</ThemedText>
           <HelloWave />
-
         </ThemedView>
 
+        {/* Button from your branch */}
         <LargeButton label="Next" onPress={handlePress} />
+
+        {/* Link from homePage branch */}
+        <ThemedView style={styles.stepContainer}>
+          <Link href="/homePage">
+            <ThemedText type="subtitle">View New Home Page</ThemedText>
+          </Link>
+        </ThemedView>
 
         <ThemedView style={styles.stepContainer}>
           <ThemedText type="subtitle">Step 1: Try it</ThemedText>
           <ThemedText>
-            Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-            Press{' '}
+            Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes. Press{' '}
             <ThemedText type="defaultSemiBold">
               {Platform.select({ ios: 'cmd + d', android: 'cmd + m', web: 'F12' })}
             </ThemedText>{' '}
@@ -52,7 +56,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   titleContainer: {
-    flexDirection: 'column', // stack vertically
+    flexDirection: 'column',
     alignItems: 'flex-start',
     gap: 8,
     marginVertical: 10,
