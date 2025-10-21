@@ -51,6 +51,20 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <Ionicons name="chatbubbles" size={24} color={color} />,
           }}
         />
+        <Tabs.Screen
+          name="homePage"
+          options={{
+            title: 'Home Page',
+            tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="confirmation"
+          options={{
+            title: 'Confirmation',
+            tabBarIcon: ({ color }) => <Ionicons name="checkmark-circle" size={24} color={color} />,
+          }}
+        />
       </Tabs>
     </View>
   );
