@@ -28,9 +28,11 @@ function breathingExercise() {
   const [timeRemaining, setTimeRemaining] = useState(BREATHING_PATTERN.INHALE);
 
   // Animation
-  const circleScale = useRef(new Animated.Value(0.5)).current; // Start at 50% scale
+  const circleSize = useRef(new Animated.Value(145)).current; // Start at 145px
+  const circleColor = useRef(new Animated.Value(0)).current; // 0 = #7267D9, 1 = #332E62
   const timerRef = useRef(null);
   const animationRef = useRef(null);
+  const colorAnimationRef = useRef(null);
 
   // Get phase duration
   const getPhaseDuration = useCallback((phase) => {
@@ -68,41 +70,59 @@ function breathingExercise() {
   // Start circle animation for current phase
   const startPhaseAnimation = useCallback(
     (phase, duration) => {
-      // Stop any existing animation
+      // Stop any existing animations
       if (animationRef.current) {
         animationRef.current.stop();
       }
-
-      let toValue;
-      switch (phase) {
-        case PHASES.INHALE:
-          toValue = 1; // Scale up to 100%
-          break;
-        case PHASES.HOLD:
-          toValue = 1; // Stay at 100%
-          break;
-        case PHASES.EXHALE:
-          toValue = 0.5; // Scale down to 50%
-          break;
-        default:
-          toValue = 0.5;
+      if (colorAnimationRef.current) {
+        colorAnimationRef.current.stop();
       }
 
-      // For HOLD phase, don't animate (stay at current scale)
+      let sizeToValue, colorToValue;
+      switch (phase) {
+        case PHASES.INHALE:
+          sizeToValue = 275; // Expand to 275px
+          colorToValue = 1; // Change to darker color #332E62
+          break;
+        case PHASES.HOLD:
+          sizeToValue = 275; // Stay at 275px
+          colorToValue = 1; // Stay at darker color
+          break;
+        case PHASES.EXHALE:
+          sizeToValue = 145; // Shrink to 145px
+          colorToValue = 0; // Back to original color #7267D9
+          break;
+        default:
+          sizeToValue = 145;
+          colorToValue = 0;
+      }
+
+      // For HOLD phase, don't animate (stay at current size and color)
       if (phase === PHASES.HOLD) {
         return;
       }
 
-      // Create smooth animation
-      animationRef.current = Animated.timing(circleScale, {
-        toValue,
+      // Create smooth size animation
+      animationRef.current = Animated.timing(circleSize, {
+        toValue: sizeToValue,
         duration: duration * 1000, // Convert to milliseconds
         useNativeDriver: false,
       });
 
-      animationRef.current.start();
+      // Create smooth color animation
+      colorAnimationRef.current = Animated.timing(circleColor, {
+        toValue: colorToValue,
+        duration: duration * 1000, // Convert to milliseconds
+        useNativeDriver: false,
+      });
+
+      // Start both animations together
+      Animated.parallel([
+        animationRef.current,
+        colorAnimationRef.current,
+      ]).start();
     },
-    [circleScale]
+    [circleSize, circleColor]
   );
 
   // Main timer function
@@ -135,9 +155,19 @@ function breathingExercise() {
             clearInterval(timerRef.current);
             return;
           }
+
+          // Add 1-second delay between cycles
+          clearInterval(timerRef.current);
+          setTimeout(() => {
+            if (!isPaused && !isCompleted) {
+              setCurrentPhase(nextPhase);
+              setTimeRemaining(getPhaseDuration(nextPhase));
+            }
+          }, 1000);
+          return;
         }
 
-        // Move to next phase
+        // Move to next phase (within same cycle)
         setCurrentPhase(nextPhase);
         setTimeRemaining(getPhaseDuration(nextPhase));
 
@@ -165,8 +195,9 @@ function breathingExercise() {
     setTimeRemaining(BREATHING_PATTERN.INHALE);
 
     // Reset circle to starting position
-    circleScale.setValue(0.5);
-  }, [circleScale]);
+    circleSize.setValue(145);
+    circleColor.setValue(0);
+  }, [circleSize, circleColor]);
 
   // Pause exercise
   const handlePause = useCallback(() => {
@@ -176,6 +207,9 @@ function breathingExercise() {
     // Stop animation
     if (animationRef.current) {
       animationRef.current.stop();
+    }
+    if (colorAnimationRef.current) {
+      colorAnimationRef.current.stop();
     }
   }, []);
 
@@ -198,10 +232,14 @@ function breathingExercise() {
     if (animationRef.current) {
       animationRef.current.stop();
     }
+    if (colorAnimationRef.current) {
+      colorAnimationRef.current.stop();
+    }
 
     // Reset circle
-    circleScale.setValue(0.5);
-  }, [circleScale]);
+    circleSize.setValue(145);
+    circleColor.setValue(0);
+  }, [circleSize, circleColor]);
 
   // Run timer when started and not paused
   useEffect(() => {
@@ -220,6 +258,9 @@ function breathingExercise() {
       clearInterval(timerRef.current);
       if (animationRef.current) {
         animationRef.current.stop();
+      }
+      if (colorAnimationRef.current) {
+        colorAnimationRef.current.stop();
       }
     };
   }, []);
@@ -245,6 +286,12 @@ function breathingExercise() {
   const phaseText = getPhaseText(currentPhase);
   const showBreathingView = isStarted && !isCompleted;
 
+  // Interpolate color based on animation value
+  const backgroundColor = circleColor.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["#7267D9", "#332E62"], // Original purple to darker purple
+  });
+
   return (
     <View style={styles.page}>
       {!isCompleted && (
@@ -266,18 +313,25 @@ function breathingExercise() {
           </View>
         ) : showBreathingView ? (
           <View style={styles.breathingContainer}>
-            <Text style={styles.phaseText}>{phaseText}</Text>
-            <Text style={styles.timerText}>{timeRemaining}</Text>
-            <Text style={styles.cycleText}>Cycle {currentCycle} of 4</Text>
+            <View style={styles.circleContainer}>
+              <Animated.View
+                style={[
+                  styles.breathingCircle,
+                  {
+                    width: circleSize,
+                    height: circleSize,
+                    borderRadius: Animated.divide(circleSize, 2),
+                    backgroundColor: backgroundColor,
+                  },
+                ]}
+              />
+            </View>
 
-            <Animated.View
-              style={[
-                styles.breathingCircle,
-                {
-                  transform: [{ scale: circleScale }],
-                },
-              ]}
-            />
+            <View style={styles.infoContainer}>
+              <Text style={styles.cycleText}>Cycle {currentCycle} of 4</Text>
+              <Text style={styles.phaseText}>{phaseText}</Text>
+              <Text style={styles.timerText}>{timeRemaining}</Text>
+            </View>
           </View>
         ) : (
           <>
@@ -323,16 +377,24 @@ const styles = StyleSheet.create({
   },
   breathingContainer: {
     flex: 1,
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    paddingVertical: 40,
+  },
+  circleContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
   },
+  infoContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingBottom: 20,
+  },
   breathingCircle: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: "#7267D9",
-    marginTop: 30,
+    // Base size will be animated, so no fixed width/height here
   },
   phaseText: {
     fontSize: 32,
