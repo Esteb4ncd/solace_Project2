@@ -16,9 +16,9 @@ const VoiceRecordingVisual: React.FC<VoiceRecordingVisualProps> = ({ onSend }) =
   );
   const animationLoops = useRef<Animated.CompositeAnimation[]>([]);
 
-  // Initialize and start animations once
-  useEffect(() => {
-    animationLoops.current = animationRefs.current.map((anim, index) => {
+  // Function to build the looping animations
+  const buildAnimations = () => {
+    return animationRefs.current.map((anim, index) => {
       const base = 0.1 + (index % 4) * 0.1;
       const max = 0.9 + Math.random() * 0.3;
 
@@ -37,20 +37,28 @@ const VoiceRecordingVisual: React.FC<VoiceRecordingVisualProps> = ({ onSend }) =
         ])
       );
     });
+  };
 
+  // Start animations on mount
+  useEffect(() => {
+    animationLoops.current = buildAnimations();
     animationLoops.current.forEach(loop => loop.start());
 
     return () => animationLoops.current.forEach(loop => loop.stop());
   }, []);
 
-  // Toggle play/pause
+  // Play/Pause logic
   const handlePlayPause = () => {
+    console.log('Clicked. isPaused =', isPaused);
     if (isPaused) {
-      // resume animations
+      console.log('Resuming...');
+      // rebuild and restart animations
+      animationLoops.current = buildAnimations();
       animationLoops.current.forEach(loop => loop.start());
       setIsPaused(false);
     } else {
-      // pause animations
+      console.log('Pausing...');
+      // stop animations
       animationLoops.current.forEach(loop => loop.stop());
       setIsPaused(true);
     }
@@ -148,7 +156,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 12,
-    
   },
 });
 
