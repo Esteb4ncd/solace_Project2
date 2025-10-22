@@ -64,6 +64,7 @@ const HomePage = () => {
             tasks={dailyTasks}
             onTaskPress={handleTaskPress}
             exerciseType="physical"
+            isDaily={true}
           />
 
           {/* Additional XP Section */}
