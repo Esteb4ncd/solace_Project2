@@ -1,7 +1,6 @@
-import TaskCard from '@/components/ui/TaskCard';
 import { router } from 'expo-router';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface Task {
   id: string;
@@ -13,12 +12,15 @@ interface Task {
 
 interface TaskCardProps {
   tasks: Task[];
-  onTaskPress: (taskId: string) => void;
   exerciseType: 'physical' | 'mental';
   isDaily?: boolean;
 }
 
-const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, onTaskPress, exerciseType, isDaily = false }) => {
+const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDaily = false }) => {
+  const [taskStates, setTaskStates] = useState<Record<string, boolean>>(
+    tasks.reduce((acc, task) => ({ ...acc, [task.id]: task.isCompleted }), {})
+  );
+
   const getSectionTitle = () => {
     if (exerciseType === 'physical') {
       return 'Daily Checklist';
@@ -28,15 +30,39 @@ const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, onTaskPress, exerci
   };
 
   const handleTaskPress = (taskId: string) => {
-    // Call the original onTaskPress handler
-    onTaskPress(taskId);
+    console.log('Task pressed:', taskId, 'isDaily:', isDaily);
+    
+    // Toggle task completion state
+    setTaskStates(prev => ({
+      ...prev,
+      [taskId]: !prev[taskId]
+    }));
     
     // If this is a daily task, navigate to VideoPlayer
     if (isDaily) {
+      console.log('Navigating to VideoPlayer for daily task:', taskId);
+      
+      // Get the specific video ID based on taskId
+      const getVideoId = (id: string) => {
+        switch (id) {
+          case '1': // Hand Warm Up
+            return 'RYw0TmopxC8';
+          case '2': // Shoulder Relief
+            return 'dQw4w9WgXcQ'; // Default video for now
+          case '3': // Joint Relief
+            return 'dQw4w9WgXcQ'; // Default video for now
+          default:
+            return 'dQw4w9WgXcQ'; // Default video
+        }
+      };
+
+      const videoId = getVideoId(taskId);
+      console.log('Video ID:', videoId);
+
       router.push({
         pathname: '/videoPlayer',
         params: { 
-          videoId: 'dQw4w9WgXcQ', // You can customize this based on taskId
+          videoId: videoId,
           type: 'daily'
         }
       });
@@ -47,14 +73,19 @@ const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, onTaskPress, exerci
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{getSectionTitle()}</Text>
       {tasks.map((task) => (
-        <TaskCard
+        <TouchableOpacity 
           key={task.id}
-          title={task.title}
-          xpAmount={task.xpAmount}
-          xpColor={task.xpColor}
-          isCompleted={task.isCompleted}
+          style={[styles.taskContainer, taskStates[task.id] && styles.completedContainer]}
           onPress={() => handleTaskPress(task.id)}
-        />
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.taskTitle, taskStates[task.id] && styles.completedTitle]}>
+            {task.title}
+          </Text>
+          <Text style={[styles.xpText, { color: task.xpColor }]}>
+            {task.xpAmount}xp
+          </Text>
+        </TouchableOpacity>
       ))}
     </View>
   );
@@ -69,6 +100,45 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000000',
     marginBottom: 8, // 8px margin between checklist items
+  },
+  taskContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 16, // 16px spacing between cards
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: 360,
+    height: 72,
+    borderWidth: 1,
+    borderColor: '#9CA3AF', // Grey border
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  completedContainer: {
+    backgroundColor: '#F3F4F6',
+  },
+  taskTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000',
+    flex: 1,
+  },
+  completedTitle: {
+    textDecorationLine: 'line-through',
+    opacity: 0.6,
+  },
+  xpText: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });
 
