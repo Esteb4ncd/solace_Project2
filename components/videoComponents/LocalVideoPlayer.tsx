@@ -1,13 +1,13 @@
 import { ResizeMode, Video } from 'expo-av';
 import React, { useRef, useState } from "react";
 import {
-    Dimensions,
-    Image,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Dimensions,
+  Image,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 
 interface LocalVideoPlayerProps {
@@ -190,41 +190,44 @@ const styles = StyleSheet.create({
   },
   bottomControls: {
     position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    paddingBottom: 40, // Extra padding for safe area
+    bottom: 40,
+    left: 20,
+    right: 20,
+    // No background - transparent overlay
   },
   videoTitle: {
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 12,
+    textShadowColor: "rgba(0, 0, 0, 0.8)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   progressContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
   progressBar: {
-    flex: 1,
-    height: 4,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-    borderRadius: 2,
+    width: 350,
+    height: 16,
+    backgroundColor: "#D9D9D9", // Light grey background
+    borderRadius: 5,
     marginRight: 12,
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "white",
-    borderRadius: 2,
+    backgroundColor: "#B0E06F", // Green progress
+    borderRadius: 5,
   },
   timeText: {
     color: "white",
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "bold",
     minWidth: 40,
     textAlign: "right",
+    textShadowColor: "rgba(0, 0, 0, 0.8)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
 });
