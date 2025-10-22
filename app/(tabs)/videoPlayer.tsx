@@ -1,0 +1,63 @@
+import LocalVideoPlayer from '@/components/videoComponents/LocalVideoPlayer';
+import { useExerciseContext } from '@/contexts/ExerciseContext';
+import { router, useLocalSearchParams } from 'expo-router';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+
+const VideoPlayerScreen = () => {
+  const { videoId, type } = useLocalSearchParams<{ videoId: string; type: string }>();
+  const { videoResetTrigger } = useExerciseContext();
+
+  console.log('VideoPlayerScreen loaded with:', { videoId, type });
+
+  // Use the local HandWarmUp.mp4 file
+  const videoSource = require('@/assets/videos/HandWarmUp.mp4');
+
+  const handleBack = () => {
+    console.log('Back button pressed');
+    router.back();
+  };
+
+  const handleVideoEnd = () => {
+    console.log('Video ended');
+  };
+
+  const handleVideoError = (error: any) => {
+    console.log('Video error:', error);
+  };
+
+  const handleDone = () => {
+    console.log('Done button pressed');
+    router.push({
+      pathname: '/xpGain',
+      params: { 
+        xpAmount: '10',
+        exerciseId: '1',
+        exerciseName: 'Hand Warm Up'
+      }
+    });
+  };
+
+  return (
+    <View style={styles.container}>
+      <LocalVideoPlayer 
+        videoSource={videoSource}
+        videoTitle="Hand Warm Up"
+        onBack={handleBack}
+        onEnd={handleVideoEnd}
+        onError={handleVideoError}
+        onDone={handleDone}
+        resetTrigger={videoResetTrigger}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+});
+
+export default VideoPlayerScreen;
