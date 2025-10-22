@@ -1,22 +1,26 @@
 import TaskCard from '@/components/taskCards/TaskCard';
 import BottomNavigation from '@/components/ui/BottomNavigation';
+import CompletedTask from '@/components/ui/CompletedTask';
 import Header from '@/components/ui/Header';
 import StatusBar from '@/components/ui/StatusBar';
 import XPBar from '@/components/ui/XPBar';
 import { spacing } from '@/constants/styles';
 import { Colors } from '@/constants/theme';
+import { useExerciseContext } from '@/contexts/ExerciseContext';
 import React, { useState } from 'react';
-import { Image, Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { Image, Keyboard, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 
 const HomePage = () => {
   const [userName, setUserName] = useState("Solly");
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempUserName, setTempUserName] = useState("Solly");
   
+  const { completedExercises } = useExerciseContext();
+  
   const dailyTasks = [
     { id: '1', title: 'Hand Warm Up', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
-    { id: '2', title: 'Shoulder Relief', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
-    { id: '3', title: 'Joint Relief', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
+    { id: '2', title: 'Shoulder Warm Up', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
+    { id: '3', title: 'Upper Back Stretch', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
   ];
 
   const additionalTasks = [
@@ -76,7 +80,6 @@ const HomePage = () => {
 
           <View style={styles.xpBarContainer}>
             <XPBar 
-              currentProgress={0}
               totalProgress={50}
               level={1}
             />
@@ -95,6 +98,20 @@ const HomePage = () => {
             exerciseType="mental"
             isDaily={false}
           />
+
+          {/* Completed Exercises Section */}
+          {completedExercises.length > 0 && (
+            <View style={styles.completedSection}>
+              <Text style={styles.completedSectionTitle}>Completed Today</Text>
+              {completedExercises.map((exercise) => (
+                <CompletedTask
+                  key={exercise.id}
+                  taskName={exercise.name}
+                  xpGained={exercise.xpGained}
+                />
+              ))}
+            </View>
+          )}
 
           {/* Bottom spacing for navigation */}
           <View style={styles.bottomSpacing} />
@@ -135,6 +152,15 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: spacing.xxxl,
+  },
+  completedSection: {
+    marginTop: 20,
+  },
+  completedSectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000000',
+    marginBottom: 12,
   },
 });
 

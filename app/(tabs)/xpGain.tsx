@@ -1,14 +1,25 @@
 import ExercisePage from '@/components/ui/ExercisePage';
+import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 
 const XPGainScreen = () => {
-  const { xpAmount } = useLocalSearchParams<{ 
+  const { xpAmount, exerciseId, exerciseName } = useLocalSearchParams<{ 
     xpAmount: string; 
+    exerciseId: string;
+    exerciseName: string;
   }>();
+  
+  const { markExerciseComplete } = useExerciseContext();
 
   const handleBackToHome = () => {
     console.log('Back to Home button pressed');
+    
+    // Mark exercise as complete
+    if (exerciseId && exerciseName) {
+      markExerciseComplete(exerciseId, exerciseName, parseInt(xpAmount || '10'));
+    }
+    
     router.push('/(tabs)/homePage');
   };
 
