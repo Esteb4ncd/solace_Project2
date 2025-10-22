@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 import BackButton from "../../components/ui/BackButton";
@@ -17,6 +18,8 @@ const PHASES = {
 };
 
 function breathingExercise() {
+  const router = useRouter();
+
   // Core states
   const [isStarted, setIsStarted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -239,7 +242,10 @@ function breathingExercise() {
     // Reset circle
     circleSize.setValue(145);
     circleColor.setValue(0);
-  }, [circleSize, circleColor]);
+
+    // Navigate back to home page
+    router.push("/homePage");
+  }, [circleSize, circleColor, router]);
 
   // Run timer when started and not paused
   useEffect(() => {
@@ -297,9 +303,7 @@ function breathingExercise() {
       {!isCompleted && (
         <BackButton
           style={styles.backButton}
-          onPress={() => {
-            /* Handle back navigation */
-          }}
+          onPress={() => router.push("/homePage")}
         />
       )}
 
