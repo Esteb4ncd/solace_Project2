@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import LargeButton from '../ui/LargeButton';
 
 interface LocalVideoPlayerProps {
   videoSource: any; // require() or { uri: string }
@@ -16,6 +17,7 @@ interface LocalVideoPlayerProps {
   onBack?: () => void;
   onEnd?: () => void;
   onError?: (error: any) => void;
+  onDone?: () => void;
 }
 
 export default function LocalVideoPlayer({ 
@@ -23,7 +25,8 @@ export default function LocalVideoPlayer({
   videoTitle = "Hand Warm Up",
   onBack,
   onEnd,
-  onError
+  onError,
+  onDone
 }: LocalVideoPlayerProps) {
   const videoRef = useRef<Video>(null);
   const screenHeight = Dimensions.get('window').height;
@@ -33,9 +36,10 @@ export default function LocalVideoPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isVideoEnded, setIsVideoEnded] = useState(false);
   
   const handlePlayPause = async () => {
-    if (videoRef.current) {
+    if (videoRef.current && !isVideoEnded) {
       if (isPlaying) {
         await videoRef.current.pauseAsync();
       } else {
@@ -45,14 +49,34 @@ export default function LocalVideoPlayer({
     }
   };
 
+  const handleReplay = async () => {
+    if (videoRef.current) {
+      await videoRef.current.replayAsync();
+      setIsVideoEnded(false);
+      setIsPlaying(true);
+    }
+  };
+
+  const handleDone = () => {
+    if (onDone) {
+      onDone();
+    } else if (onBack) {
+      onBack();
+    }
+  };
+
   const handlePlaybackStatusUpdate = (status: any) => {
     if (status.isLoaded) {
       setCurrentTime(status.positionMillis / 1000);
       setDuration(status.durationMillis / 1000);
       setIsLoading(false);
       
-      if (status.didJustFinish && onEnd) {
-        onEnd();
+      if (status.didJustFinish) {
+        setIsVideoEnded(true);
+        setIsPlaying(false);
+        if (onEnd) {
+          onEnd();
+        }
       }
     } else if (status.error && onError) {
       console.error('Video error:', status.error);
@@ -94,19 +118,38 @@ export default function LocalVideoPlayer({
         )}
 
         {/* Play/Pause Button Overlay */}
-        <TouchableOpacity 
-          style={styles.playButtonOverlay}
-          onPress={handlePlayPause}
-          activeOpacity={0.7}
-        >
-          {!isPlaying && (
-            <Image 
-              source={require('@/assets/physicalFlowAssets/PlayButton.png')}
-              style={styles.playButtonImage}
-              resizeMode="contain"
-            />
-          )}
-        </TouchableOpacity>
+        {!isVideoEnded && (
+          <TouchableOpacity 
+            style={styles.playButtonOverlay}
+            onPress={handlePlayPause}
+            activeOpacity={0.7}
+          >
+            {!isPlaying && (
+              <Image 
+                source={require('@/assets/physicalFlowAssets/PlayButton.png')}
+                style={styles.playButtonImage}
+                resizeMode="contain"
+              />
+            )}
+          </TouchableOpacity>
+        )}
+
+        {/* Replay Overlay */}
+        {isVideoEnded && (
+          <View style={styles.replayOverlay}>
+            <TouchableOpacity 
+              style={styles.replayButton}
+              onPress={handleReplay}
+              activeOpacity={0.7}
+            >
+              <Image 
+                source={require('@/assets/physicalFlowAssets/ReplayButton.png')}
+                style={styles.replayButtonImage}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       {/* Bottom Controls */}
@@ -125,6 +168,16 @@ export default function LocalVideoPlayer({
           <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
         </View>
       </View>
+
+      {/* Done Button - Only show when video has ended */}
+      {isVideoEnded && (
+        <View style={styles.doneButtonContainer}>
+          <LargeButton 
+            label="Done" 
+            onPress={handleDone}
+          />
+        </View>
+      )}
     </View>
   );
 }
@@ -190,7 +243,7 @@ const styles = StyleSheet.create({
   },
   bottomControls: {
     position: "absolute",
-    bottom: 40,
+    bottom: 120, // Moved up to make room for Done button
     left: 20,
     right: 20,
     // No background - transparent overlay
@@ -229,5 +282,30 @@ const styles = StyleSheet.create({
     textShadowColor: "rgba(0, 0, 0, 0.8)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
+  },
+  replayOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.7)", // Transparent black overlay
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  replayButton: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  replayButtonImage: {
+    width: 100,
+    height: 100,
+  },
+  doneButtonContainer: {
+    position: "absolute",
+    bottom: 40, // Positioned below the progress bar
+    left: 0,
+    right: 0,
+    alignItems: "center",
   },
 });
