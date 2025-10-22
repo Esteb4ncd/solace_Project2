@@ -107,6 +107,7 @@ export default function OnboardingQuestionsScreen() {
             onTaskToggle={handleTaskToggle}
             onTextChange={setTextInput}
             onVoiceInput={handleVoiceInput}
+            onNext={handleVoiceInput}
             isKeyboardVisible={isKeyboardVisible}
             currentQuestion={currentQuestion}
           />

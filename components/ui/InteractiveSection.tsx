@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import AnswerChip from './AnswerChip';
+import LargeButton from './LargeButton';
 import TextInputWithVoice from './TextInputWithVoice';
 
 interface InteractiveSectionProps {
@@ -9,6 +10,7 @@ interface InteractiveSectionProps {
   onTaskToggle: (task: string) => void;
   onTextChange: (text: string) => void;
   onVoiceInput: () => void;
+  onNext: () => void;
   isKeyboardVisible: boolean;
   currentQuestion: {
     title: string;
@@ -43,9 +45,12 @@ const InteractiveSection: React.FC<InteractiveSectionProps> = ({
   onTaskToggle,
   onTextChange,
   onVoiceInput,
+  onNext,
   isKeyboardVisible,
   currentQuestion,
 }) => {
+  const hasSelectedTasks = selectedTasks.length > 0;
+
   return (
     <View style={styles.interactiveSection}>
       {/* Task Selection Buttons */}
@@ -60,17 +65,24 @@ const InteractiveSection: React.FC<InteractiveSectionProps> = ({
         ))}
       </View>
       
-      {/* Text Input with Voice Button */}
-      <TextInputWithVoice
-        placeholder="Type or click to say something..."
-        value={textInput}
-        onChangeText={onTextChange}
-        onVoicePress={onVoiceInput}
-        isKeyboardVisible={isKeyboardVisible}
-        multiline={false}
-        autoFocus={false}
-        blurOnSubmit={false}
-      />
+      {/* Conditional rendering based on selection */}
+      {hasSelectedTasks ? (
+        <LargeButton 
+          label="Next" 
+          onPress={onNext}
+        />
+      ) : (
+        <TextInputWithVoice
+          placeholder="Type or click to say something..."
+          value={textInput}
+          onChangeText={onTextChange}
+          onVoicePress={onVoiceInput}
+          isKeyboardVisible={isKeyboardVisible}
+          multiline={false}
+          autoFocus={false}
+          blurOnSubmit={false}
+        />
+      )}
     </View>
   );
 };
