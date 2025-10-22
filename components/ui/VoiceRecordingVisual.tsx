@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, StyleSheet, View } from 'react-native';
+import { Animated, Dimensions, Pressable, StyleSheet, View } from 'react-native';
 import { Globals } from '../../constants/globals';
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 interface VoiceRecordingVisualProps {
   onSend: () => void;
@@ -106,56 +108,56 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    maxWidth: 350,
+    maxWidth: screenWidth * 0.9, // 90% of screen width
     backgroundColor: Globals.colors.white,
-    borderRadius: 24,
-    paddingLeft: 16,
-    paddingRight: 4,
-    paddingVertical: 4,
+    borderRadius: screenWidth * 0.06, // 6% of screen width
+    paddingLeft: screenWidth * 0.04, // 4% of screen width
+    paddingRight: screenWidth * 0.01, // 1% of screen width
+    paddingVertical: screenWidth * 0.01, // 1% of screen width
     borderWidth: 1,
     borderColor: Globals.colors.accentNormal,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: screenWidth * 0.005 }, // 0.5% of screen width
     shadowOpacity: 0.1,
-    shadowRadius: 3,
+    shadowRadius: screenWidth * 0.008, // 0.8% of screen width
     elevation: 3,
   },
   controlButton: {
     backgroundColor: Globals.colors.primaryButton,
-    borderRadius: 24,
-    width: 52,
-    height: 52,
+    borderRadius: screenWidth * 0.06, // 6% of screen width
+    width: screenWidth * 0.13, // 13% of screen width
+    height: screenWidth * 0.13, // 13% of screen width
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: -11,
+    marginLeft: screenWidth * -0.028, // -2.8% of screen width
   },
   stopIcon: {
-    width: 16,
-    height: 16,
+    width: screenWidth * 0.04, // 4% of screen width
+    height: screenWidth * 0.04, // 4% of screen width
     backgroundColor: '#000',
-    borderRadius: 2,
+    borderRadius: screenWidth * 0.005, // 0.5% of screen width
   },
   barsContainer: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 50,
+    height: screenWidth * 0.13, // 13% of screen width
   },
   bar: {
-    width: 3,
+    width: screenWidth * 0.008, // 0.8% of screen width
     backgroundColor: Globals.colors.primaryButton,
-    marginHorizontal: 1,
-    borderRadius: 1.5,
+    marginHorizontal: screenWidth * 0.0025, // 0.25% of screen width
+    borderRadius: screenWidth * 0.004, // 0.4% of screen width
   },
   sendButton: {
     backgroundColor: Globals.colors.primaryButton,
-    borderRadius: 24,
-    width: 52,
-    height: 52,
+    borderRadius: screenWidth * 0.06, // 6% of screen width
+    width: screenWidth * 0.13, // 13% of screen width
+    height: screenWidth * 0.13, // 13% of screen width
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 12,
+    marginLeft: screenWidth * 0.03, // 3% of screen width
   },
 });
 

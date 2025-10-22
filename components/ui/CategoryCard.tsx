@@ -1,7 +1,9 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Dimensions, Pressable, StyleSheet, Text } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { Globals } from '../../constants/globals';
+
+const { width: screenWidth } = Dimensions.get('window');
 
 interface CategoryCardProps {
   title: string;
@@ -27,21 +29,22 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ title, xpAmount, onPress })
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#F3F0FF',
-    borderRadius: 12,
-    width: 360,
-    height: 80,
-    paddingHorizontal: 20,
-    marginVertical: 4,
+    borderRadius: screenWidth * 0.03, // 12px on 400px screen
+    width: screenWidth * 0.9, // 90% of screen width
+    height: screenWidth * 0.2, // 20% of screen width (maintains aspect ratio)
+    paddingHorizontal: screenWidth * 0.05, // 5% of screen width
+    marginVertical: screenWidth * 0.01, // 1% of screen width
+    marginBottom: screenWidth * 0.04, // 4% of screen width (equivalent to ~16px)
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: screenWidth * 0.01, // 1% of screen width
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.25,
+    shadowRadius: screenWidth * 0.01, // 1% of screen width
     elevation: 4,
   },
   title: {

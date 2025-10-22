@@ -1,5 +1,7 @@
 import React from 'react';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 type NavItem = {
   id: string;
@@ -48,25 +50,25 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     backgroundColor: '#443E82',
-    width: 394,
-    height: 67,
+    width: screenWidth,
+    height: screenHeight * 0.08, // 8% of screen height
     justifyContent: 'space-around',
     alignItems: 'center',
   },
   navItem: {
     alignItems: 'center',
     flex: 1,
-    paddingVertical: 4,
+    paddingVertical: screenHeight * 0.005, // 0.5% of screen height
   },
   icon: {
-    width: 40,
-    height: 40,
+    width: screenWidth * 0.1, // 10% of screen width
+    height: screenWidth * 0.1, // 10% of screen width
     tintColor: '#fff',
   },
   physicalIcon: {
-    width: 50,
-    height: 50,
-    marginTop: 4,
+    width: screenWidth * 0.125, // 12.5% of screen width
+    height: screenWidth * 0.125, // 12.5% of screen width
+    marginTop: screenHeight * 0.005, // 0.5% of screen height
   },
 });
 
