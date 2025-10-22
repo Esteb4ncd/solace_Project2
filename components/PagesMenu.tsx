@@ -239,6 +239,34 @@ const styles = StyleSheet.create({
     color: '#000000',
     marginLeft: 12,
   },
+  tripleTapDetector: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999,
+  },
+  specialMenuItem: {
+    backgroundColor: '#f0f0f0',
+  },
+  sectionDivider: {
+    height: 1,
+    backgroundColor: '#e0e0e0',
+    marginVertical: 8,
+  },
+  testButton: {
+    backgroundColor: '#f8f4ff',
+  },
+  testText: {
+    color: '#8B5CF6',
+  },
+  resetButton: {
+    backgroundColor: '#fff5f5',
+  },
+  resetText: {
+    color: '#FF4444',
+  },
 });
 
 export default PagesMenu;
