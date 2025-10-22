@@ -1,35 +1,27 @@
+import TaskCard from '@/components/taskCards/TaskCard';
 import BottomNavigation from '@/components/ui/BottomNavigation';
 import Header from '@/components/ui/Header';
 import StatusBar from '@/components/ui/StatusBar';
-import TaskCard from '@/components/ui/TaskCard';
 import XPBar from '@/components/ui/XPBar';
 import { spacing } from '@/constants/styles';
 import { Colors } from '@/constants/theme';
 import React, { useState } from 'react';
-import { Image, Keyboard, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { Image, Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 
 const HomePage = () => {
   const [userName, setUserName] = useState("Solly");
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempUserName, setTempUserName] = useState("Solly");
   
-  const [dailyTasks, setDailyTasks] = useState([
-    { id: '1', title: 'Back Relief', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
+  const dailyTasks = [
+    { id: '1', title: 'Hand Warm Up', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
     { id: '2', title: 'Shoulder Relief', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
     { id: '3', title: 'Joint Relief', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
-  ]);
+  ];
 
-  const [additionalTasks] = useState([
+  const additionalTasks = [
     { id: '4', title: 'Stress Relief', xpAmount: 5, xpColor: '#7267D9', isCompleted: false },
-  ]);
-
-  const handleTaskPress = (taskId: string) => {
-    setDailyTasks(tasks =>
-      tasks.map(task =>
-        task.id === taskId ? { ...task, isCompleted: !task.isCompleted } : task
-      )
-    );
-  };
+  ];
 
   const handleNavPress = (itemId: string) => {
     console.log(`Navigating to ${itemId}`);
@@ -91,34 +83,18 @@ const HomePage = () => {
           </View>
 
           {/* Daily Checklist Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Daily Checklist</Text>
-            {dailyTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                title={task.title}
-                xpAmount={task.xpAmount}
-                xpColor={task.xpColor}
-                isCompleted={task.isCompleted}
-                onPress={() => handleTaskPress(task.id)}
-              />
-            ))}
-          </View>
+          <TaskCard 
+            tasks={dailyTasks}
+            exerciseType="physical"
+            isDaily={true}
+          />
 
           {/* Additional XP Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Need more xp? Try these</Text>
-            {additionalTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                title={task.title}
-                xpAmount={task.xpAmount}
-                xpColor={task.xpColor}
-                isCompleted={task.isCompleted}
-                onPress={() => handleTaskPress(task.id)}
-              />
-            ))}
-          </View>
+          <TaskCard 
+            tasks={additionalTasks}
+            exerciseType="mental"
+            isDaily={false}
+          />
 
           {/* Bottom spacing for navigation */}
           <View style={styles.bottomSpacing} />
@@ -156,15 +132,6 @@ const styles = StyleSheet.create({
   xpBarContainer: {
     alignItems: 'center',
     paddingVertical: 16,
-  },
-  section: {
-    paddingVertical: 16, // 16px margin from element above
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000000',
-    marginBottom: 8, // 8px margin between checklist items
   },
   bottomSpacing: {
     height: spacing.xxxl,
