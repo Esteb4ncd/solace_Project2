@@ -18,11 +18,15 @@ const VideoPlayerScreen = () => {
 
   const handleVideoEnd = () => {
     console.log('Video ended');
-    // You can add logic here for when the video ends
   };
 
   const handleVideoError = (error: any) => {
     console.log('Video error:', error);
+  };
+
+  const handleDone = () => {
+    console.log('Done button pressed');
+    router.back();
   };
 
   return (
@@ -33,6 +37,7 @@ const VideoPlayerScreen = () => {
         onBack={handleBack}
         onEnd={handleVideoEnd}
         onError={handleVideoError}
+        onDone={handleDone}
       />
     </View>
   );
