@@ -2,6 +2,7 @@ import { ResizeMode, Video } from 'expo-av';
 import React, { useRef, useState } from "react";
 import {
     Dimensions,
+    Image,
     StatusBar,
     StyleSheet,
     Text,
@@ -91,6 +92,21 @@ export default function LocalVideoPlayer({
             <Text style={styles.loadingText}>Loading...</Text>
           </View>
         )}
+
+        {/* Play/Pause Button Overlay */}
+        <TouchableOpacity 
+          style={styles.playButtonOverlay}
+          onPress={handlePlayPause}
+          activeOpacity={0.7}
+        >
+          {!isPlaying && (
+            <Image 
+              source={require('@/assets/physicalFlowAssets/PlayButton.png')}
+              style={styles.playButtonImage}
+              resizeMode="contain"
+            />
+          )}
+        </TouchableOpacity>
       </View>
 
       {/* Bottom Controls */}
@@ -158,6 +174,19 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "500",
+  },
+  playButtonOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  playButtonImage: {
+    width: 80,
+    height: 80,
   },
   bottomControls: {
     position: "absolute",
