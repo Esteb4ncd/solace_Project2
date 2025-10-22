@@ -2,13 +2,18 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Globals } from '../../constants/globals';
+import VoiceRecordingVisual from './VoiceRecordingVisual';
 
 interface TextInputWithVoiceProps {
   placeholder?: string;
   value?: string;
   onChangeText?: (text: string) => void;
   onVoicePress?: () => void;
+  onStopRecording?: () => void;
+  onSendRecording?: () => void;
   isKeyboardVisible?: boolean;
+  isRecording?: boolean;
+  isPaused?: boolean;
   multiline?: boolean;
   autoFocus?: boolean;
   blurOnSubmit?: boolean;
@@ -19,11 +24,26 @@ const TextInputWithVoice: React.FC<TextInputWithVoiceProps> = ({
   value = "",
   onChangeText,
   onVoicePress,
+  onStopRecording,
+  onSendRecording,
   isKeyboardVisible = false,
+  isRecording = false,
+  isPaused = false,
   multiline = false,
   autoFocus = false,
   blurOnSubmit = false,
 }) => {
+  // If recording, show the voice recording visual
+  if (isRecording) {
+    return (
+      <VoiceRecordingVisual
+        onStop={onStopRecording || (() => {})}
+        onSend={onSendRecording || (() => {})}
+        isPaused={isPaused}
+      />
+    );
+  }
+
   return (
     <View style={styles.inputContainer}>
       <TextInput

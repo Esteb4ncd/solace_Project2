@@ -10,8 +10,12 @@ interface InteractiveSectionProps {
   onTaskToggle: (task: string) => void;
   onTextChange: (text: string) => void;
   onVoiceInput: () => void;
+  onStopRecording: () => void;
+  onSendRecording: () => void;
   onNext: () => void;
   isKeyboardVisible: boolean;
+  isRecording: boolean;
+  isPaused: boolean;
   currentQuestion: {
     title: string;
     options: string[];
@@ -31,10 +35,10 @@ export const questions = [
   {
     title: "Where do you usually feel pain or discomfort?",
     options: [
-      "Left shoulder",
-      "Right Shoulder",
-      "Right Knee",
-      "Central lower back"
+      "Shoulders",
+      "Knees",
+      "Hands & Wrists",
+      "Back"
     ]
   }
 ];
@@ -45,8 +49,12 @@ const InteractiveSection: React.FC<InteractiveSectionProps> = ({
   onTaskToggle,
   onTextChange,
   onVoiceInput,
+  onStopRecording,
+  onSendRecording,
   onNext,
   isKeyboardVisible,
+  isRecording,
+  isPaused,
   currentQuestion,
 }) => {
   const hasSelectedTasks = selectedTasks.length > 0;
@@ -77,7 +85,11 @@ const InteractiveSection: React.FC<InteractiveSectionProps> = ({
           value={textInput}
           onChangeText={onTextChange}
           onVoicePress={onVoiceInput}
+          onStopRecording={onStopRecording}
+          onSendRecording={onSendRecording}
           isKeyboardVisible={isKeyboardVisible}
+          isRecording={isRecording}
+          isPaused={isPaused}
           multiline={false}
           autoFocus={false}
           blurOnSubmit={false}
