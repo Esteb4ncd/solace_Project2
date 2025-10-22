@@ -1,107 +1,90 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, StyleSheet, View } from 'react-native';
 import { Globals } from '../../constants/globals';
 
 interface VoiceRecordingVisualProps {
-  onStop: () => void;
   onSend: () => void;
-  isPaused?: boolean;
 }
 
-const VoiceRecordingVisual: React.FC<VoiceRecordingVisualProps> = ({ onStop, onSend, isPaused = false }) => {
-  const animationRefs = useRef<Animated.Value[]>([]);
-  
-  // Initialize animated values for each bar
-  useEffect(() => {
-    animationRefs.current = Array.from({ length: 20 }, () => new Animated.Value(0.3));
-    
-    // Start animations immediately when component mounts
-    const startAnimations = () => {
-      const animations = animationRefs.current.map((anim, index) => 
-        Animated.loop(
-          Animated.sequence([
-            Animated.timing(anim, {
-              toValue: Math.random() * 0.7 + 0.3, // Random height between 0.3 and 1
-              duration: 200 + Math.random() * 300, // Random duration
-              useNativeDriver: false,
-            }),
-            Animated.timing(anim, {
-              toValue: Math.random() * 0.7 + 0.3,
-              duration: 200 + Math.random() * 300,
-              useNativeDriver: false,
-            }),
-          ])
-        )
-      );
-      
-      animations.forEach(animation => animation.start());
-      return animations;
-    };
+const VoiceRecordingVisual: React.FC<VoiceRecordingVisualProps> = ({ onSend }) => {
+  const [isPaused, setIsPaused] = useState(false);
 
-    const animations = startAnimations();
-    
-    return () => {
-      animations.forEach(animation => animation.stop());
-    };
+  // Create animated values right away (one for each bar)
+  const animationRefs = useRef(
+    Array.from({ length: 20 }, () => new Animated.Value(0.1))
+  );
+  const animationLoops = useRef<Animated.CompositeAnimation[]>([]);
+
+  // Initialize and start animations once
+  useEffect(() => {
+    animationLoops.current = animationRefs.current.map((anim, index) => {
+      const base = 0.1 + (index % 4) * 0.1;
+      const max = 0.9 + Math.random() * 0.3;
+
+      return Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, {
+            toValue: base + Math.random() * (max - base),
+            duration: 150 + Math.random() * 200,
+            useNativeDriver: false,
+          }),
+          Animated.timing(anim, {
+            toValue: base + Math.random() * (max - base),
+            duration: 150 + Math.random() * 200,
+            useNativeDriver: false,
+          }),
+        ])
+      );
+    });
+
+    animationLoops.current.forEach(loop => loop.start());
+
+    return () => animationLoops.current.forEach(loop => loop.stop());
   }, []);
 
-  // Control animations based on pause state
-  useEffect(() => {
-    if (animationRefs.current.length > 0) {
-      animationRefs.current.forEach(anim => {
-        if (isPaused) {
-          anim.stopAnimation();
-        } else {
-          // Resume animation with new random values
-          Animated.loop(
-            Animated.sequence([
-              Animated.timing(anim, {
-                toValue: Math.random() * 0.7 + 0.3,
-                duration: 200 + Math.random() * 300,
-                useNativeDriver: false,
-              }),
-              Animated.timing(anim, {
-                toValue: Math.random() * 0.7 + 0.3,
-                duration: 200 + Math.random() * 300,
-                useNativeDriver: false,
-              }),
-            ])
-          ).start();
-        }
-      });
+  // Toggle play/pause
+  const handlePlayPause = () => {
+    if (isPaused) {
+      // resume animations
+      animationLoops.current.forEach(loop => loop.start());
+      setIsPaused(false);
+    } else {
+      // pause animations
+      animationLoops.current.forEach(loop => loop.stop());
+      setIsPaused(true);
     }
-  }, [isPaused]);
+  };
 
   return (
     <View style={styles.container}>
-      {/* Stop/Pause Button */}
-      <Pressable style={styles.stopButton} onPress={onStop}>
-        {isPaused ? (
-          <Ionicons name="play" size={16} color="#000" />
-        ) : (
-          <View style={styles.stopIcon} />
-        )}
-      </Pressable>
-      
+       {/* Play/Pause Button */}
+       <Pressable style={styles.controlButton} onPress={handlePlayPause}>
+         {isPaused ? (
+           <Ionicons name="play" size={16} color="#000" />
+         ) : (
+           <View style={styles.stopIcon} />
+         )}
+       </Pressable>
+
       {/* Animated Bars */}
       <View style={styles.barsContainer}>
-        {animationRefs.current.map((anim, index) => (
+        {animationRefs.current.map((anim, i) => (
           <Animated.View
-            key={index}
+            key={i}
             style={[
               styles.bar,
               {
                 height: anim.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [8, 40], // Min and max bar heights
+                  outputRange: [4, 50],
                 }),
               },
             ]}
           />
         ))}
       </View>
-      
+
       {/* Send Button */}
       <Pressable style={styles.sendButton} onPress={onSend}>
         <Ionicons name="arrow-up" size={16} color="#000" />
@@ -124,22 +107,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Globals.colors.accentNormal,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 3,
   },
-  stopButton: {
-    backgroundColor: '#90EE90', // Light green
+  controlButton: {
+    backgroundColor: Globals.colors.primaryButton,
     borderRadius: 24,
     width: 52,
     height: 52,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginLeft: -11,
   },
   stopIcon: {
     width: 16,
@@ -152,22 +132,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 40,
+    height: 50,
   },
   bar: {
     width: 3,
-    backgroundColor: '#90EE90', // Light green
+    backgroundColor: Globals.colors.primaryButton,
     marginHorizontal: 1,
     borderRadius: 1.5,
   },
   sendButton: {
-    backgroundColor: '#90EE90', // Light green
+    backgroundColor: Globals.colors.primaryButton,
     borderRadius: 24,
     width: 52,
     height: 52,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 12,
+    
   },
 });
 
