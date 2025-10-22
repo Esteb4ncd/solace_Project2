@@ -4,6 +4,7 @@ import StatusBar from '@/components/ui/StatusBar';
 import XPBar from '@/components/ui/XPBar';
 import { Globals } from '@/constants/globals';
 import { Colors } from '@/constants/theme';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -13,7 +14,22 @@ const PhysicalHomePage = () => {
   const [userName] = useState("Sarah");
   
   const handleNavPress = (itemId: string) => {
-    console.log(`Navigating to ${itemId}`);
+    switch (itemId) {
+      case 'home':
+        router.push('/(tabs)/homePage');
+        break;
+      case 'physical':
+        // Already on physical page
+        break;
+      case 'mental':
+        router.push('/(tabs)/mentalHomePage');
+        break;
+      case 'account':
+        router.push('/(tabs)/signInPage');
+        break;
+      default:
+        console.log(`Navigating to ${itemId}`);
+    }
   };
 
   const handleExercisePress = (exerciseName: string) => {
