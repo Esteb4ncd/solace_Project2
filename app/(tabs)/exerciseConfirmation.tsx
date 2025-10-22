@@ -93,8 +93,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "black",
     textAlign: "center",
-    marginTop: 80,
-    marginBottom: 8,
+    marginTop: 130,
+    marginBottom: 10,
   },
   xpReward: {
     fontSize: 24,
@@ -106,19 +106,18 @@ const styles = StyleSheet.create({
   characterContainer: {
     alignItems: "center",
     justifyContent: "center",
-    flex: 1,
-    marginBottom: 20,
+    marginBottom: 40,
   },
   sollyImage: {
-    width: 150,
-    height: 150,
+    width: 200,
+    height: 200,
   },
   duration: {
     fontSize: 24,
     fontWeight: "bold",
     color: "black",
     textAlign: "center",
-    marginBottom: 60,
+    marginBottom: 80,
   },
   startButtonContainer: {
     alignItems: "center",
