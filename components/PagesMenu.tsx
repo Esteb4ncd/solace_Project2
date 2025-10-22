@@ -87,6 +87,8 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
     { name: 'onboardingQuestions', title: 'Onboarding Questions', icon: 'help-circle' },
     { name: 'confirmation', title: 'Confirmation', icon: 'checkmark-circle' },
     { name: 'homePage', title: 'Home Page', icon: 'home-outline' },
+    { name: 'physicalHomePage', title: 'Physical Home Page', icon: 'fitness' },
+    { name: 'mentalHomePage', title: 'Mental Home Page', icon: 'brain' },
     { name: 'hide', title: 'Hide Menu', icon: 'eye-off', isSpecial: true },
   ];
 
