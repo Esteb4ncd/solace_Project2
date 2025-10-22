@@ -3,7 +3,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import LargeButton from '../../components/ui/LargeButton';
 import OnboardingMascot from '../../components/ui/OnboardingMascot';
 import TextInputWithVoice from '../../components/ui/TextInputWithVoice';
@@ -66,8 +66,19 @@ export default function ConfirmationScreen() {
   };
 
   const handleVoicePress = () => {
-    // Navigate to confirmation page
-    router.push('/(tabs)/confirmation');
+    // This will be called when keyboard is visible (send functionality)
+    // For now, just show an alert
+    Alert.alert(
+      "Message sent",
+      "Your message has been sent",
+      [{ text: "OK" }]
+    );
+  };
+
+  const handleSend = () => {
+    // This will be called when voice recording is sent
+    // Navigate to next page
+    handleYesPress();
   };
 
   const dismissKeyboard = () => {
@@ -143,6 +154,7 @@ export default function ConfirmationScreen() {
         <TextInputWithVoice
           placeholder="No, add more..."
           onVoicePress={handleVoicePress}
+          onSend={handleSend}
           isKeyboardVisible={isKeyboardVisible}
           autoFocus={false}
         />

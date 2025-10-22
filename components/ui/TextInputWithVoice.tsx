@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Globals } from '../../constants/globals';
 import VoiceRecordingVisual from './VoiceRecordingVisual';
@@ -9,11 +9,8 @@ interface TextInputWithVoiceProps {
   value?: string;
   onChangeText?: (text: string) => void;
   onVoicePress?: () => void;
-  onStopRecording?: () => void;
-  onSendRecording?: () => void;
+  onSend?: () => void;
   isKeyboardVisible?: boolean;
-  isRecording?: boolean;
-  isPaused?: boolean;
   multiline?: boolean;
   autoFocus?: boolean;
   blurOnSubmit?: boolean;
@@ -24,22 +21,35 @@ const TextInputWithVoice: React.FC<TextInputWithVoiceProps> = ({
   value = "",
   onChangeText,
   onVoicePress,
-  onStopRecording,
-  onSendRecording,
+  onSend,
   isKeyboardVisible = false,
-  isRecording = false,
-  isPaused = false,
   multiline = false,
   autoFocus = false,
   blurOnSubmit = false,
 }) => {
+  const [isRecording, setIsRecording] = useState(false);
+
+  const handleVoicePress = () => {
+    if (isKeyboardVisible) {
+      // When keyboard is visible, call the original onVoicePress (for send functionality)
+      onVoicePress?.();
+    } else {
+      // When keyboard is not visible, start recording
+      setIsRecording(true);
+    }
+  };
+
+  const handleSendRecording = () => {
+    setIsRecording(false);
+    // Call the onSend function to navigate to next page
+    onSend?.();
+  };
+
   // If recording, show the voice recording visual
   if (isRecording) {
     return (
       <VoiceRecordingVisual
-        onStop={onStopRecording || (() => {})}
-        onSend={onSendRecording || (() => {})}
-        isPaused={isPaused}
+        onSend={handleSendRecording}
       />
     );
   }
@@ -56,7 +66,7 @@ const TextInputWithVoice: React.FC<TextInputWithVoiceProps> = ({
         autoFocus={autoFocus}
         blurOnSubmit={blurOnSubmit}
       />
-      <Pressable style={styles.voiceButton} onPress={onVoicePress}>
+      <Pressable style={styles.voiceButton} onPress={handleVoicePress}>
         <Ionicons 
           name={isKeyboardVisible ? "play" : "mic"} 
           size={16} 

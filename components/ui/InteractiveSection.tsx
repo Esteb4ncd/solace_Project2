@@ -10,12 +10,8 @@ interface InteractiveSectionProps {
   onTaskToggle: (task: string) => void;
   onTextChange: (text: string) => void;
   onVoiceInput: () => void;
-  onStopRecording: () => void;
-  onSendRecording: () => void;
   onNext: () => void;
   isKeyboardVisible: boolean;
-  isRecording: boolean;
-  isPaused: boolean;
   currentQuestion: {
     title: string;
     options: string[];
@@ -49,12 +45,8 @@ const InteractiveSection: React.FC<InteractiveSectionProps> = ({
   onTaskToggle,
   onTextChange,
   onVoiceInput,
-  onStopRecording,
-  onSendRecording,
   onNext,
   isKeyboardVisible,
-  isRecording,
-  isPaused,
   currentQuestion,
 }) => {
   const hasSelectedTasks = selectedTasks.length > 0;
@@ -85,11 +77,8 @@ const InteractiveSection: React.FC<InteractiveSectionProps> = ({
           value={textInput}
           onChangeText={onTextChange}
           onVoicePress={onVoiceInput}
-          onStopRecording={onStopRecording}
-          onSendRecording={onSendRecording}
+          onSend={onNext}
           isKeyboardVisible={isKeyboardVisible}
-          isRecording={isRecording}
-          isPaused={isPaused}
           multiline={false}
           autoFocus={false}
           blurOnSubmit={false}
