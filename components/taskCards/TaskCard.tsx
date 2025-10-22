@@ -23,7 +23,7 @@ const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDai
 
   const getSectionTitle = () => {
     if (exerciseType === 'physical') {
-      return 'Daily Checklist';
+      return 'Your Exercises';
     } else {
       return 'Need more xp? Try these';
     }
