@@ -12,6 +12,8 @@ export default function OnboardingQuestionsScreen() {
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [textInput, setTextInput] = useState('');
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const { next, findingIndex, previousTasks } = useLocalSearchParams();
 
@@ -48,9 +50,37 @@ export default function OnboardingQuestionsScreen() {
   };
 
   const handleVoiceInput = () => {
+    if (isKeyboardVisible) {
+      // When keyboard is visible, show "Message sent" and clear the text
+      Alert.alert(
+        "Message sent",
+        "Your message has been sent",
+        [{ text: "OK" }]
+      );
+      setTextInput(''); // Clear the text input
+    } else {
+      // When keyboard is not visible, start recording
+      setIsRecording(true);
+      setIsPaused(false); // Start with animation running
+    }
+  };
+
+  const handleStopRecording = () => {
+    if (isPaused) {
+      // If paused, resume recording
+      setIsPaused(false);
+    } else {
+      // If recording, pause it
+      setIsPaused(true);
+    }
+  };
+
+  const handleSendRecording = () => {
+    setIsRecording(false);
+    setIsPaused(false);
     Alert.alert(
-      "Voice Feature",
-      "This is where the voice feature would go",
+      "Voice message sent",
+      "Your voice message has been sent",
       [{ text: "OK" }]
     );
   };
@@ -115,8 +145,12 @@ export default function OnboardingQuestionsScreen() {
             onTaskToggle={handleTaskToggle}
             onTextChange={setTextInput}
             onVoiceInput={handleVoiceInput}
+            onStopRecording={handleStopRecording}
+            onSendRecording={handleSendRecording}
             onNext={handleNextQuestion}
             isKeyboardVisible={isKeyboardVisible}
+            isRecording={isRecording}
+            isPaused={isPaused}
             currentQuestion={currentQuestion}
           />
         </View>
