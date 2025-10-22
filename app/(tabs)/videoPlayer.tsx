@@ -26,7 +26,10 @@ const VideoPlayerScreen = () => {
 
   const handleDone = () => {
     console.log('Done button pressed');
-    router.back();
+    router.push({
+      pathname: '/xpGain',
+      params: { xpAmount: '10' }
+    });
   };
 
   return (
