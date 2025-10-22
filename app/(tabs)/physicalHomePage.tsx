@@ -5,7 +5,9 @@ import XPBar from '@/components/ui/XPBar';
 import { Globals } from '@/constants/globals';
 import { Colors } from '@/constants/theme';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const PhysicalHomePage = () => {
   const [userName] = useState("Sarah");
@@ -87,33 +89,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.light.background,
-    width: 393,
-    height: 852,
+    width: screenWidth,
+    height: screenHeight,
   },
   scrollView: {
     flex: 1,
   },
   contentContainer: {
-    paddingHorizontal: Globals.spacing.medium,
+    paddingHorizontal: screenWidth * 0.04, // 4% of screen width
   },
   headerSection: {
-    paddingTop: 20,
-    paddingBottom: 24,
+    paddingTop: screenHeight * 0.025, // 2.5% of screen height
+    paddingBottom: screenHeight * 0.03, // 3% of screen height
   },
   progressContainer: {
-    marginBottom: Globals.spacing.medium,
+    marginBottom: screenHeight * 0.02, // 2% of screen height
   },
   greeting: {
     ...Globals.fonts.styles.header1,
   },
   section: {
-    marginBottom: 32,
+    marginBottom: screenHeight * 0.04, // 4% of screen height
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: screenHeight * 0.015, // 1.5% of screen height
   },
   sectionTitle: {
     ...Globals.fonts.styles.header2Bold,
@@ -123,7 +125,7 @@ const styles = StyleSheet.create({
     color: '#7267D9',
   },
   bottomSpacing: {
-    height: 100,
+    height: screenHeight * 0.12, // 12% of screen height
   },
 });
 

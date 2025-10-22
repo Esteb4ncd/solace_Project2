@@ -4,11 +4,12 @@ import CompletedTask from '@/components/ui/CompletedTask';
 import Header from '@/components/ui/Header';
 import StatusBar from '@/components/ui/StatusBar';
 import XPBar from '@/components/ui/XPBar';
-import { spacing } from '@/constants/styles';
 import { Colors } from '@/constants/theme';
 import { useExerciseContext } from '@/contexts/ExerciseContext';
 import React, { useState } from 'react';
-import { Image, Keyboard, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { Dimensions, Image, Keyboard, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const HomePage = () => {
   const [userName, setUserName] = useState("Solly");
@@ -128,39 +129,39 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.light.background,
-    width: 393,
-    height: 852,
+    width: screenWidth,
+    height: screenHeight,
   },
   scrollView: {
     flex: 1,
   },
   contentContainer: {
-    paddingHorizontal: 16, // 16px left/right margins
+    paddingHorizontal: screenWidth * 0.04, // 4% of screen width
   },
   avatarSection: {
     alignItems: 'center',
-    paddingVertical: 8, // Reduced from 32px to 8px
+    paddingVertical: screenHeight * 0.01, // 1% of screen height
   },
   avatar: {
-    width: 150,
-    height: 150,
+    width: screenWidth * 0.38, // 38% of screen width
+    height: screenWidth * 0.38, // 38% of screen width (maintains aspect ratio)
     resizeMode: 'contain',
   },
   xpBarContainer: {
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: screenHeight * 0.02, // 2% of screen height
   },
   bottomSpacing: {
-    height: spacing.xxxl,
+    height: screenHeight * 0.12, // 12% of screen height
   },
   completedSection: {
-    marginTop: 20,
+    marginTop: screenHeight * 0.025, // 2.5% of screen height
   },
   completedSectionTitle: {
-    fontSize: 20,
+    fontSize: screenWidth * 0.05, // 5% of screen width
     fontWeight: 'bold',
     color: '#000000',
-    marginBottom: 12,
+    marginBottom: screenHeight * 0.015, // 1.5% of screen height
   },
 });
 

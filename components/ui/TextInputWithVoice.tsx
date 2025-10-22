@@ -1,8 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Dimensions, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Globals } from '../../constants/globals';
 import VoiceRecordingVisual from './VoiceRecordingVisual';
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 interface TextInputWithVoiceProps {
   placeholder?: string;
@@ -82,37 +84,37 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    maxWidth: 350,
+    maxWidth: screenWidth * 0.9, // 90% of screen width
     backgroundColor: Globals.colors.white,
-    borderRadius: 24,
-    paddingLeft: 16,
-    paddingRight: 4,
-    paddingVertical: 4,
+    borderRadius: screenWidth * 0.06, // 6% of screen width
+    paddingLeft: screenWidth * 0.04, // 4% of screen width
+    paddingRight: screenWidth * 0.01, // 1% of screen width
+    paddingVertical: screenWidth * 0.01, // 1% of screen width
     borderWidth: 1,
     borderColor: Globals.colors.accentNormal,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: screenWidth * 0.005, // 0.5% of screen width
     },
     shadowOpacity: 0.1,
-    shadowRadius: 3,
+    shadowRadius: screenWidth * 0.008, // 0.8% of screen width
     elevation: 3,
   },
   textInput: {
     flex: 1,
     ...Globals.fonts.styles.caption,
     color: '#000',
-    paddingVertical: 4,
+    paddingVertical: screenWidth * 0.01, // 1% of screen width
   },
   voiceButton: {
     backgroundColor: Globals.colors.accentNormal,
-    borderRadius: 24,
-    width: 52,
-    height: 52,
+    borderRadius: screenWidth * 0.06, // 6% of screen width
+    width: screenWidth * 0.13, // 13% of screen width
+    height: screenWidth * 0.13, // 13% of screen width
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 12,
+    marginLeft: screenWidth * 0.03, // 3% of screen width
   },
 });
 
