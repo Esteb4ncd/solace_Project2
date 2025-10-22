@@ -73,7 +73,7 @@ const InteractiveSection: React.FC<InteractiveSectionProps> = ({
         />
       ) : (
         <TextInputWithVoice
-          placeholder="Type or click to say something..."
+          placeholder="Type or say something..."
           value={textInput}
           onChangeText={onTextChange}
           onVoicePress={onVoiceInput}

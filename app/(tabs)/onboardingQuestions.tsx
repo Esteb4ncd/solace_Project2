@@ -3,7 +3,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import InteractiveSection, { questions } from '../../components/ui/InteractiveSection';
 import OnboardingMascot from '../../components/ui/OnboardingMascot';
 import { Globals } from '../../constants/globals';
@@ -13,7 +13,7 @@ export default function OnboardingQuestionsScreen() {
   const [textInput, setTextInput] = useState('');
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const { next, findingIndex } = useLocalSearchParams();
+  const { next, findingIndex, previousTasks } = useLocalSearchParams();
 
   useEffect(() => {
     // If coming from confirmation page, advance to next finding
@@ -48,15 +48,23 @@ export default function OnboardingQuestionsScreen() {
   };
 
   const handleVoiceInput = () => {
-    // Navigate to confirmation page with current finding index
-    router.push(`/(tabs)/confirmation?findingIndex=${currentQuestionIndex}`);
+    Alert.alert(
+      "Voice Feature",
+      "This is where the voice feature would go",
+      [{ text: "OK" }]
+    );
   };
 
   const handleNextQuestion = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedTasks([]);
-      setTextInput('');
+    // Navigate to confirmation page with current finding index and selected tasks
+    const selectedTasksParam = selectedTasks.join(',');
+    
+    if (currentQuestionIndex === 1 && previousTasks) {
+      // This is the second question, pass both previous tasks and current body parts
+      router.push(`/(tabs)/confirmation?findingIndex=${currentQuestionIndex}&selectedTasks=${selectedTasksParam}&previousTasks=${previousTasks}`);
+    } else {
+      // First question, just pass current tasks
+      router.push(`/(tabs)/confirmation?findingIndex=${currentQuestionIndex}&selectedTasks=${selectedTasksParam}`);
     }
   };
 
@@ -107,7 +115,7 @@ export default function OnboardingQuestionsScreen() {
             onTaskToggle={handleTaskToggle}
             onTextChange={setTextInput}
             onVoiceInput={handleVoiceInput}
-            onNext={handleVoiceInput}
+            onNext={handleNextQuestion}
             isKeyboardVisible={isKeyboardVisible}
             currentQuestion={currentQuestion}
           />

@@ -27,10 +27,14 @@ const confirmations = [
 ];
 
 export default function ConfirmationScreen() {
-  const { findingIndex } = useLocalSearchParams();
+  const { findingIndex, selectedTasks, previousTasks } = useLocalSearchParams();
   const confirmationIndex = findingIndex ? parseInt(findingIndex as string) : 0;
   const currentConfirmation = confirmations[confirmationIndex];
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  
+  // Parse selected tasks from URL parameter
+  const selectedTasksArray = selectedTasks ? (selectedTasks as string).split(',') : [];
+  const previousTasksArray = previousTasks ? (previousTasks as string).split(',') : [];
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -48,8 +52,9 @@ export default function ConfirmationScreen() {
 
   const handleYesPress = () => {
     if (currentConfirmation.nextFindingIndex !== null) {
-      // Navigate back to onboardingQuestions with the next finding
-      router.push(`/(tabs)/onboardingQuestions?next=true&findingIndex=${currentConfirmation.nextFindingIndex}`);
+      // Navigate back to onboardingQuestions with the next finding and pass along the selected tasks
+      const selectedTasksParam = selectedTasksArray.join(',');
+      router.push(`/(tabs)/onboardingQuestions?next=true&findingIndex=${currentConfirmation.nextFindingIndex}&previousTasks=${selectedTasksParam}`);
     } else {
       // End of findings - navigate to homepage
       router.push('/(tabs)/homePage');
@@ -108,11 +113,15 @@ export default function ConfirmationScreen() {
         confirmationIndex === 1 ? styles.findingContainerSecond : styles.findingContainer,
         isKeyboardVisible && styles.findingContainerKeyboardVisible
       ]}>
-        {confirmationIndex === 1 ? (
+        {confirmationIndex === 0 ? (
+          <ThemedText style={styles.mainFinding}>
+            Your tasks involve <ThemedText style={styles.boldText}>{selectedTasksArray.join(', ')}</ThemedText>.
+          </ThemedText>
+        ) : confirmationIndex === 1 ? (
           <ThemedText style={styles.mainFindingRegular}>
-            Your exercises will target your <ThemedText style={styles.boldText}>left shoulder and right knee</ThemedText>.
+            Your exercises will target <ThemedText style={styles.boldText}>{selectedTasksArray.join(', ')}</ThemedText>.
             {'\n\n'}
-            Your exercises will help you with <ThemedText style={styles.boldText}>heavy lifting and overhead work</ThemedText>.
+            Your exercises will help you with <ThemedText style={styles.boldText}>{previousTasksArray.join(', ')}</ThemedText>.
           </ThemedText>
         ) : (
           <ThemedText style={styles.mainFinding}>
@@ -132,7 +141,7 @@ export default function ConfirmationScreen() {
       {/* Text Input Section */}
       <View style={styles.inputSection}>
         <TextInputWithVoice
-          placeholder="Type or click to say something..."
+          placeholder="No, add more..."
           onVoicePress={handleVoicePress}
           isKeyboardVisible={isKeyboardVisible}
           autoFocus={false}
