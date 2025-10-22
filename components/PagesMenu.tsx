@@ -1,13 +1,33 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
-import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 const PagesMenu = ({ hideOnTutorial = false }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+  const [tapCount, setTapCount] = useState(0);
+  const tapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
-  console.log('PagesMenu hideOnTutorial:', hideOnTutorial);
-
+  // Triple tap detection
+  const handleTripleTap = () => {
+    if (tapCount === 2) {
+      setIsHidden(false);
+      setTapCount(0);
+      if (tapTimeoutRef.current) {
+        clearTimeout(tapTimeoutRef.current);
+      }
+    } else {
+      setTapCount(prev => prev + 1);
+      if (tapTimeoutRef.current) {
+        clearTimeout(tapTimeoutRef.current);
+      }
+      tapTimeoutRef.current = setTimeout(() => {
+        setTapCount(0);
+      }, 500); // Reset tap count after 500ms
+    }
+  };
+  
   const toggleMenu = () => {
     setIsMenuVisible(!isMenuVisible);
   };
@@ -17,6 +37,11 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
     router.push(`/(tabs)/${screenName}` as any);
   };
 
+  const hideMenu = () => {
+    setIsMenuVisible(false);
+    setIsHidden(true);
+  };
+
   const menuItems = [
     { name: 'signInPage', title: 'Sign In Page', icon: 'log-in' },
     { name: 'tutorial', title: 'Tutorial', icon: 'school' },
@@ -24,16 +49,22 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
     { name: 'onboardingQuestions', title: 'Onboarding Questions', icon: 'help-circle' },
     { name: 'confirmation', title: 'Confirmation', icon: 'checkmark-circle' },
     { name: 'homePage', title: 'Home Page', icon: 'home-outline' },
+    { name: 'hide', title: 'Hide Menu', icon: 'eye-off', isSpecial: true },
   ];
 
   return (
     <>
-      {!hideOnTutorial && (
+      {!hideOnTutorial && !isHidden && (
         <View style={styles.floatingMenu}>
           <Pressable onPress={toggleMenu} style={styles.menuButton}>
             <Ionicons name="menu" size={24} color="#000" />
           </Pressable>
         </View>
+      )}
+
+      {/* Triple tap detector when hidden */}
+      {isHidden && (
+        <Pressable style={styles.tripleTapDetector} onPress={handleTripleTap} />
       )}
 
       <Modal
@@ -57,8 +88,14 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
             {menuItems.map((item) => (
               <Pressable
                 key={item.name}
-                style={styles.menuItem}
-                onPress={() => navigateToScreen(item.name)}
+                style={[styles.menuItem, item.isSpecial && styles.specialMenuItem]}
+                onPress={() => {
+                  if (item.isSpecial) {
+                    hideMenu();
+                  } else {
+                    navigateToScreen(item.name);
+                  }
+                }}
               >
                 <Ionicons name={item.icon as any} size={20} color="#000" />
                 <Text style={styles.menuItemText}>{item.title}</Text>
@@ -74,14 +111,9 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
 const styles = StyleSheet.create({
   floatingMenu: {
     position: 'absolute',
-    top: Platform.OS === 'web' ? 20 : 50, // Closer to top on web
+    top: 50,
     right: 20,
     zIndex: 1000,
-    // Ensure proper positioning on web
-    ...(Platform.OS === 'web' && {
-      maxWidth: 393,
-      right: 20,
-    }),
   },
   menuButton: {
     padding: 8,
@@ -144,6 +176,20 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#000000',
     marginLeft: 12,
+  },
+  specialMenuItem: {
+    backgroundColor: '#f0f0f0',
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    marginTop: 8,
+  },
+  tripleTapDetector: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999,
   },
 });
 
