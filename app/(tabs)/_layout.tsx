@@ -84,6 +84,13 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <Ionicons name="log-in" size={24} color={color} />,
           }}
         />
+        <Tabs.Screen
+          name="videoPlayer"
+          options={{
+            title: 'Video Player',
+            tabBarIcon: ({ color }) => <Ionicons name="play-circle" size={24} color={color} />,
+          }}
+        />
       </Tabs>
     </View>
   );
