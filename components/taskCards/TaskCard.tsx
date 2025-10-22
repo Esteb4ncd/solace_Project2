@@ -38,32 +38,49 @@ const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDai
       [taskId]: !prev[taskId]
     }));
     
-    // If this is a daily task, navigate to VideoPlayer
+    // If this is a daily task, navigate to Exercise Confirmation page
     if (isDaily) {
-      console.log('Navigating to VideoPlayer for daily task:', taskId);
+      console.log('Navigating to Exercise Confirmation for daily task:', taskId);
       
-      // Get the specific video ID based on taskId
-      const getVideoId = (id: string) => {
+      // Get exercise details based on taskId
+      const getExerciseDetails = (id: string) => {
         switch (id) {
           case '1': // Hand Warm Up
-            return 'RYw0TmopxC8';
+            return {
+              name: 'Hand Warm Up',
+              xpReward: '10',
+              duration: '10 seconds'
+            };
           case '2': // Shoulder Relief
-            return 'dQw4w9WgXcQ'; // Default video for now
+            return {
+              name: 'Shoulder Relief',
+              xpReward: '15',
+              duration: '3 minutes'
+            };
           case '3': // Joint Relief
-            return 'dQw4w9WgXcQ'; // Default video for now
+            return {
+              name: 'Joint Relief',
+              xpReward: '20',
+              duration: '5 minutes'
+            };
           default:
-            return 'dQw4w9WgXcQ'; // Default video
+            return {
+              name: 'Exercise',
+              xpReward: '10',
+              duration: '2 minutes'
+            };
         }
       };
 
-      const videoId = getVideoId(taskId);
-      console.log('Video ID:', videoId);
+      const exerciseDetails = getExerciseDetails(taskId);
+      console.log('Exercise details:', exerciseDetails);
 
       router.push({
-        pathname: '/videoPlayer',
+        pathname: '/exerciseConfirmation',
         params: { 
-          videoId: videoId,
-          type: 'daily'
+          exerciseName: exerciseDetails.name,
+          xpReward: exerciseDetails.xpReward,
+          duration: exerciseDetails.duration
         }
       });
     }
