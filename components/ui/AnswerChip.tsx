@@ -36,9 +36,8 @@ const styles = StyleSheet.create({
     margin: 8,
   }, 
   chipSelected: {
-    backgroundColor: '#fff',
-    borderColor: '#000',
-    borderStyle: 'solid',
+    backgroundColor: '#7267D9',
+    borderWidth: 0
   },
   chipText: {
     ...Globals.fonts.styles.header4,
@@ -47,6 +46,7 @@ const styles = StyleSheet.create({
   chipTextSelected: {
     ...Globals.fonts.styles.header4,
     textAlign: 'center',
+    color: '#fff',
   },
 });
 
