@@ -1,10 +1,12 @@
+import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 const PagesMenu = ({ hideOnTutorial = false }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const { completedExercises, resetAllExercises, markAllDailyExercisesComplete } = useExerciseContext();
   
   console.log('PagesMenu hideOnTutorial:', hideOnTutorial);
 
@@ -15,6 +17,42 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
   const navigateToScreen = (screenName: string) => {
     setIsMenuVisible(false);
     router.push(`/(tabs)/${screenName}` as any);
+  };
+
+  const handleResetExercises = () => {
+    Alert.alert(
+      'Reset All Exercises',
+      'Are you sure you want to reset all completed exercises?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Reset', 
+          style: 'destructive',
+          onPress: () => {
+            resetAllExercises();
+            setIsMenuVisible(false);
+          }
+        }
+      ]
+    );
+  };
+
+  const handleMarkAllComplete = () => {
+    Alert.alert(
+      'Mark All Daily Exercises Complete',
+      'This will mark all daily exercises as complete for styling testing.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Mark Complete', 
+          style: 'default',
+          onPress: () => {
+            markAllDailyExercisesComplete();
+            setIsMenuVisible(false);
+          }
+        }
+      ]
+    );
   };
 
   const menuItems = [
@@ -64,6 +102,30 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
                 <Text style={styles.menuItemText}>{item.title}</Text>
               </Pressable>
             ))}
+
+            {/* Test Button */}
+            <View style={styles.sectionDivider} />
+            <Pressable
+              style={[styles.menuItem, styles.testButton]}
+              onPress={handleMarkAllComplete}
+            >
+              <Ionicons name="checkmark-circle" size={20} color="#8B5CF6" />
+              <Text style={[styles.menuItemText, styles.testText]}>Mark All Daily Complete (Test)</Text>
+            </Pressable>
+
+            {/* Reset Button */}
+            {completedExercises.length > 0 && (
+              <>
+                <View style={styles.sectionDivider} />
+                <Pressable
+                  style={[styles.menuItem, styles.resetButton]}
+                  onPress={handleResetExercises}
+                >
+                  <Ionicons name="refresh" size={20} color="#FF4444" />
+                  <Text style={[styles.menuItemText, styles.resetText]}>Reset All Exercises</Text>
+                </Pressable>
+              </>
+            )}
           </View>
         </Pressable>
       </Modal>
@@ -144,6 +206,25 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#000000',
     marginLeft: 12,
+  },
+  sectionDivider: {
+    height: 1,
+    backgroundColor: '#e0e0e0',
+    marginVertical: 16,
+  },
+  testButton: {
+    backgroundColor: '#F3F0FF',
+  },
+  testText: {
+    color: '#8B5CF6',
+    fontWeight: '500',
+  },
+  resetButton: {
+    backgroundColor: '#FFE6E6',
+  },
+  resetText: {
+    color: '#FF4444',
+    fontWeight: '500',
   },
 });
 

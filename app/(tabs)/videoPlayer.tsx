@@ -28,7 +28,11 @@ const VideoPlayerScreen = () => {
     console.log('Done button pressed');
     router.push({
       pathname: '/xpGain',
-      params: { xpAmount: '10' }
+      params: { 
+        xpAmount: '10',
+        exerciseId: '1',
+        exerciseName: 'Hand Warm Up'
+      }
     });
   };
 

@@ -1,3 +1,4 @@
+import { useExerciseContext } from '@/contexts/ExerciseContext';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -8,11 +9,19 @@ type XPBarProps = {
 };
 
 const XPBar = ({ 
-  currentProgress = 0, 
+  currentProgress, 
   totalProgress = 50, 
   level = 1
 }: XPBarProps) => {
-  const progressPercentage = Math.min((currentProgress / totalProgress) * 100, 100);
+  const { completedExercises } = useExerciseContext();
+  
+  // Calculate current progress from completed exercises
+  const calculatedProgress = completedExercises.reduce((total, exercise) => total + exercise.xpGained, 0);
+  
+  // Use calculated progress if no currentProgress prop is provided
+  const actualProgress = currentProgress !== undefined ? currentProgress : calculatedProgress;
+  
+  const progressPercentage = Math.min((actualProgress / totalProgress) * 100, 100);
 
   return (
     <View style={styles.container}>
@@ -29,7 +38,7 @@ const XPBar = ({
         />
         <View style={styles.textContainer}>
           <Text style={styles.progressText}>
-            {currentProgress}/{totalProgress}
+            {actualProgress}/{totalProgress}
           </Text>
         </View>
       </View>
@@ -49,7 +58,7 @@ const styles = StyleSheet.create({
     width: 59,
     height: 59,
     borderRadius: 29.5,
-    backgroundColor: '#332E62',
+    backgroundColor: '#332E62', // Dark purple from design
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
@@ -63,7 +72,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 26,
-    backgroundColor: '#9CA3AF', // Medium gray
+    backgroundColor: '#949494', // Gray from design
     borderRadius: 13,
     position: 'absolute',
     left: 29.5, // Half overlap with circle (59/2 = 29.5)
@@ -73,7 +82,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#6B7280', // Darker gray
+    backgroundColor: '#5B52AE', // Purple from design
     borderRadius: 13,
   },
   textContainer: {

@@ -1,5 +1,7 @@
+import CompletedTask from '@/components/ui/CompletedTask';
+import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface Task {
@@ -17,9 +19,7 @@ interface TaskCardProps {
 }
 
 const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDaily = false }) => {
-  const [taskStates, setTaskStates] = useState<Record<string, boolean>>(
-    tasks.reduce((acc, task) => ({ ...acc, [task.id]: task.isCompleted }), {})
-  );
+  const { isExerciseComplete } = useExerciseContext();
 
   const getSectionTitle = () => {
     if (exerciseType === 'physical') {
@@ -31,12 +31,6 @@ const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDai
 
   const handleTaskPress = (taskId: string) => {
     console.log('Task pressed:', taskId, 'isDaily:', isDaily);
-    
-    // Toggle task completion state
-    setTaskStates(prev => ({
-      ...prev,
-      [taskId]: !prev[taskId]
-    }));
     
     // If this is a daily task, navigate to Exercise Confirmation page
     if (isDaily) {
@@ -89,21 +83,35 @@ const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDai
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{getSectionTitle()}</Text>
-      {tasks.map((task) => (
-        <TouchableOpacity 
-          key={task.id}
-          style={[styles.taskContainer, taskStates[task.id] && styles.completedContainer]}
-          onPress={() => handleTaskPress(task.id)}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.taskTitle, taskStates[task.id] && styles.completedTitle]}>
-            {task.title}
-          </Text>
-          <Text style={[styles.xpText, { color: task.xpColor }]}>
-            {task.xpAmount}xp
-          </Text>
-        </TouchableOpacity>
-      ))}
+      {tasks.map((task) => {
+        const isCompleted = isExerciseComplete(task.id);
+        
+        if (isCompleted) {
+          return (
+            <CompletedTask
+              key={task.id}
+              taskName={task.title}
+              xpGained={task.xpAmount}
+            />
+          );
+        }
+        
+        return (
+          <TouchableOpacity 
+            key={task.id}
+            style={styles.taskContainer}
+            onPress={() => handleTaskPress(task.id)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.taskTitle}>
+              {task.title}
+            </Text>
+            <Text style={[styles.xpText, { color: task.xpColor }]}>
+              {task.xpAmount}xp
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 };
@@ -140,18 +148,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  completedContainer: {
-    backgroundColor: '#F3F4F6',
-  },
   taskTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#000',
     flex: 1,
-  },
-  completedTitle: {
-    textDecorationLine: 'line-through',
-    opacity: 0.6,
   },
   xpText: {
     fontSize: 20,
