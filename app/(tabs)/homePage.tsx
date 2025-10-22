@@ -6,6 +6,7 @@ import StatusBar from '@/components/ui/StatusBar';
 import XPBar from '@/components/ui/XPBar';
 import { Colors } from '@/constants/theme';
 import { useExerciseContext } from '@/contexts/ExerciseContext';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Dimensions, Image, Keyboard, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 
@@ -29,7 +30,22 @@ const HomePage = () => {
   ];
 
   const handleNavPress = (itemId: string) => {
-    console.log(`Navigating to ${itemId}`);
+    switch (itemId) {
+      case 'home':
+        // Already on home page
+        break;
+      case 'physical':
+        router.push('/(tabs)/physicalHomePage');
+        break;
+      case 'mental':
+        router.push('/(tabs)/mentalHomePage');
+        break;
+      case 'account':
+        router.push('/(tabs)/signInPage');
+        break;
+      default:
+        console.log(`Navigating to ${itemId}`);
+    }
   };
 
   const handleEditPress = () => {
