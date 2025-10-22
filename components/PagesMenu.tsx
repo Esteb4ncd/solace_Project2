@@ -2,7 +2,9 @@ import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useRef, useState } from 'react';
-import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Dimensions, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const PagesMenu = ({ hideOnTutorial = false }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -175,21 +177,21 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
 const styles = StyleSheet.create({
   floatingMenu: {
     position: 'absolute',
-    top: 50,
-    right: 20,
+    top: screenHeight * 0.06, // 6% of screen height
+    right: screenWidth * 0.05, // 5% of screen width
     zIndex: 1000,
   },
   menuButton: {
-    padding: 8,
+    padding: screenWidth * 0.02, // 2% of screen width
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 20,
+    borderRadius: screenWidth * 0.05, // 5% of screen width
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: screenWidth * 0.005, // 0.5% of screen width
     },
     shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowRadius: screenWidth * 0.01, // 1% of screen width
     elevation: 5,
   },
   modalOverlay: {
@@ -197,49 +199,49 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-start',
     alignItems: 'flex-end',
-    paddingTop: 100,
-    paddingRight: 20,
+    paddingTop: screenHeight * 0.12, // 12% of screen height
+    paddingRight: screenWidth * 0.05, // 5% of screen width
   },
   menuContainer: {
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    minWidth: 200,
+    borderRadius: screenWidth * 0.03, // 3% of screen width
+    padding: screenWidth * 0.04, // 4% of screen width
+    minWidth: screenWidth * 0.5, // 50% of screen width
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: screenWidth * 0.005, // 0.5% of screen width
     },
     shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowRadius: screenWidth * 0.01, // 1% of screen width
     elevation: 5,
   },
   menuHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
-    paddingBottom: 12,
+    marginBottom: screenHeight * 0.02, // 2% of screen height
+    paddingBottom: screenHeight * 0.015, // 1.5% of screen height
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
   menuTitle: {
-    fontSize: 18,
+    fontSize: screenWidth * 0.045, // 4.5% of screen width
     fontWeight: '500',
     color: '#000000',
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderRadius: 8,
+    paddingVertical: screenHeight * 0.015, // 1.5% of screen height
+    paddingHorizontal: screenWidth * 0.02, // 2% of screen width
+    borderRadius: screenWidth * 0.02, // 2% of screen width
   },
   menuItemText: {
-    fontSize: 16,
+    fontSize: screenWidth * 0.04, // 4% of screen width
     fontWeight: '400',
     color: '#000000',
-    marginLeft: 12,
+    marginLeft: screenWidth * 0.03, // 3% of screen width
   },
   tripleTapDetector: {
     position: 'absolute',
@@ -255,7 +257,7 @@ const styles = StyleSheet.create({
   sectionDivider: {
     height: 1,
     backgroundColor: '#e0e0e0',
-    marginVertical: 8,
+    marginVertical: screenHeight * 0.01, // 1% of screen height
   },
   testButton: {
     backgroundColor: '#f8f4ff',
