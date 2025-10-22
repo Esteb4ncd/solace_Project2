@@ -1,12 +1,12 @@
+import TaskCard from '@/components/taskCards/TaskCard';
 import BottomNavigation from '@/components/ui/BottomNavigation';
 import Header from '@/components/ui/Header';
 import StatusBar from '@/components/ui/StatusBar';
-import TaskCard from '@/components/ui/TaskCard';
 import XPBar from '@/components/ui/XPBar';
 import { spacing } from '@/constants/styles';
 import { Colors } from '@/constants/theme';
 import React, { useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
 
 const HomePage = () => {
   const [dailyTasks, setDailyTasks] = useState([
@@ -60,34 +60,18 @@ const HomePage = () => {
           </View>
 
           {/* Daily Checklist Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Daily Checklist</Text>
-            {dailyTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                title={task.title}
-                xpAmount={task.xpAmount}
-                xpColor={task.xpColor}
-                isCompleted={task.isCompleted}
-                onPress={() => handleTaskPress(task.id)}
-              />
-            ))}
-          </View>
+          <TaskCard 
+            tasks={dailyTasks}
+            onTaskPress={handleTaskPress}
+            exerciseType="physical"
+          />
 
           {/* Additional XP Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Need more xp? Try these</Text>
-            {additionalTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                title={task.title}
-                xpAmount={task.xpAmount}
-                xpColor={task.xpColor}
-                isCompleted={task.isCompleted}
-                onPress={() => handleTaskPress(task.id)}
-              />
-            ))}
-          </View>
+          <TaskCard 
+            tasks={additionalTasks}
+            onTaskPress={handleTaskPress}
+            exerciseType="mental"
+          />
 
           {/* Bottom spacing for navigation */}
           <View style={styles.bottomSpacing} />
@@ -124,15 +108,6 @@ const styles = StyleSheet.create({
   xpBarContainer: {
     alignItems: 'center',
     paddingVertical: 16,
-  },
-  section: {
-    paddingVertical: 16, // 16px margin from element above
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000000',
-    marginBottom: 8, // 8px margin between checklist items
   },
   bottomSpacing: {
     height: spacing.xxxl,
