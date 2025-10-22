@@ -1,5 +1,5 @@
 import { ResizeMode, Video } from 'expo-av';
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -18,6 +18,7 @@ interface LocalVideoPlayerProps {
   onEnd?: () => void;
   onError?: (error: any) => void;
   onDone?: () => void;
+  resetTrigger?: number; // Add reset trigger prop
 }
 
 export default function LocalVideoPlayer({ 
@@ -26,7 +27,8 @@ export default function LocalVideoPlayer({
   onBack,
   onEnd,
   onError,
-  onDone
+  onDone,
+  resetTrigger
 }: LocalVideoPlayerProps) {
   const videoRef = useRef<Video>(null);
   const screenHeight = Dimensions.get('window').height;
@@ -37,6 +39,23 @@ export default function LocalVideoPlayer({
   const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isVideoEnded, setIsVideoEnded] = useState(false);
+
+  // Reset video when resetTrigger changes
+  useEffect(() => {
+    if (resetTrigger !== undefined && videoRef.current) {
+      const resetVideo = async () => {
+        try {
+          await videoRef.current?.setPositionAsync(0);
+          setCurrentTime(0);
+          setIsPlaying(false);
+          setIsVideoEnded(false);
+        } catch (error) {
+          console.log('Error resetting video:', error);
+        }
+      };
+      resetVideo();
+    }
+  }, [resetTrigger]);
   
   const handlePlayPause = async () => {
     if (videoRef.current && !isVideoEnded) {

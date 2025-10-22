@@ -1,10 +1,12 @@
 import LocalVideoPlayer from '@/components/videoComponents/LocalVideoPlayer';
+import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 const VideoPlayerScreen = () => {
   const { videoId, type } = useLocalSearchParams<{ videoId: string; type: string }>();
+  const { videoResetTrigger } = useExerciseContext();
 
   console.log('VideoPlayerScreen loaded with:', { videoId, type });
 
@@ -45,6 +47,7 @@ const VideoPlayerScreen = () => {
         onEnd={handleVideoEnd}
         onError={handleVideoError}
         onDone={handleDone}
+        resetTrigger={videoResetTrigger}
       />
     </View>
   );
