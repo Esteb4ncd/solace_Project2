@@ -13,6 +13,7 @@ interface ExerciseContextType {
   markAllDailyExercisesComplete: () => void;
   resetAllExercises: () => void;
   isExerciseComplete: (id: string) => boolean;
+  videoResetTrigger: number;
 }
 
 const ExerciseContext = createContext<ExerciseContextType | undefined>(undefined);
@@ -31,6 +32,7 @@ interface ExerciseProviderProps {
 
 export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) => {
   const [completedExercises, setCompletedExercises] = useState<CompletedExercise[]>([]);
+  const [videoResetTrigger, setVideoResetTrigger] = useState(0);
 
   const markAllDailyExercisesComplete = () => {
     const dailyExercises = [
@@ -73,6 +75,7 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
 
   const resetAllExercises = () => {
     setCompletedExercises([]);
+    setVideoResetTrigger(prev => prev + 1); // Increment trigger to reset video
   };
 
   const isExerciseComplete = (id: string) => {
@@ -87,6 +90,7 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
         markAllDailyExercisesComplete,
         resetAllExercises,
         isExerciseComplete,
+        videoResetTrigger,
       }}
     >
       {children}
