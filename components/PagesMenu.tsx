@@ -1,7 +1,7 @@
 import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Alert, Dimensions, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -39,6 +39,18 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
   const navigateToScreen = (screenName: string) => {
     setIsMenuVisible(false);
     router.push(`/(tabs)/${screenName}` as any);
+  };
+
+  const skipToXPGain = () => {
+    setIsMenuVisible(false);
+    router.push({
+      pathname: '/(tabs)/xpGain',
+      params: {
+        xpAmount: '5',
+        exerciseId: 'breathing-exercise',
+        exerciseName: 'Breathing Exercise'
+      }
+    });
   };
 
   const handleResetExercises = () => {
@@ -84,6 +96,7 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
 
   const menuItems = [
     { name: 'breathingExercisePage', title: 'Breathing Exercise Page', icon: 'leaf-outline' },
+    { name: 'skipBreathing', title: 'Skip Breathing Exercise', icon: 'fast-forward', isSkip: true },
     { name: 'signInPage', title: 'Sign In Page', icon: 'log-in' },
     { name: 'tutorial', title: 'Tutorial', icon: 'school' },
     { name: 'startQuestions', title: 'Start Questions', icon: 'person' },
@@ -131,17 +144,23 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
             {menuItems.map((item) => (
               <Pressable
                 key={item.name}
-                style={[styles.menuItem, item.isSpecial && styles.specialMenuItem]}
+                style={[
+                  styles.menuItem, 
+                  item.isSpecial && styles.specialMenuItem,
+                  item.isSkip && styles.skipMenuItem
+                ]}
                 onPress={() => {
                   if (item.isSpecial) {
                     hideMenu();
+                  } else if (item.isSkip) {
+                    skipToXPGain();
                   } else {
                     navigateToScreen(item.name);
                   }
                 }}
               >
-                <Ionicons name={item.icon as any} size={20} color="#000" />
-                <Text style={styles.menuItemText}>{item.title}</Text>
+                <Ionicons name={item.icon as any} size={20} color={item.isSkip ? "#FF6B35" : "#000"} />
+                <Text style={[styles.menuItemText, item.isSkip && styles.skipText]}>{item.title}</Text>
               </Pressable>
             ))}
 
@@ -254,6 +273,12 @@ const styles = StyleSheet.create({
   },
   specialMenuItem: {
     backgroundColor: '#f0f0f0',
+  },
+  skipMenuItem: {
+    backgroundColor: '#fff5f0',
+  },
+  skipText: {
+    color: '#FF6B35',
   },
   sectionDivider: {
     height: 1,
