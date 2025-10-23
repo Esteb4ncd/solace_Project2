@@ -1,6 +1,6 @@
-import { useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
+import { useRouter } from "expo-router";
 import BackButton from "../../components/ui/BackButton";
 import LargeButton from "../../components/ui/LargeButton";
 
@@ -244,7 +244,7 @@ function breathingExercise() {
     circleColor.setValue(0);
 
     // Navigate back to home page
-    router.push("/homePage");
+    router.push("/(tabs)/homePage");
   }, [circleSize, circleColor, router]);
 
   // Run timer when started and not paused
@@ -303,12 +303,13 @@ function breathingExercise() {
       {!isCompleted && (
         <BackButton
           style={styles.backButton}
-          onPress={() => router.push("/homePage")}
+          onPress={() => router.push("/(tabs)/homePage")}
         />
       )}
 
       <View style={styles.container}>
         {isCompleted ? (
+            /*--------------------Completed page here----------------------------------------- */
           <View style={styles.completionContainer}>
             <Text style={[styles.title, { marginBottom: 60 }]}>Congrates!</Text>
             {/* <Image
@@ -319,6 +320,8 @@ function breathingExercise() {
               You’ve gained 10 xp
             </Text>
           </View>
+            /*--------------------Completed page here----------------------------------------- */
+
         ) : showBreathingView ? (
           <View style={styles.breathingContainer}>
             <View style={styles.circleContainer}>
