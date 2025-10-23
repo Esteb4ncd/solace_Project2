@@ -1,10 +1,10 @@
 
-import {Pressable, StyleSheet, View} from 'react-native';
 import { useButton } from '@react-native-aria/button';
-import {useToggleState} from '@react-stately/toggle';
 import { useNavigation } from '@react-navigation/native';
+import { useToggleState } from '@react-stately/toggle';
+import { Pressable, StyleSheet, View } from 'react-native';
 
-const BackButton = ({onPress}) => {
+const BackButton = ({onPress, style}) => {
   const state = useToggleState({});
   const navigation = useNavigation();
   const {buttonProps} = useButton(
@@ -18,7 +18,7 @@ const BackButton = ({onPress}) => {
   return (
     <Pressable
       {...buttonProps}
-      style={[styles.button]}
+      style={[styles.button, style]}
     >
       <View style={styles.LeftArrow}></View>
     </Pressable>

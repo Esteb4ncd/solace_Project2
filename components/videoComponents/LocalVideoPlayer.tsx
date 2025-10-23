@@ -1,14 +1,15 @@
 import { ResizeMode, Video } from 'expo-av';
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  Dimensions,
-  Image,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    Dimensions,
+    Image,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
+import BackButton from '../ui/BackButton';
 import LargeButton from '../ui/LargeButton';
 
 interface LocalVideoPlayerProps {
@@ -114,9 +115,7 @@ export default function LocalVideoPlayer({
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       
       {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={onBack}>
-        <Text style={styles.backButtonText}>‹</Text>
-      </TouchableOpacity>
+      <BackButton style={styles.backButton} onPress={onBack} />
 
       {/* Video */}
       <View style={styles.videoContainer}>
@@ -207,21 +206,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
   },
   backButton: {
-    position: "absolute",
-    top: 60,
-    left: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    justifyContent: "center",
-    alignItems: "center",
+    position: 'absolute',
+    top: 55,
+    left: 25.5,
     zIndex: 10,
-  },
-  backButtonText: {
-    color: "white",
-    fontSize: 24,
-    fontWeight: "bold",
   },
   videoContainer: {
     flex: 1,

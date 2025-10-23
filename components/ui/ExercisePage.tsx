@@ -1,12 +1,12 @@
+import BackButton from '@/components/ui/BackButton';
 import LargeButton from '@/components/ui/LargeButton';
 import React from 'react';
 import {
-    Image,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Image,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View
 } from 'react-native';
 
 interface ExercisePageProps {
@@ -36,9 +36,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({
       
       {/* Back Button */}
       {showBackButton && (
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Text style={styles.backButtonText}>‹</Text>
-        </TouchableOpacity>
+        <BackButton style={styles.backButton} onPress={onBack} />
       )}
 
       {/* Title */}
@@ -81,21 +79,10 @@ const styles = StyleSheet.create({
     paddingTop: 60, // Account for status bar
   },
   backButton: {
-    position: "absolute",
-    top: 60,
-    left: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
-    justifyContent: "center",
-    alignItems: "center",
+    position: 'absolute',
+    top: 55,
+    left: 25.5,
     zIndex: 10,
-  },
-  backButtonText: {
-    color: "black",
-    fontSize: 24,
-    fontWeight: "bold",
   },
   title: {
     fontSize: 32,
