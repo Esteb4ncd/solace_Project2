@@ -38,7 +38,20 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
 
   const navigateToScreen = (screenName: string) => {
     setIsMenuVisible(false);
-    router.push(`/(tabs)/${screenName}` as any);
+    
+    // Special handling for breathing exercise - go to confirmation first
+    if (screenName === 'breathingExercisePage') {
+      router.push({
+        pathname: '/(tabs)/exerciseConfirmation',
+        params: {
+          exerciseName: 'Breathing Exercise',
+          xpReward: '5',
+          duration: '2 minutes'
+        }
+      });
+    } else {
+      router.push(`/(tabs)/${screenName}` as any);
+    }
   };
 
   const skipToXPGain = () => {
@@ -47,8 +60,8 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
       pathname: '/(tabs)/xpGain',
       params: {
         xpAmount: '5',
-        exerciseId: 'breathing-exercise',
-        exerciseName: 'Breathing Exercise'
+        exerciseId: '4',
+        exerciseName: 'Stress Relief'
       }
     });
   };

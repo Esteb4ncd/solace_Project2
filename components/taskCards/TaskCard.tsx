@@ -32,52 +32,65 @@ const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDai
   const handleTaskPress = (taskId: string) => {
     console.log('Task pressed:', taskId, 'isDaily:', isDaily);
     
-    // If this is a daily task, navigate to Exercise Confirmation page
-    if (isDaily) {
-      console.log('Navigating to Exercise Confirmation for daily task:', taskId);
-      
-      // Get exercise details based on taskId
-      const getExerciseDetails = (id: string) => {
-        switch (id) {
-          case '1': // Hand Warm Up
-            return {
-              name: 'Hand Warm Up',
-              xpReward: '10',
-              duration: '10 seconds'
-            };
-          case '2': // Shoulder Relief
-            return {
-              name: 'Shoulder Relief',
-              xpReward: '15',
-              duration: '3 minutes'
-            };
-          case '3': // Joint Relief
-            return {
-              name: 'Joint Relief',
-              xpReward: '20',
-              duration: '5 minutes'
-            };
-          default:
-            return {
-              name: 'Exercise',
-              xpReward: '10',
-              duration: '2 minutes'
-            };
-        }
-      };
+    // Get exercise details based on taskId
+    const getExerciseDetails = (id: string) => {
+      switch (id) {
+        case '1': // Hand Warm Up
+          return {
+            name: 'Hand Warm Up',
+            xpReward: '10',
+            duration: '10 seconds'
+          };
+        case '2': // Shoulder Relief
+          return {
+            name: 'Shoulder Relief',
+            xpReward: '15',
+            duration: '3 minutes'
+          };
+        case '3': // Joint Relief
+          return {
+            name: 'Joint Relief',
+            xpReward: '20',
+            duration: '5 minutes'
+          };
+        case '4': // Stress Relief
+          return {
+            name: 'Stress Relief',
+            xpReward: '5',
+            duration: '2 minutes'
+          };
+        case '5': // Sleep Help
+          return {
+            name: 'Sleep Help',
+            xpReward: '5',
+            duration: '2 minutes'
+          };
+        case '6': // Anxiety Release
+          return {
+            name: 'Anxiety Release',
+            xpReward: '5',
+            duration: '2 minutes'
+          };
+        default:
+          return {
+            name: 'Exercise',
+            xpReward: '10',
+            duration: '2 minutes'
+          };
+      }
+    };
 
-      const exerciseDetails = getExerciseDetails(taskId);
-      console.log('Exercise details:', exerciseDetails);
+    const exerciseDetails = getExerciseDetails(taskId);
+    console.log('Exercise details:', exerciseDetails);
 
-      router.push({
-        pathname: '/exerciseConfirmation',
-        params: { 
-          exerciseName: exerciseDetails.name,
-          xpReward: exerciseDetails.xpReward,
-          duration: exerciseDetails.duration
-        }
-      });
-    }
+    router.push({
+      pathname: '/exerciseConfirmation',
+      params: { 
+        exerciseName: exerciseDetails.name,
+        xpReward: exerciseDetails.xpReward,
+        duration: exerciseDetails.duration
+      }
+    });
   };
 
   return (
