@@ -7,6 +7,7 @@ import { spacing } from '@/constants/styles';
 import { Colors } from '@/constants/theme';
 import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import StartQuestionsScreen from './(tabs)/startQuestions';
 
 const HomePage = () => {
   const [dailyTasks, setDailyTasks] = useState([
@@ -102,9 +103,7 @@ const HomePage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
-    width: 393,
-    height: 852,
+    backgroundColor: Colors.light.background
   },
   scrollView: {
     flex: 1,
