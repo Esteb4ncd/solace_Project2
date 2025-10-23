@@ -4,6 +4,7 @@ import { Animated, StyleSheet, Text, View } from "react-native";
 import BackButton from "../../components/ui/BackButton";
 import ExercisePage from "../../components/ui/ExercisePage";
 import LargeButton from "../../components/ui/LargeButton";
+import { useExerciseContext } from "../../contexts/ExerciseContext";
 
 // 4-7-8 breathing pattern configuration
 const BREATHING_PATTERN = {
@@ -20,9 +21,10 @@ const PHASES = {
 
 function breathingExercise() {
   const router = useRouter();
+  const { markExerciseComplete } = useExerciseContext();
 
   // Core states
-  const [isStarted, setIsStarted] = useState(false);
+  const [isStarted, setIsStarted] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
@@ -157,6 +159,7 @@ function breathingExercise() {
             setIsCompleted(true);
             setIsStarted(false);
             clearInterval(timerRef.current);
+            markExerciseComplete('4', 'Stress Relief', 5);
             return;
           }
 
@@ -189,19 +192,6 @@ function breathingExercise() {
     startPhaseAnimation,
   ]);
 
-  // Start exercise
-  const handleStart = useCallback(() => {
-    setIsStarted(true);
-    setIsPaused(false);
-    setIsCompleted(false);
-    setCurrentPhase(PHASES.INHALE);
-    setCurrentCycle(1);
-    setTimeRemaining(BREATHING_PATTERN.INHALE);
-
-    // Reset circle to starting position
-    circleSize.setValue(145);
-    circleColor.setValue(0);
-  }, [circleSize, circleColor]);
 
   // Pause exercise
   const handlePause = useCallback(() => {
@@ -278,10 +268,6 @@ function breathingExercise() {
       return { label: "Back to Home", onPress: handleReset };
     }
 
-    if (!isStarted) {
-      return { label: "Start", onPress: handleStart };
-    }
-
     if (isPaused) {
       return { label: "Resume", onPress: handleResume };
     }
@@ -291,7 +277,6 @@ function breathingExercise() {
 
   const { label: buttonLabel, onPress: buttonAction } = getButtonConfig();
   const phaseText = getPhaseText(currentPhase);
-  const showBreathingView = isStarted && !isCompleted;
 
   // Interpolate color based on animation value
   const backgroundColor = circleColor.interpolate({
@@ -321,42 +306,27 @@ function breathingExercise() {
       />
 
       <View style={styles.container}>
-        {showBreathingView ? (
-          <View style={styles.breathingContainer}>
-            <View style={styles.circleContainer}>
-              <Animated.View
-                style={[
-                  styles.breathingCircle,
-                  {
-                    width: circleSize,
-                    height: circleSize,
-                    borderRadius: Animated.divide(circleSize, 2),
-                    backgroundColor: backgroundColor,
-                  },
-                ]}
-              />
-            </View>
-
-            <View style={styles.infoContainer}>
-              <Text style={styles.cycleText}>Cycle {currentCycle} of 4</Text>
-              <Text style={styles.phaseText}>{phaseText}</Text>
-              <Text style={styles.timerText}>{timeRemaining}</Text>
-            </View>
+        <View style={styles.breathingContainer}>
+          <View style={styles.circleContainer}>
+            <Animated.View
+              style={[
+                styles.breathingCircle,
+                {
+                  width: circleSize,
+                  height: circleSize,
+                  borderRadius: Animated.divide(circleSize, 2),
+                  backgroundColor: backgroundColor,
+                },
+              ]}
+            />
           </View>
-        ) : (
-          <>
-            <Text style={styles.title}>
-              Click start when you're ready to start
-            </Text>
-            <Text style={styles.description}>
-              Follow the prompts, pause at any time, and click start to continue
-            </Text>
-            <Text style={styles.description}>
-              <Text style={{ fontWeight: "bold" }}>Tips:</Text>
-              {"\n"}You have to breathe
-            </Text>
-          </>
-        )}
+
+          <View style={styles.infoContainer}>
+            <Text style={styles.cycleText}>Cycle {currentCycle} of 4</Text>
+            <Text style={styles.phaseText}>{phaseText}</Text>
+            <Text style={styles.timerText}>{timeRemaining}</Text>
+          </View>
+        </View>
       </View>
 
       <LargeButton
@@ -423,18 +393,11 @@ const styles = StyleSheet.create({
     color: "#666",
     marginBottom: 20,
   },
-  title: {
-    fontSize: 28,
-    marginBottom: 20,
-    fontWeight: "bold",
-  },
-  description: {
-    fontSize: 20,
-    marginBottom: 20,
-  },
   backButton: {
-    marginTop: 55,
-    marginLeft: 25.5,
+    position: 'absolute',
+    top: 55,
+    left: 25.5,
+    zIndex: 10,
   },
   completionContainer: {
     flex: 1,
