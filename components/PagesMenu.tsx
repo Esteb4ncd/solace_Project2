@@ -53,6 +53,11 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
     });
   };
 
+  const startPhysicalExerciseFlow = () => {
+    setIsMenuVisible(false);
+    router.push('/(tabs)/exerciseConfirmation');
+  };
+
   const handleResetExercises = () => {
     Alert.alert(
       'Reset All Exercises',
@@ -97,6 +102,7 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
   const menuItems = [
     { name: 'breathingExercisePage', title: 'Breathing Exercise Page', icon: 'leaf-outline' },
     { name: 'skipBreathing', title: 'Skip Breathing Exercise', icon: 'fast-forward', isSkip: true },
+    { name: 'startPhysicalFlow', title: 'Start Physical Exercise Flow', icon: 'play-circle', isPhysicalFlow: true },
     { name: 'signInPage', title: 'Sign In Page', icon: 'log-in' },
     { name: 'tutorial', title: 'Tutorial', icon: 'school' },
     { name: 'startQuestions', title: 'Start Questions', icon: 'person' },
@@ -147,20 +153,37 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
                 style={[
                   styles.menuItem, 
                   item.isSpecial && styles.specialMenuItem,
-                  item.isSkip && styles.skipMenuItem
+                  item.isSkip && styles.skipMenuItem,
+                  item.isPhysicalFlow && styles.physicalFlowMenuItem
                 ]}
                 onPress={() => {
                   if (item.isSpecial) {
                     hideMenu();
                   } else if (item.isSkip) {
                     skipToXPGain();
+                  } else if (item.isPhysicalFlow) {
+                    startPhysicalExerciseFlow();
                   } else {
                     navigateToScreen(item.name);
                   }
                 }}
               >
-                <Ionicons name={item.icon as any} size={20} color={item.isSkip ? "#FF6B35" : "#000"} />
-                <Text style={[styles.menuItemText, item.isSkip && styles.skipText]}>{item.title}</Text>
+                <Ionicons 
+                  name={item.icon as any} 
+                  size={20} 
+                  color={
+                    item.isSkip ? "#FF6B35" : 
+                    item.isPhysicalFlow ? "#4CAF50" : 
+                    "#000"
+                  } 
+                />
+                <Text style={[
+                  styles.menuItemText, 
+                  item.isSkip && styles.skipText,
+                  item.isPhysicalFlow && styles.physicalFlowText
+                ]}>
+                  {item.title}
+                </Text>
               </Pressable>
             ))}
 
@@ -279,6 +302,12 @@ const styles = StyleSheet.create({
   },
   skipText: {
     color: '#FF6B35',
+  },
+  physicalFlowMenuItem: {
+    backgroundColor: '#f0f8f0',
+  },
+  physicalFlowText: {
+    color: '#4CAF50',
   },
   sectionDivider: {
     height: 1,
