@@ -1,14 +1,13 @@
 import TaskCard from '@/components/taskCards/TaskCard';
 import BottomNavigation from '@/components/ui/BottomNavigation';
-import CompletedTask from '@/components/ui/CompletedTask';
 import Header from '@/components/ui/Header';
 import StatusBar from '@/components/ui/StatusBar';
 import XPBar from '@/components/ui/XPBar';
 import { Colors } from '@/constants/theme';
 import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
-import { Dimensions, Image, Keyboard, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { useState } from 'react';
+import { Dimensions, Image, Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -27,6 +26,8 @@ const HomePage = () => {
 
   const additionalTasks = [
     { id: '4', title: 'Stress Relief', xpAmount: 5, xpColor: '#7267D9', isCompleted: false },
+    { id: '5', title: 'Sleep Help', xpAmount: 5, xpColor: '#7267D9', isCompleted: false },
+    { id: '6', title: 'Anxiety Release', xpAmount: 5, xpColor: '#7267D9', isCompleted: false },
   ];
 
   const handleNavPress = (itemId: string) => {
@@ -116,20 +117,6 @@ const HomePage = () => {
             isDaily={false}
           />
 
-          {/* Completed Exercises Section */}
-          {completedExercises.length > 0 && (
-            <View style={styles.completedSection}>
-              <Text style={styles.completedSectionTitle}>Completed Today</Text>
-              {completedExercises.map((exercise) => (
-                <CompletedTask
-                  key={exercise.id}
-                  taskName={exercise.name}
-                  xpGained={exercise.xpGained}
-                />
-              ))}
-            </View>
-          )}
-
           {/* Bottom spacing for navigation */}
           <View style={styles.bottomSpacing} />
         </View>
@@ -169,15 +156,6 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: screenHeight * 0.12, // 12% of screen height
-  },
-  completedSection: {
-    marginTop: screenHeight * 0.025, // 2.5% of screen height
-  },
-  completedSectionTitle: {
-    fontSize: screenWidth * 0.05, // 5% of screen width
-    fontWeight: 'bold',
-    color: '#000000',
-    marginBottom: screenHeight * 0.015, // 1.5% of screen height
   },
 });
 

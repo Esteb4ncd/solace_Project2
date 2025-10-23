@@ -1,6 +1,5 @@
 import ExercisePage from '@/components/ui/ExercisePage';
 import { router, useLocalSearchParams } from 'expo-router';
-import React from 'react';
 
 const ExerciseConfirmationScreen = () => {
   const { exerciseName, xpReward, duration } = useLocalSearchParams<{ 
@@ -11,7 +10,13 @@ const ExerciseConfirmationScreen = () => {
 
   const handleStart = () => {
     console.log('Start button pressed for:', exerciseName);
-    router.push('/videoPlayer');
+    
+    // Navigate to different pages based on exercise type
+    if (exerciseName === 'Stress Relief' || exerciseName === 'Breathing Exercise') {
+      router.push('/(tabs)/breathingExercisePage');
+    } else {
+      router.push('/videoPlayer');
+    }
   };
 
   const handleBack = () => {
