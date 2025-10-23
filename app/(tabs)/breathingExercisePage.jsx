@@ -310,9 +310,13 @@ function breathingExercise() {
       <View style={styles.container}>
         {isCompleted ? (
           <View style={styles.completionContainer}>
-            <Text style={styles.congratsTitle}>Congratulations!</Text>
-            <Text style={styles.congratsMessage}>
-              You have completed the breathing exercise
+            <Text style={[styles.title, { marginBottom: 60 }]}>Congrates!</Text>
+            {/* <Image
+              source={require("")} // ADD THE CONGRATE IMAGE
+              style={styles.image}
+            /> */}
+            <Text style={[styles.description, { fontWeight: "bold" }]}>
+              You’ve gained 10 xp
             </Text>
           </View>
         ) : showBreathingView ? (
@@ -436,18 +440,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
   },
-  congratsTitle: {
-    fontSize: 36,
-    fontWeight: "bold",
-    color: "#7267D9",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  congratsMessage: {
-    fontSize: 22,
-    color: "#333",
-    textAlign: "center",
-    paddingHorizontal: 20,
+    image: {
+    width: 200,
+    height: 200,
+    marginVertical: 20,
   },
 });
 
