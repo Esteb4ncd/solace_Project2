@@ -83,6 +83,7 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
   };
 
   const menuItems = [
+    { name: 'breathingExercisePage', title: 'Breathing Exercise Page', icon: 'leaf-outline' },
     { name: 'signInPage', title: 'Sign In Page', icon: 'log-in' },
     { name: 'tutorial', title: 'Tutorial', icon: 'school' },
     { name: 'startQuestions', title: 'Start Questions', icon: 'person' },
