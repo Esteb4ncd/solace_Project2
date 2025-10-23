@@ -43,8 +43,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    width: 360,
-    height: 72,
     borderWidth: 1,
     borderColor: '#9CA3AF', // Grey border
     shadowColor: '#000',
@@ -60,7 +58,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
   },
   title: {
-    fontSize: 20,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#000',
     flex: 1,
