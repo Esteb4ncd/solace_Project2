@@ -1,7 +1,8 @@
+import { useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
-import { useRouter } from "expo-router";
 import BackButton from "../../components/ui/BackButton";
+import ExercisePage from "../../components/ui/ExercisePage";
 import LargeButton from "../../components/ui/LargeButton";
 
 // 4-7-8 breathing pattern configuration
@@ -298,31 +299,29 @@ function breathingExercise() {
     outputRange: ["#7267D9", "#332E62"], // Original purple to darker purple
   });
 
+  // If completed, show the XP gain page as full screen
+  if (isCompleted) {
+    return (
+      <ExercisePage
+        title="Congrats!"
+        characterImage={require('@/assets/SollyStates/SollyXPGain.png')}
+        bottomText="You've gained 5 xp"
+        buttonLabel="Back to Home"
+        onButtonPress={handleReset}
+        showBackButton={false}
+      />
+    );
+  }
+
   return (
     <View style={styles.page}>
-      {!isCompleted && (
-        <BackButton
-          style={styles.backButton}
-          onPress={() => router.push("/(tabs)/homePage")}
-        />
-      )}
+      <BackButton
+        style={styles.backButton}
+        onPress={() => router.push("/(tabs)/homePage")}
+      />
 
       <View style={styles.container}>
-        {isCompleted ? (
-            /*--------------------Completed page here----------------------------------------- */
-          <View style={styles.completionContainer}>
-            <Text style={[styles.title, { marginBottom: 60 }]}>Congrates!</Text>
-            {/* <Image
-              source={require("")} // ADD THE CONGRATE IMAGE
-              style={styles.image}
-            /> */}
-            <Text style={[styles.description, { fontWeight: "bold" }]}>
-              You’ve gained 10 xp
-            </Text>
-          </View>
-            /*--------------------Completed page here----------------------------------------- */
-
-        ) : showBreathingView ? (
+        {showBreathingView ? (
           <View style={styles.breathingContainer}>
             <View style={styles.circleContainer}>
               <Animated.View
