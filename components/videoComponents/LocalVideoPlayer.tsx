@@ -170,9 +170,19 @@ export default function LocalVideoPlayer({
         )}
       </View>
 
+      {/* Caption - Show when playing */}
+      {isPlaying && (
+        <View style={styles.captionContainer}>
+          <Text style={styles.captionText}>Move your hands in a circular motion</Text>
+        </View>
+      )}
+
       {/* Bottom Controls */}
       <View style={styles.bottomControls}>
-        <Text style={styles.videoTitle}>{videoTitle}</Text>
+        {/* Title - Show when paused */}
+        {!isPlaying && (
+          <Text style={styles.videoTitle}>{videoTitle}</Text>
+        )}
         
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
@@ -183,7 +193,6 @@ export default function LocalVideoPlayer({
               ]} 
             />
           </View>
-          <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
         </View>
       </View>
 
@@ -248,6 +257,13 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
   },
+  captionContainer: {
+    position: "absolute",
+    bottom: 160, // Closer to bottom controls
+    left: 20,
+    right: 20,
+    alignItems: "center",
+  },
   bottomControls: {
     position: "absolute",
     bottom: 120, // Moved up to make room for Done button
@@ -260,6 +276,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 12,
+    textShadowColor: "rgba(0, 0, 0, 0.8)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+  },
+  captionText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "500",
+    marginBottom: 16,
+    textAlign: "center",
     textShadowColor: "rgba(0, 0, 0, 0.8)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
