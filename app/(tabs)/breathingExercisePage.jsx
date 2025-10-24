@@ -155,13 +155,15 @@ function breathingExercise() {
           setCurrentCycle(nextCycle);
 
           // Check if we completed all 4 cycles
-          if (nextCycle > 4) {
+          // <------------------------change to (nextCycle > 4) for 4 cycles-------------------------->
+          if (nextCycle >= 1) { 
             setIsCompleted(true);
             setIsStarted(false);
             clearInterval(timerRef.current);
             markExerciseComplete('4', 'Stress Relief', 5);
             return;
           }
+          // <----------------------------------------------------------------------------------------->
 
           // Add 1-second delay between cycles
           clearInterval(timerRef.current);
