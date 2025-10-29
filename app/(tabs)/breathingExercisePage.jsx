@@ -156,7 +156,7 @@ function breathingExercise() {
 
           // Check if we completed all 4 cycles
           // <------------------------change to (nextCycle > 4) for 4 cycles-------------------------->
-          if (nextCycle >= 1) { 
+          if (nextCycle > 4) { 
             setIsCompleted(true);
             setIsStarted(false);
             clearInterval(timerRef.current);
