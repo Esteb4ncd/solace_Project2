@@ -4,18 +4,27 @@ import Header from '@/components/ui/Header';
 import StatusBar from '@/components/ui/StatusBar';
 import XPBar from '@/components/ui/XPBar';
 import { Colors } from '@/constants/theme';
+<<<<<<< HEAD
 import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Dimensions, Image, Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+=======
+import { useExerciseContext } from '@/contexts/ExerciseContext';
+import { router } from 'expo-router';
+import { useState } from 'react';
+import { Dimensions, Image, Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+>>>>>>> ai-sandbox
 
 const HomePage = () => {
   const [userName, setUserName] = useState("Solly");
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempUserName, setTempUserName] = useState("Solly");
   
+<<<<<<< HEAD
   const { completedExercises } = useExerciseContext();
   
   const dailyTasks = [
@@ -23,12 +32,25 @@ const HomePage = () => {
     { id: '2', title: 'Shoulder Warm Up', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
     { id: '3', title: 'Upper Back Stretch', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
   ];
+=======
+  const { completedExercises } = useExerciseContext();
+  
+  const dailyTasks = [
+    { id: '1', title: 'Hand Warm Up', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
+    { id: '2', title: 'Shoulder Warm Up', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
+    { id: '3', title: 'Upper Back Stretch', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
+  ];
+>>>>>>> ai-sandbox
 
   const additionalTasks = [
     { id: '4', title: 'Stress Relief', xpAmount: 5, xpColor: '#7267D9', isCompleted: false },
+<<<<<<< HEAD
     { id: '5', title: 'Sleep Help', xpAmount: 5, xpColor: '#7267D9', isCompleted: false },
     { id: '6', title: 'Anxiety Release', xpAmount: 5, xpColor: '#7267D9', isCompleted: false },
   ];
+=======
+  ];
+>>>>>>> ai-sandbox
 
   const handleNavPress = (itemId: string) => {
     switch (itemId) {
