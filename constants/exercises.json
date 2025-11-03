@@ -1,0 +1,19 @@
+[
+  {
+    "id": "1",
+    "name": "Hand Warm Up",
+    "description": "Gentle exercises to warm up and mobilize your hands and wrists",
+    "videoFileName": "HandWarmUp.mp4",
+    "targetAreas": ["wrist", "hand", "forearm"],
+    "exerciseTypes": ["warm up", "mobility"],
+    "keywords": ["wrist", "hand", "finger", "typing", "computer", "repetitive"],
+    "workTaskMatches": ["repetitive tool use"],
+    "difficulty": "beginner",
+    "duration": "2 minutes",
+    "baseXpReward": 5,
+    "recommendedXpReward": 10,
+    "category": "physical",
+    "instructions": "Move your hands in a circular motion"
+  }
+]
+
