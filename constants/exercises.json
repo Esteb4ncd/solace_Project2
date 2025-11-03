@@ -65,19 +65,19 @@
   },
   {
     "id": "5",
-    "name": "Hand Warm Up",
-    "description": "Gentle exercises to warm up and mobilize your hands and wrists",
-    "videoFileName": "HandWarmUp.mp4",
-    "targetAreas": ["wrist", "hand", "forearm"],
-    "exerciseTypes": ["warm up", "mobility"],
-    "keywords": ["wrist", "hand", "finger", "typing", "computer", "repetitive"],
-    "workTaskMatches": ["repetitive tool use"],
+    "name": "Chest Stretch",
+    "description": "Stretch that helps warm up your chest and improve posture",
+    "videoFileName": "ChestStretch.mp4",
+    "targetAreas": ["chest", "shoulder", "arm"],
+    "exerciseTypes": ["warm up", "mobility", "stretch"],
+    "keywords": ["chest", "shoulder", "arm", "stretch", "warm up", "posture"],
+    "workTaskMatches": ["heavy lifting", "overhead work"],
     "difficulty": "beginner",
-    "duration": "2 minutes",
+    "duration": "1 minute",
     "baseXpReward": 5,
     "recommendedXpReward": 10,
     "category": "physical",
-    "instructions": "Move your hands in a circular motion"
+    "instructions": "Stretch your chest and improve posture"
   },
   {
     "id": "6",
