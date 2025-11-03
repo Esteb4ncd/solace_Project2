@@ -6,6 +6,7 @@ import { HelloWave } from '@/components/hello-wave';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import LargeButton from '../../components/ui/LargeButton';
+import OnboardingQuestionsScreen from './onboardingQuestions';
 
 export default function HomeScreen() {
   const handlePress = () => {
@@ -15,7 +16,8 @@ export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
       <View style={styles.content}>
-        <ThemedView style={styles.titleContainer}>
+        <OnboardingQuestionsScreen />
+        {/* <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Welcome!</ThemedText>
           <HelloWave />
         </ThemedView>
@@ -37,7 +39,7 @@ export default function HomeScreen() {
             </ThemedText>{' '}
             to open developer tools.
           </ThemedText>
-        </ThemedView>
+        </ThemedView> */}
       </View>
     </ThemedView>
   );
@@ -47,12 +49,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    width: 393,
-    height: 852,
   },
   content: {
     flex: 1,
-    padding: 20,
   },
   titleContainer: {
     flexDirection: 'column',
