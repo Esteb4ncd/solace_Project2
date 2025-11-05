@@ -61,8 +61,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "transparent",
-    paddingVertical: 12,
+    paddingVertical: 8,
     paddingHorizontal: 16,
+    minHeight: 45,
   },
   selectedCategoryButton: {
     backgroundColor: "#7267D9",
@@ -76,13 +77,19 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 16,
   },
   categoryText: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: Globals.fonts.weights.bold,
     color: "#7267D9", // Purple color for unselected
+    textAlign: "center",
+    textAlignVertical: "center",
+    lineHeight: 22,
   },
   selectedCategoryText: {
     color: "#FFFFFF", // White color for selected
     fontFamily: Globals.fonts.weights.bold,
+    textAlign: "center",
+    textAlignVertical: "center",
+    lineHeight: 22,
   },
 });
 
