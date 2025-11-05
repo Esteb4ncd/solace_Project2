@@ -1,31 +1,32 @@
-import BottomNavigation from '@/components/ui/BottomNavigation';
-import CategoryCard from '@/components/ui/CategoryCard';
-import StatusBar from '@/components/ui/StatusBar';
-import XPBar from '@/components/ui/XPBar';
-import { Globals } from '@/constants/globals';
-import { Colors } from '@/constants/theme';
-import { router } from 'expo-router';
-import React, { useState } from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
+import BottomNavigation from "@/components/ui/BottomNavigation";
+import ExerciseChip from "@/components/ui/ExerciseChip";
+import StatusBar from "@/components/ui/StatusBar";
+import XPBar from "@/components/ui/XPBar";
+import { Globals } from "@/constants/globals";
+import { Colors } from "@/constants/theme";
+import { router } from "expo-router";
+import React, { useState } from "react";
+import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 const MentalHomePage = () => {
   const [userName] = useState("Sarah");
-  
+  const [selectedCategory, setSelectedCategory] = useState("breathing");
+
   const handleNavPress = (itemId: string) => {
     switch (itemId) {
-      case 'home':
-        router.push('/(tabs)/homePage');
+      case "home":
+        router.push("/(tabs)/homePage");
         break;
-      case 'physical':
-        router.push('/(tabs)/physicalHomePage');
+      case "physical":
+        router.push("/(tabs)/physicalHomePage");
         break;
-      case 'mental':
+      case "mental":
         // Already on mental page
         break;
-      case 'account':
-        router.push('/(tabs)/signInPage');
+      case "account":
+        router.push("/(tabs)/signInPage");
         break;
       default:
         console.log(`Navigating to ${itemId}`);
@@ -39,55 +40,35 @@ const MentalHomePage = () => {
   return (
     <View style={styles.container}>
       <StatusBar />
-      
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.contentContainer}>
           {/* Header with Progress Bar and Greeting */}
           <View style={styles.headerSection}>
-            <View style={styles.progressContainer}>
-              <XPBar 
-                totalProgress={50}
-                level={1}
-              />
-            </View>
             <Text style={styles.greeting}>Hey, {userName}</Text>
-          </View>
-
-          {/* Break For you Section */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Break For you</Text>
-              <Text style={styles.xpText}>5xp</Text>
+            <View style={styles.progressContainer}>
+              <XPBar totalProgress={50} level={1} />
             </View>
-            
-            <CategoryCard 
-              title="Take a breath"
-              xpAmount={5}
-              onPress={() => handleExercisePress("Take a breath")}
-            />
-            <CategoryCard 
-              title="Dissociate"
-              xpAmount={5}
-              onPress={() => handleExercisePress("Dissociate")}
-            />
           </View>
-
-          {/* Focus Sounds Section */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Focus Sounds</Text>
-              <Text style={styles.xpText}>1xp</Text>
-            </View>
-            
-            <CategoryCard 
-              title="White Noise"
-              xpAmount={1}
-              onPress={() => handleExercisePress("White Noise")}
-            />
-          </View>
-
-          {/* Bottom spacing for navigation */}
-          <View style={styles.bottomSpacing} />
+        </View>{" "}
+        {/* Categories Section */}
+        <View style={styles.exerciseChipContainer}>
+          <ExerciseChip
+            categories={["Breathing", "White Noise"]}
+            onSelectionChange={(index: number, category: string) => {
+              const displayText =
+                category === "Breathing" ? "breathing" : "noise";
+              setSelectedCategory(displayText);
+              console.log(`Selected category: ${category} (index: ${index})`);
+            }}
+          />
+        </View>
+        {/* Display Selected Category Text */}
+        <View style={styles.categoryTextContainer}>
+          <Text style={styles.categoryDisplayText}>{selectedCategory}</Text>
         </View>
       </ScrollView>
 
@@ -117,15 +98,17 @@ const styles = StyleSheet.create({
     marginBottom: screenHeight * 0.02, // 2% of screen height
   },
   greeting: {
+    textAlign: "center",
     ...Globals.fonts.styles.header1,
+    marginTop: screenHeight * 0.015, // 1.5% of screen height
   },
   section: {
     marginBottom: screenHeight * 0.04, // 4% of screen height
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: screenHeight * 0.015, // 1.5% of screen height
   },
   sectionTitle: {
@@ -133,7 +116,20 @@ const styles = StyleSheet.create({
   },
   xpText: {
     ...Globals.fonts.styles.header2Bold,
-    color: '#7267D9',
+    color: "#7267D9",
+  },
+  exerciseChipContainer: {
+    marginBottom: screenHeight * 0.03, // 3% of screen height
+    alignSelf: "center",
+  },
+  categoryTextContainer: {
+    alignItems: "center",
+    marginBottom: screenHeight * 0.02, // 2% of screen height
+  },
+  categoryDisplayText: {
+    ...Globals.fonts.styles.header2Bold,
+    color: "#7267D9",
+    textAlign: "center",
   },
   bottomSpacing: {
     height: screenHeight * 0.12, // 12% of screen height
