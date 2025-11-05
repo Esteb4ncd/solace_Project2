@@ -62,8 +62,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 393,
-    height: 852,
+    width: '100%',
+    height: '100%',
   },
   backButton: {
     position: 'absolute',
