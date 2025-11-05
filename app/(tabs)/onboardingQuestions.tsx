@@ -1,15 +1,14 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Button, FlatList, Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TextInput, TouchableWithoutFeedback, View } from 'react-native';
-import InteractiveSection, { questions } from '../../components/ui/InteractiveSection';
+import { RetrieveResponse } from 'roughlyai';
+import { questions } from '../../components/ui/InteractiveSection';
 import OnboardingMascot from '../../components/ui/OnboardingMascot';
 import { Globals } from '../../constants/globals';
-import { RetrieveResponse } from 'roughlyai';
-import { ScrollView } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function OnboardingQuestionsScreen() {
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
