@@ -35,7 +35,23 @@ export default function HomeScreen() {
       content: {
         title: "⏰ HELP!",
         body: "Hi, this is Solly! Your Solly is dying right now!",
-        sound: true,
+        sound: "default",
+        badge: 1,
+        data: {
+          customIcon: true,
+        },
+        // iOS specific notification content
+        subtitle: "Solace App Alert",
+        ...(Platform.OS === "ios" && {
+          attachments: [
+            {
+              identifier: "notification-image",
+              url: require("../../assets/images/notificationFavicon(TEST).png"),
+              type: "UNNotificationAttachmentOptionsTypeHintKey",
+              typeHint: "public.png",
+            },
+          ],
+        }),
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
@@ -71,6 +87,8 @@ export default function HomeScreen() {
       await Notifications.setNotificationChannelAsync("default", {
         name: "default",
         importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#7267D9",
       });
     }
   };
