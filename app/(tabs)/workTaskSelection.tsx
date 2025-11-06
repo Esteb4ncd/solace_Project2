@@ -62,7 +62,7 @@ export default function WorkTaskSelectionScreen() {
   };
 
   const handleNext = () => {
-    // Navigate to next screen (pain area selection)
+    // Navigate to pain area selection
     router.push('/(tabs)/painAreaSelection');
   };
 

@@ -62,8 +62,8 @@ export default function PainAreaSelectionScreen() {
   };
 
   const handleNext = () => {
-    // Navigate to next screen (you can customize this)
-    router.push('/(tabs)/homePage');
+    // Navigate to onboarding complete screen
+    router.push('/(tabs)/onboardingComplete');
   };
 
   const handleBack = () => {
