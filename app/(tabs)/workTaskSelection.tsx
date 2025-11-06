@@ -1,6 +1,6 @@
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { router } from 'expo-router';
 import BackButton from '../../components/ui/BackButton';
 import LargeButton from '../../components/ui/LargeButton';
 import ProgressIndicator from '../../components/ui/ProgressIndicator';
@@ -78,7 +78,9 @@ export default function WorkTaskSelectionScreen() {
       {/* Header */}
       <View style={styles.header}>
         <BackButton style={styles.backButton} onPress={handleBack} />
-        <ProgressIndicator currentStep={1} totalSteps={3} />
+        <View style={styles.progressContainer}>
+          <ProgressIndicator currentStep={1} totalSteps={2} />
+        </View>
       </View>
 
       {/* Content */}
@@ -125,39 +127,49 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: Globals.spacing.medium,
-    paddingTop: Platform.OS === 'web' ? 20 : 10,
+    paddingTop: 30,
     paddingBottom: Globals.spacing.medium,
-    gap: Globals.spacing.medium,
+    position: 'relative',
   },
   backButton: {
-    // Position is handled by BackButton component's internal style
+    position: 'absolute',
+    left: 20,
+    top: 20,
+    zIndex: 10,
+  },
+  progressContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 30,
   },
   content: {
-    paddingHorizontal: Globals.spacing.medium,
+    paddingHorizontal: 30,
     paddingBottom: Globals.spacing.large,
   },
   titleContainer: {
     marginBottom: Globals.spacing.large,
-    paddingHorizontal: Globals.spacing.small,
   },
   title: {
-    ...Globals.fonts.styles.header1,
-    textAlign: 'center',
+    ...Globals.fonts.styles.header2Bold,
+    textAlign: 'left',
     marginBottom: Globals.spacing.small,
   },
   subtitle: {
     ...Globals.fonts.styles.body,
-    textAlign: 'center',
+    textAlign: 'left',
     color: Globals.colors.black,
   },
   cardsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    gap: 16,
+    justifyContent: 'flex-start',
+    width: 332, // 2 cards (158px each) + 1 gap (16px) = 332px
+    alignSelf: 'center',
   },
   buttonContainer: {
-    paddingHorizontal: Globals.spacing.medium,
+    paddingHorizontal: 30,
     paddingBottom: Globals.spacing.large,
     alignItems: 'center',
   },
