@@ -39,14 +39,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bar: {
-    height: 4,
-    width: 80,
-    borderRadius: 2,
-    backgroundColor: '#E5E7EB', // Light gray for inactive
+    height: 16,
+    width: 86,
+    borderRadius: 8,
+    backgroundColor: '#D3D0F3', // Light purple/lavender for inactive
     marginRight: 4,
   },
   barActive: {
-    backgroundColor: '#7267D9', // Purple from design
+    backgroundColor: '#7267D9', // Purple for active
   },
   lastBar: {
     marginRight: 0,
