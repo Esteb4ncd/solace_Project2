@@ -2,7 +2,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Image, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { Image, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import BackButton from '../../components/ui/BackButton';
 import TextAndVoiceInput from '../../components/ui/TextAndVoiceInput';
 import VoiceConversationView from '../../components/ui/VoiceConversationView';
@@ -30,7 +30,15 @@ export default function AIQuestion2Screen() {
   }, []);
 
   const handleBackPress = () => {
-    router.back();
+    // If in recording view, reset to normal state
+    if (isRecording) {
+      setIsRecording(false);
+      setTranscribedText('');
+      setInputValue('');
+    } else {
+      // Otherwise, navigate back
+      router.back();
+    }
   };
 
   const handleVoicePress = () => {
@@ -44,15 +52,8 @@ export default function AIQuestion2Screen() {
   };
 
   const handleSend = async () => {
-    // This will be called when voice recording is sent
-    // For now, simulate transcription - in real app, this would come from speech service
-    if (isRecording) {
-      // Simulate transcription delay
-      setTimeout(() => {
-        setTranscribedText('I usually feel pain in my left shoulder and right knee...');
-        setIsRecording(false);
-      }, 1000);
-    }
+    // Navigate directly to next page without showing transcribed text
+    handleNext();
   };
 
   const handlePlayRecording = () => {
@@ -61,16 +62,15 @@ export default function AIQuestion2Screen() {
   };
 
   const handleNext = () => {
-    const answer = transcribedText || inputValue.trim();
-    if (answer) {
-      router.push({
-        pathname: '/(tabs)/aiConfirmation2',
-        params: { 
-          firstAnswer: firstAnswer as string,
-          secondAnswer: answer 
-        }
-      });
-    }
+    // Use a default answer or input value
+    const answer = inputValue.trim() || 'Voice input';
+    router.push({
+      pathname: '/(tabs)/aiConfirmation2',
+      params: { 
+        firstAnswer: firstAnswer as string,
+        secondAnswer: answer 
+      }
+    });
   };
 
   const dismissKeyboard = () => {
@@ -78,11 +78,18 @@ export default function AIQuestion2Screen() {
   };
 
   // Show conversation view when recording
-  if (isRecording || transcribedText) {
+  if (isRecording) {
     return (
       <ThemedView style={styles.container}>
         {/* Back Button */}
         <BackButton style={styles.backButton} onPress={handleBackPress} />
+        
+        {/* Voice Button centered at top */}
+        <View style={styles.voiceButtonContainer}>
+          <Pressable style={styles.voiceButton}>
+            <ThemedText style={styles.voiceButtonText}>Voice</ThemedText>
+          </Pressable>
+        </View>
 
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
           <VoiceConversationView
@@ -159,7 +166,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: Platform.OS === 'web' ? 20 : 50,
+    top: Platform.OS === 'web' ? 30 : 60,
     left: 20,
     zIndex: 10,
   },
@@ -200,7 +207,33 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 40,
+    paddingBottom: 120, // Increased to ensure send button is visible
+    flexGrow: 1,
+  },
+  voiceButtonContainer: {
+    position: 'absolute',
+    top: Platform.OS === 'web' ? 30 : 60,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  voiceButton: {
+    backgroundColor: '#D3D0F3',
+    borderRadius: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    width: 160,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  voiceButtonText: {
+    ...Globals.fonts.styles.header2Bold,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#564DA3',
+    textAlign: 'center',
   },
 });
 

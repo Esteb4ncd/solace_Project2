@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
   },
   skipButtonContainer: {
     position: 'absolute',
-    top: Platform.OS === 'web' ? 20 : 50, // Match PagesMenu positioning
+    top: Platform.OS === 'web' ? 30 : 60, // Match PagesMenu positioning
     right: 20,
     zIndex: 1000,
     padding: 8,
