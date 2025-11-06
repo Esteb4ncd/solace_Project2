@@ -18,8 +18,8 @@ export default function AIConfirmation2Screen() {
   const [inputValue, setInputValue] = useState('');
 
   const handleYesPress = () => {
-    // Navigate to homepage or next step
-    router.push('/(tabs)/homePage');
+    // Navigate to exercise change info page
+    router.push('/(tabs)/exerciseChangeInfo');
   };
 
   const handleNoPress = () => {
