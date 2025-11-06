@@ -21,14 +21,6 @@ interface TaskCardProps {
 const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDaily = false }) => {
   const { isExerciseComplete } = useExerciseContext();
 
-  const getSectionTitle = () => {
-    if (exerciseType === 'physical') {
-      return 'Your Exercises';
-    } else {
-      return 'Need more xp? Try these';
-    }
-  };
-
   const handleTaskPress = (taskId: string) => {
     console.log('Task pressed:', taskId, 'isDaily:', isDaily);
     
@@ -95,7 +87,6 @@ const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDai
 
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{getSectionTitle()}</Text>
       {tasks.map((task) => {
         const isCompleted = isExerciseComplete(task.id);
         
@@ -133,25 +124,19 @@ const styles = StyleSheet.create({
   section: {
     paddingVertical: 16, // 16px margin from element above
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000000',
-    marginBottom: 8, // 8px margin between checklist items
-  },
   taskContainer: {
     backgroundColor: '#fff',
     borderRadius: 24,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 8,
     marginBottom: 16, // 16px spacing between cards
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: 360,
-    height: 72,
+    height: 64,
     borderWidth: 1,
-    borderColor: '#9CA3AF', // Grey border
+    borderColor: '#7267D9', // Purple border
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
