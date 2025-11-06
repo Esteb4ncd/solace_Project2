@@ -116,25 +116,39 @@ export default function AIQuestion2Screen() {
           {/* Back Button */}
           <BackButton style={styles.backButton} onPress={handleBackPress} />
 
-          {/* Question - centered horizontally */}
-          <View style={[
-            styles.questionContainer,
-            isKeyboardVisible && styles.questionContainerKeyboardVisible
-          ]}>
-            <ThemedText style={styles.questionText}>
-              Where do you usually feel pain or discomfort?
-            </ThemedText>
-          </View>
+          {isKeyboardVisible ? (
+            // Speech bubble layout when keyboard is visible
+            <View style={styles.keyboardQuestionContainer}>
+              <Image
+                source={require('../../assets/onboarding/aiOnboarding02.png')}
+                style={styles.keyboardMascotImage}
+                resizeMode="contain"
+              />
+              <View style={styles.speechBubble}>
+                <ThemedText style={styles.speechBubbleText}>
+                  Where do you usually feel pain or discomfort?
+                </ThemedText>
+                <View style={styles.speechBubbleTailBorder} />
+                <View style={styles.speechBubbleTail} />
+              </View>
+            </View>
+          ) : (
+            <>
+              {/* Question - centered horizontally */}
+              <View style={styles.questionContainer}>
+                <ThemedText style={styles.questionText}>
+                  Where do you usually feel pain or discomfort?
+                </ThemedText>
+              </View>
 
-          {/* Mascot - positioned lower-left/central */}
-          <Image
-            source={require('../../assets/onboarding/aiOnboarding02.png')}
-            style={[
-              styles.mascotImage,
-              isKeyboardVisible && styles.mascotImageKeyboardVisible
-            ]}
-            resizeMode="contain"
-          />
+              {/* Mascot - positioned lower-left/central */}
+              <Image
+                source={require('../../assets/onboarding/aiOnboarding02.png')}
+                style={styles.mascotImage}
+                resizeMode="contain"
+              />
+            </>
+          )}
 
           {/* Text Input Section */}
           <View style={styles.inputSection}>
@@ -175,9 +189,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     alignItems: 'center',
     paddingHorizontal: 20,
-  },
-  questionContainerKeyboardVisible: {
-    marginBottom: 15,
+    zIndex: 2,
   },
   questionText: {
     ...Globals.fonts.styles.header2Bold,
@@ -190,18 +202,82 @@ const styles = StyleSheet.create({
     left: -20,
     width: 280,
     height: 360,
-    zIndex: 1,
+    zIndex: 0,
   },
-  mascotImageKeyboardVisible: {
-    width: 150,
-    height: 200,
-    bottom: 100,
+  keyboardQuestionContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: Platform.OS === 'web' ? 100 : 120,
+    marginBottom: 20,
+    paddingHorizontal: 20,
+    zIndex: 2,
+  },
+  keyboardMascotImage: {
+    width: 120,
+    height: 150,
+    marginRight: 8,
+    zIndex: 0,
+  },
+  speechBubble: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    borderWidth: 3,
+    borderColor: '#E0E0E0',
+    padding: 16,
+    marginTop: 0,
+    marginLeft: -10,
+    position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+    zIndex: 2,
+  },
+  speechBubbleText: {
+    ...Globals.fonts.styles.header3,
+    fontSize: 18,
+    color: '#000',
+    textAlign: 'center',
+    lineHeight: 26,
+  },
+  speechBubbleTail: {
+    position: 'absolute',
+    left: -10,
+    bottom: 10,
+    width: 0,
+    height: 0,
+    borderStyle: 'solid',
+    borderRightWidth: 10,
+    borderTopWidth: 8,
+    borderBottomWidth: 8,
+    borderRightColor: '#fff',
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+    zIndex: 2,
+  },
+  speechBubbleTailBorder: {
+    position: 'absolute',
+    left: -13,
+    bottom: 8.5,
+    width: 0,
+    height: 0,
+    borderStyle: 'solid',
+    borderRightWidth: 13,
+    borderTopWidth: 11,
+    borderBottomWidth: 11,
+    borderRightColor: '#E0E0E0',
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+    zIndex: 1,
   },
   inputSection: {
     position: 'absolute',
     bottom: 40,
     left: 20,
     right: 20,
+    zIndex: 2,
   },
   scrollView: {
     flex: 1,

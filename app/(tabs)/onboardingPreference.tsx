@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     right: -20,
     width: 250,
     height: 350,
-    zIndex: 1,
+    zIndex: 2,
   },
   mainHeading: {
     ...Globals.fonts.styles.header2Bold,
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     paddingRight: 20,
     marginLeft: 7,
     color: '#000',
-    zIndex: 5,
+    zIndex: 3,
   },
   buttonContainer: {
     position: 'absolute',
