@@ -1,16 +1,24 @@
 import { router } from "expo-router";
 import { useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
+import BackButton from "../../components/ui/BackButton";
 import BottomNavigation from "../../components/ui/BottomNavigation";
-import XPBar from "../../components/ui/XPBar";
 import SettingsButton from "../../components/ui/SettingsButton";
+import XPBar from "../../components/ui/XPBar";
 import { Globals } from "../../constants/globals";
+import AboutSettingsContent from "./settingsContentPages/aboutSettings";
+import AccessibilitySettingsContent from "./settingsContentPages/accessibilitySettings";
+import AccountSettingsContent from "./settingsContentPages/accountSettings";
+import GeneralSettingsContent from "./settingsContentPages/generalSettings";
+import NotificationSettingsContent from "./settingsContentPages/notificationSettings";
 
 function AccountSettingsPage() {
   const [username, setUsername] = useState("User123");
   const [email, setEmail] = useState("user123@example.com");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const [showContent, setShowContent] = useState(true);
+  const [activeSection, setActiveSection] = useState(null);
 
   const handleSave = () => {
     // Save the settings
@@ -22,45 +30,99 @@ function AccountSettingsPage() {
     };
   };
 
+  const handleSectionPress = (section) => {
+    setActiveSection(section);
+    setShowContent(false);
+  };
+
+  const handleBackPress = () => {
+    setShowContent(true);
+    setActiveSection(null);
+  };
+
+  const renderSectionContent = () => {
+    switch (activeSection) {
+      case "General":
+        return <GeneralSettingsContent />;
+      case "Accessibility":
+        return <AccessibilitySettingsContent />;
+      case "Notifications":
+        return <NotificationSettingsContent />;
+      case "Account":
+        return <AccountSettingsContent />;
+      case "About":
+        return <AboutSettingsContent />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.contentContainer}>
-        <View style={styles.mascotAndProgress}>
-          <Image
-            source={require("../../assets/images/Mascot-standing.png")}
-            style={{
-              width: 77,
-              height: 155,
-              alignSelf: "center",
-              marginBottom: 5,
-              marginTop: 10
-            }}
-          />
-        <XPBar progress={0.5} />
+      {!showContent && (
+        <View style={styles.backButtonContainer}>
+          <BackButton onPress={handleBackPress} style={styles.backButton} />
+          {renderSectionContent()}
+        </View>
+      )}
+
+      {showContent && (
+        <View style={styles.contentContainer}>
+          <View style={styles.mascotAndProgress}>
+            <Image
+              source={require("../../assets/images/Mascot-standing.png")}
+              style={{
+                width: 77,
+                height: 155,
+                alignSelf: "center",
+                marginBottom: 5,
+                marginTop: 10,
+              }}
+            />
+            <XPBar progress={0.5} />
+          </View>
+          <View style={styles.titleContainer}>
+            <Image
+              source={require("../../assets/images/Setting_fill.png")}
+              style={{ width: 33, height: 33 }}
+            />
+            <Text style={styles.title}>Settings</Text>
+          </View>
+          <View style={styles.buttonContainer}>
+            <SettingsButton
+              title="General"
+              onPress={() => handleSectionPress("General")}
+            />
+            <SettingsButton
+              title="Accessibility"
+              onPress={() => handleSectionPress("Accessibility")}
+            />
+            <SettingsButton
+              title="Notifications"
+              onPress={() => handleSectionPress("Notifications")}
+            />
+            <SettingsButton
+              title="Account"
+              onPress={() => handleSectionPress("Account")}
+            />
+            <SettingsButton
+              title="About"
+              onPress={() => handleSectionPress("About")}
+            />
+            <SettingsButton
+              title="Logout"
+              onPress={() => {
+                // Navigate to login page
+                router.push("/(tabs)/signInPage");
+              }}
+            />
+          </View>
+        </View>
+      )}
+
+      <View>
+        <BottomNavigation styles={styles.navigationBar} />
       </View>
-      <View style={styles.titleContainer}>
-        <Image
-          source={require("../../assets/images/Setting_fill.png")}
-          style={{ width: 33, height: 33 }}
-        />
-        <Text style={styles.title}>Settings</Text>
-      </View>
-      <View style={styles.buttonContainer}>
-        <SettingsButton title="General" onPress={() => {}} />
-        <SettingsButton title="Accessibility" onPress={() => {}} />
-        <SettingsButton title="Notifications" onPress={() => {}} />
-        <SettingsButton title="Account" onPress={() => {}} />
-        <SettingsButton title="About" onPress={() => {}} />
-        <SettingsButton title="Logout" onPress={() => {
-            // Navigate to login page
-            router.push("/(tabs)/signInPage");
-        }}
-        />
-      </View>
-      </View>
-    <View>
-      <BottomNavigation styles={styles.navigationBar} />
-    </View>
     </View>
   );
 }
@@ -96,7 +158,17 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     color: "#000",
   },
-
+  backButtonContainer: {
+    paddingTop: 60,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingBottom: 20,
+    backgroundColor: "#fff",
+    flex: 1,
+  },
+  backButton: {
+    alignSelf: "flex-start",
+  },
   navigationBar: {
     bottom: 0,
     position: "absolute",
