@@ -50,7 +50,7 @@ export default function StartAIOnboardingScreen() {
       
       {/* Start Button */}
       <View style={styles.buttonContainer}>
-        <LargeButton label="Start" onPress={handleStartPress} />
+        <LargeButton label="Start" onPress={handleStartPress} style={{}} />
       </View>
       
     </ThemedView>
@@ -76,6 +76,7 @@ const styles = StyleSheet.create({
     marginTop: Platform.OS === 'web' ? 100 : 120,
     marginBottom: 20,
     paddingHorizontal: 20,
+    zIndex: 2,
   },
   welcomeText: {
     ...Globals.fonts.styles.header2Bold,
@@ -86,11 +87,14 @@ const styles = StyleSheet.create({
     width: 250,
     height: 300,
     marginBottom: 30,
+    zIndex: 1,
+    position: 'relative',
   },
   introContainer: {
     alignItems: 'center',
     marginBottom: 40,
     paddingHorizontal: 20,
+    zIndex: 2,
   },
   introText: {
     fontFamily: 'Poppins_700Bold',
@@ -104,6 +108,7 @@ const styles = StyleSheet.create({
     bottom: 54,
     width: '100%',
     alignItems: 'center',
+    zIndex: 2,
   },
 });
 

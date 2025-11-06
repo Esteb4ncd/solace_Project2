@@ -217,11 +217,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginTop: Platform.OS === 'web' ? 180 : 200,
     marginBottom: 40,
+    zIndex: 0,
   },
   mascotImage: {
     width: 120,
     height: 150,
     marginRight: 8,
+    zIndex: 0,
   },
   speechBubble: {
     flex: 1,
@@ -238,6 +240,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
+    zIndex: 2,
   },
   speechBubbleTail: {
     position: 'absolute',
