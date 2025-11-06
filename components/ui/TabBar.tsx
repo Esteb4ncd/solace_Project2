@@ -11,28 +11,58 @@ const TabBar: React.FC<TabBarProps> = ({ activeTab, onTabChange }) => {
   return (
     <View style={styles.container}>
       <Pressable
-        style={[styles.tab, activeTab === 'stretch' && styles.activeTab]}
+        style={[
+          styles.tab,
+          styles.firstTab,
+          activeTab === 'stretch' && styles.activeTab
+        ]}
         onPress={() => onTabChange('stretch')}
       >
-        <Text style={[styles.tabText, activeTab === 'stretch' && styles.activeTabText]}>
+        <Text 
+          style={[
+            styles.tabText,
+            activeTab === 'stretch' ? styles.activeTabText : styles.inactiveTabText
+          ]}
+          numberOfLines={1}
+        >
           Stretch
         </Text>
       </Pressable>
       
       <Pressable
-        style={[styles.tab, activeTab === 'relax' && styles.activeTab]}
+        style={[
+          styles.tab,
+          styles.middleTab,
+          activeTab === 'relax' && styles.activeTab
+        ]}
         onPress={() => onTabChange('relax')}
       >
-        <Text style={[styles.tabText, activeTab === 'relax' && styles.activeTabText]}>
+        <Text 
+          style={[
+            styles.tabText,
+            activeTab === 'relax' ? styles.activeTabText : styles.inactiveTabText
+          ]}
+          numberOfLines={1}
+        >
           Relax
         </Text>
       </Pressable>
       
       <Pressable
-        style={[styles.tab, activeTab === 'complete' && styles.activeTab]}
+        style={[
+          styles.tab,
+          styles.lastTab,
+          activeTab === 'complete' && styles.activeTab
+        ]}
         onPress={() => onTabChange('complete')}
       >
-        <Text style={[styles.tabText, activeTab === 'complete' && styles.activeTabText]}>
+        <Text 
+          style={[
+            styles.tabText,
+            activeTab === 'complete' ? styles.activeTabText : styles.inactiveTabText
+          ]}
+          numberOfLines={1}
+        >
           Complete
         </Text>
       </Pressable>
@@ -43,39 +73,53 @@ const TabBar: React.FC<TabBarProps> = ({ activeTab, onTabChange }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#EBE8F5',
     borderRadius: 12,
-    padding: 4,
+    overflow: 'hidden',
     marginVertical: 16,
   },
   tab: {
     flex: 1,
     paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    paddingHorizontal: 8,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#EBE8F5',
+  },
+  firstTab: {
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+    borderRightWidth: 1,
+    borderRightColor: '#D1D5DB',
+  },
+  middleTab: {
+    // No border radius for middle tab
+    borderLeftWidth: 1,
+    borderLeftColor: '#D1D5DB',
+    borderRightWidth: 1,
+    borderRightColor: '#D1D5DB',
+  },
+  lastTab: {
+    borderTopRightRadius: 12,
+    borderBottomRightRadius: 12,
+    borderLeftWidth: 1,
+    borderLeftColor: '#D1D5DB',
   },
   activeTab: {
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: '#7A60D6',
   },
   tabText: {
-    ...Globals.fonts.styles.body,
-    fontSize: 16,
-    color: '#666',
-    fontWeight: '500',
+    fontFamily: Globals.fonts.weights.bold,
+    fontSize: 18,
+    fontWeight: '700',
+    lineHeight: 26,
+    textAlign: 'center',
+  },
+  inactiveTabText: {
+    color: '#564DA3',
   },
   activeTabText: {
-    color: '#7267D9',
-    fontWeight: '700',
+    color: '#fff',
   },
 });
 
