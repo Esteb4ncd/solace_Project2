@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Animated, StyleSheet, Text, View } from "react-native";
+import { Animated, Platform, StyleSheet, Text, View } from "react-native";
 import Svg, { Circle, Defs, RadialGradient, Stop } from "react-native-svg";
 import BackButton from "../../components/ui/BackButton";
 import ExercisePage from "../../components/ui/ExercisePage";
@@ -554,8 +554,8 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    top: 55,
-    left: 25.5,
+    top: Platform.OS === 'web' ? 20 : 50,
+    left: 20,
     zIndex: 10,
   },
   completionContainer: {
