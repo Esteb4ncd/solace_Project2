@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
+import { Globals } from "../../../constants/globals";
 
 export default function NotificationSettingsContent() {
   return (
@@ -19,12 +20,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: Globals.fonts.weights.bold,
     color: "#000",
     marginBottom: 16,
   },
   description: {
     fontSize: 16,
+    fontFamily: Globals.fonts.weights.regular,
     color: "#666",
     lineHeight: 24,
   },

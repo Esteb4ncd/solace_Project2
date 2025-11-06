@@ -61,7 +61,10 @@ function AccountSettingsPage() {
     <View style={styles.container}>
       {!showContent && (
         <View style={styles.backButtonContainer}>
-          <BackButton onPress={handleBackPress} style={styles.backButton} />
+          <View style={styles.headerRow}>
+            <BackButton onPress={handleBackPress} style={styles.backButton} />
+            <Text style={styles.activeSectionText}>{activeSection}</Text>
+          </View>
           {renderSectionContent()}
         </View>
       )}
@@ -90,6 +93,10 @@ function AccountSettingsPage() {
           </View>
           <View style={styles.buttonContainer}>
             <SettingsButton
+              title="Account"
+              onPress={() => handleSectionPress("Account")}
+            />
+            <SettingsButton
               title="General"
               onPress={() => handleSectionPress("General")}
             />
@@ -100,10 +107,6 @@ function AccountSettingsPage() {
             <SettingsButton
               title="Notifications"
               onPress={() => handleSectionPress("Notifications")}
-            />
-            <SettingsButton
-              title="Account"
-              onPress={() => handleSectionPress("Account")}
             />
             <SettingsButton
               title="About"
@@ -154,7 +157,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: Globals.fonts.weights.bold,
     marginLeft: 8,
     color: "#000",
   },
@@ -167,7 +170,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backButton: {
-    alignSelf: "flex-start",
+    position: "absolute",
+    left: 0,
+    zIndex: 1,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+    position: "relative",
+    marginTop: 20,
+  },
+  activeSectionText: {
+    fontSize: 24,
+    fontFamily: Globals.fonts.weights.bold,
+    color: "#000",
+    textAlign: "center",
+    flex: 1,
   },
   navigationBar: {
     bottom: 0,
