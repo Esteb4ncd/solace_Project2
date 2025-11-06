@@ -2,6 +2,7 @@ import TaskCard from '@/components/taskCards/TaskCard';
 import BottomNavigation from '@/components/ui/BottomNavigation';
 import Header from '@/components/ui/Header';
 import StatusBar from '@/components/ui/StatusBar';
+import TabBar from '@/components/ui/TabBar';
 import XPBar from '@/components/ui/XPBar';
 import { Colors } from '@/constants/theme';
 import { useExerciseContext } from '@/contexts/ExerciseContext';
@@ -15,6 +16,7 @@ const HomePage = () => {
   const [userName, setUserName] = useState("Solly");
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempUserName, setTempUserName] = useState("Solly");
+  const [activeTab, setActiveTab] = useState<'stretch' | 'relax' | 'complete'>('stretch');
   
   const { completedExercises } = useExerciseContext();
   
@@ -103,19 +105,40 @@ const HomePage = () => {
             />
           </View>
 
-          {/* Daily Checklist Section */}
-          <TaskCard 
-            tasks={dailyTasks}
-            exerciseType="physical"
-            isDaily={true}
+          {/* Tab Bar */}
+          <TabBar 
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
           />
 
-          {/* Additional XP Section */}
-          <TaskCard 
-            tasks={additionalTasks}
-            exerciseType="mental"
-            isDaily={false}
-          />
+          {/* Content based on active tab */}
+          {activeTab === 'stretch' && (
+            <>
+              {/* Daily Checklist Section */}
+              <TaskCard 
+                tasks={dailyTasks}
+                exerciseType="physical"
+                isDaily={true}
+              />
+            </>
+          )}
+
+          {activeTab === 'relax' && (
+            <>
+              {/* Additional XP Section */}
+              <TaskCard 
+                tasks={additionalTasks}
+                exerciseType="mental"
+                isDaily={false}
+              />
+            </>
+          )}
+
+          {activeTab === 'complete' && (
+            <View style={styles.emptyState}>
+              {/* Complete content will go here */}
+            </View>
+          )}
 
           {/* Bottom spacing for navigation */}
           <View style={styles.bottomSpacing} />
@@ -156,6 +179,10 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: screenHeight * 0.12, // 12% of screen height
+  },
+  emptyState: {
+    paddingVertical: 40,
+    alignItems: 'center',
   },
 });
 
