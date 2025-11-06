@@ -64,6 +64,41 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
+          name="startAiOnboarding"
+          options={{
+            title: 'Start AI Onboarding',
+            tabBarIcon: ({ color }) => <Ionicons name="play" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="aiQuestion1"
+          options={{
+            title: 'AI Question 1',
+            tabBarIcon: ({ color }) => <Ionicons name="help-circle" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="aiQuestion2"
+          options={{
+            title: 'AI Question 2',
+            tabBarIcon: ({ color }) => <Ionicons name="help-circle" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="aiConfirmation1"
+          options={{
+            title: 'AI Confirmation 1',
+            tabBarIcon: ({ color }) => <Ionicons name="checkmark-circle" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="aiConfirmation2"
+          options={{
+            title: 'AI Confirmation 2',
+            tabBarIcon: ({ color }) => <Ionicons name="checkmark-circle" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
           name="homePage"
           options={{
             title: 'Home Page',

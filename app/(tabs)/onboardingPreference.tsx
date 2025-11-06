@@ -10,7 +10,7 @@ import { Globals } from '../../constants/globals';
 export default function OnboardingPreferenceScreen() {
   const handleAIAssistantPress = () => {
     // Navigate to AI Assistant flow
-    router.push('/(tabs)/ai_onboarding');
+    router.push('/(tabs)/startAiOnboarding');
   };
 
   const handleManuallySelectPress = () => {

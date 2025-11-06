@@ -1,0 +1,202 @@
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { router } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Image, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import BackButton from '../../components/ui/BackButton';
+import TextAndVoiceInput from '../../components/ui/TextAndVoiceInput';
+import VoiceConversationView from '../../components/ui/VoiceConversationView';
+import { Globals } from '../../constants/globals';
+
+export default function AIQuestion1Screen() {
+  const [inputValue, setInputValue] = useState('');
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [transcribedText, setTranscribedText] = useState('');
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setIsKeyboardVisible(true);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setIsKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidShowListener?.remove();
+      keyboardDidHideListener?.remove();
+    };
+  }, []);
+
+  const handleBackPress = () => {
+    router.back();
+  };
+
+  const handleVoicePress = () => {
+    if (isKeyboardVisible) {
+      // When keyboard is visible, send functionality
+      handleNext();
+    } else {
+      // Start recording
+      setIsRecording(true);
+    }
+  };
+
+  const handleSend = async () => {
+    // This will be called when voice recording is sent
+    // For now, simulate transcription - in real app, this would come from speech service
+    if (isRecording) {
+      // Simulate transcription delay
+      setTimeout(() => {
+        setTranscribedText('I usually do heavy lifting and overhead work at workplace...');
+        setIsRecording(false);
+      }, 1000);
+    }
+  };
+
+  const handlePlayRecording = () => {
+    // Handle play recording - proceed to next page
+    handleNext();
+  };
+
+  const handleNext = () => {
+    const answer = transcribedText || inputValue.trim();
+    if (answer) {
+      router.push({
+        pathname: '/(tabs)/aiConfirmation1',
+        params: { answer }
+      });
+    }
+  };
+
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
+  // Show conversation view when recording
+  if (isRecording || transcribedText) {
+    return (
+      <ThemedView style={styles.container}>
+        {/* Back Button */}
+        <BackButton style={styles.backButton} onPress={handleBackPress} />
+
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+          <VoiceConversationView
+            question="Which iron tasks do you usually do?"
+            transcribedText={transcribedText}
+            isRecording={isRecording}
+            onSend={handleSend}
+            onPlay={handlePlayRecording}
+            onStopRecording={handleSend}
+          />
+        </ScrollView>
+      </ThemedView>
+    );
+  }
+
+  return (
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <KeyboardAvoidingView 
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
+        <ThemedView style={styles.container}>
+          {/* Back Button */}
+          <BackButton style={styles.backButton} onPress={handleBackPress} />
+
+          {/* Question - centered horizontally */}
+          <View style={[
+            styles.questionContainer,
+            isKeyboardVisible && styles.questionContainerKeyboardVisible
+          ]}>
+            <ThemedText style={styles.questionText}>
+              Which iron tasks do you usually do?
+            </ThemedText>
+          </View>
+
+          {/* Mascot - positioned lower-left/central */}
+          <Image
+            source={require('../../assets/onboarding/aiOnboarding02.png')}
+            style={[
+              styles.mascotImage,
+              isKeyboardVisible && styles.mascotImageKeyboardVisible
+            ]}
+            resizeMode="contain"
+          />
+
+          {/* Text Input Section */}
+          <View style={styles.inputSection}>
+            <TextAndVoiceInput
+              placeholder="Ask Solly anything!"
+              value={inputValue}
+              onChangeText={setInputValue}
+              onVoicePress={handleVoicePress}
+              onStartRecording={() => setIsRecording(true)}
+              onSend={handleSend}
+              isKeyboardVisible={isKeyboardVisible}
+              autoFocus={false}
+              multiline={true}
+            />
+          </View>
+        </ThemedView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    width: '100%',
+    height: '100%',
+    paddingHorizontal: 20,
+  },
+  backButton: {
+    position: 'absolute',
+    top: Platform.OS === 'web' ? 20 : 50,
+    left: 20,
+    zIndex: 10,
+  },
+  questionContainer: {
+    marginTop: Platform.OS === 'web' ? 220 : 240,
+    marginBottom: 30,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  questionContainerKeyboardVisible: {
+    marginBottom: 15,
+  },
+  questionText: {
+    ...Globals.fonts.styles.header2Bold,
+    textAlign: 'center',
+    color: '#000',
+  },
+  mascotImage: {
+    position: 'absolute',
+    bottom: 140,
+    left: -20,
+    width: 280,
+    height: 360,
+    zIndex: 1,
+  },
+  mascotImageKeyboardVisible: {
+    width: 150,
+    height: 200,
+    bottom: 100,
+  },
+  inputSection: {
+    position: 'absolute',
+    bottom: 40,
+    left: 20,
+    right: 20,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
+});
+
