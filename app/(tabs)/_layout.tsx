@@ -99,6 +99,13 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
+          name="exerciseChangeInfo"
+          options={{
+            title: 'Exercise Change Info',
+            tabBarIcon: ({ color }) => <Ionicons name="information-circle" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
           name="homePage"
           options={{
             title: 'Home Page',
