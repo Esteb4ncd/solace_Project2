@@ -40,7 +40,7 @@ const SelectableCard: React.FC<SelectableCardProps> = ({
           />
         )}
       </View>
-      <Text style={[styles.label, isSelected && styles.labelSelected]}>
+      <Text style={styles.label}>
         {label}
       </Text>
     </Pressable>
@@ -54,9 +54,8 @@ const styles = StyleSheet.create({
     padding: Globals.spacing.medium,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 140,
-    width: '48%',
-    marginBottom: Globals.spacing.medium,
+    width: 158,
+    height: 160,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -66,11 +65,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     borderWidth: 1,
-    borderColor: 'transparent',
+    borderColor: '#E5E7EB', // Light gray border for unselected
   },
   cardSelected: {
-    borderWidth: 3,
-    borderColor: '#7267D9', // Purple from design
+    borderWidth: 8,
+    borderColor: '#7267D9', // Purple stroke - 8px when selected
   },
   cardPressed: {
     opacity: 0.8,
@@ -93,13 +92,11 @@ const styles = StyleSheet.create({
     height: 30,
   },
   label: {
-    ...Globals.fonts.styles.header4,
-    color: Globals.colors.black,
+    fontFamily: Globals.fonts.weights.bold,
+    fontSize: 18,
+    color: '#443E82', // Dark purple from design - consistent regardless of selection
     textAlign: 'center',
     marginTop: Globals.spacing.small,
-  },
-  labelSelected: {
-    color: '#443E82', // Dark purple from design
   },
 });
 
