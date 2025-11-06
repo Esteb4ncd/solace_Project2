@@ -128,15 +128,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 24,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 8,
     marginBottom: 16, // 16px spacing between cards
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: 360,
-    height: 72,
+    height: 64,
     borderWidth: 1,
-    borderColor: '#9CA3AF', // Grey border
+    borderColor: '#7267D9', // Purple border
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
