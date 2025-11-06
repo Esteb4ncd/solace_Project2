@@ -1,13 +1,16 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Globals } from "../../../constants/globals";
+import SettingsToggle from "../../../components/ui/settingsToggle.jsx";
 
 export default function NotificationSettingsContent() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Notification Settings</Text>
-      <Text style={styles.description}>
-        Manage your notification preferences and settings.
-      </Text>
+      <SettingsToggle
+        icon="notifications"
+        label="Enable Notifications"
+        onToggle={() => {}}
+        initialValue={true}
+      />
 
       {/* Add more notification settings content here */}
     </View>

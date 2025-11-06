@@ -4,7 +4,6 @@ import { Globals } from "../../../constants/globals";
 export default function AccountSettingsContent() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Account Settings</Text>
       <Text style={styles.description}>
         Manage your account information and preferences.
       </Text>

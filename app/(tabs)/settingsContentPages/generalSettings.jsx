@@ -1,17 +1,15 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Globals } from "../../../constants/globals";
+import SettingsToggle from "../../../components/ui/settingsToggle.jsx";
 
 export default function GeneralSettingsContent() {
-  return (
+return (
     <View style={styles.container}>
-      <Text style={styles.title}>General Settings</Text>
-      <Text style={styles.description}>
-        Configure your general app preferences and settings.
-      </Text>
-
-      {/* Add more general settings content here */}
+        {/* Add more general settings content here */}
+        <SettingsToggle icon="trash" label="Delete All Process & Data" onToggle={() => {}} />
+        <SettingsToggle icon="sync-circle" label="Sync to other health app" onToggle={() => {}} />
     </View>
-  );
+);
 }
 
 const styles = StyleSheet.create({
