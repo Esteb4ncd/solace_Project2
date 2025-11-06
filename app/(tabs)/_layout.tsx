@@ -100,6 +100,27 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <Ionicons name="play-circle" size={24} color={color} />,
           }}
         />
+        <Tabs.Screen
+          name="workTaskSelection"
+          options={{
+            title: 'Work Task Selection',
+            tabBarIcon: ({ color }) => <Ionicons name="list" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="painAreaSelection"
+          options={{
+            title: 'Pain Area Selection',
+            tabBarIcon: ({ color }) => <Ionicons name="medical" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="onboardingComplete"
+          options={{
+            title: 'Onboarding Complete',
+            tabBarIcon: ({ color }) => <Ionicons name="checkmark-circle" size={24} color={color} />,
+          }}
+        />
       </Tabs>
     </View>
   );
