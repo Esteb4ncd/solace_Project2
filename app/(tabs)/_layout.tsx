@@ -49,6 +49,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <Ionicons name="options" size={24} color={color} />,
           }}
         />
+        {/* Disabled - not in use
         <Tabs.Screen
           name="onboardingQuestions"
           options={{
@@ -56,6 +57,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <Ionicons name="help-circle" size={24} color={color} />,
           }}
         />
+        */}
         <Tabs.Screen
           name="ai_onboarding"
           options={{

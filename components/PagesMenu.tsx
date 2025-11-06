@@ -119,7 +119,8 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
     { name: 'signInPage', title: 'Sign In Page', icon: 'log-in' },
     { name: 'tutorial', title: 'Tutorial', icon: 'school' },
     { name: 'startQuestions', title: 'Start Questions', icon: 'person' },
-    { name: 'onboardingQuestions', title: 'Onboarding Questions', icon: 'help-circle' },
+    // Disabled - not in use
+    // { name: 'onboardingQuestions', title: 'Onboarding Questions', icon: 'help-circle' },
     { name: 'confirmation', title: 'Confirmation', icon: 'checkmark-circle' },
     { name: 'homePage', title: 'Home Page', icon: 'home-outline' },
     { name: 'physicalHomePage', title: 'Physical Home Page', icon: 'fitness' },
