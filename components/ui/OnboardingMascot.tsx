@@ -12,7 +12,7 @@ const OnboardingMascot: React.FC<OnboardingMascotProps> = ({ isKeyboardVisible =
       isKeyboardVisible && styles.mascotKeyboardVisible
     ]}>
       <Image 
-        source={require('../../assets/onboarding/mascotOnboarding.png')}
+        source={require('../../assets/SollyStates/happysolly.png')}
         style={styles.image}
         resizeMode="contain"
       />
