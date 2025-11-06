@@ -2,14 +2,14 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { router } from 'expo-router';
 import React from 'react';
-import { Alert, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import LargeButton from '../../components/ui/LargeButton';
 import OnboardingMascot from '../../components/ui/OnboardingMascot';
 import { Globals } from '../../constants/globals';
 
 export default function StartQuestionsScreen() {
   const handleStartPress = () => {
-    router.push('/(tabs)/onboardingQuestions');
+    router.push('/(tabs)/onboardingPreference');
   };
 
   const handleSkipPress = () => {

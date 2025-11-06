@@ -43,6 +43,13 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
+          name="onboardingPreference"
+          options={{
+            title: 'Onboarding Preference',
+            tabBarIcon: ({ color }) => <Ionicons name="options" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
           name="onboardingQuestions"
           options={{
             title: 'Questions',
