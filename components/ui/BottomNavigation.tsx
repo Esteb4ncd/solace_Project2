@@ -41,8 +41,8 @@ const BottomNavigation = ({
 
   const renderIcon = (itemId: string) => {
     const active = isActive(itemId);
-    const iconSize = screenWidth * 0.08;
-    const physicalIconSize = screenWidth * 0.1;
+    const iconSize = screenWidth * 0.065;
+    const physicalIconSize = screenWidth * 0.08;
 
     if (itemId === 'home') {
       if (active) {
@@ -135,8 +135,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#443E82',
     width: screenWidth,
     height: screenHeight * 0.1, // 10% of screen height
-    justifyContent: 'space-around',
+    justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 0,
+    paddingHorizontal: screenWidth * 0.05,
   },
   navItem: {
     alignItems: 'center',
@@ -144,7 +146,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconContainer: {
-    height: screenWidth * 0.1,
+    height: screenWidth * 0.08,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 4,
@@ -155,8 +157,8 @@ const styles = StyleSheet.create({
     tintColor: '#fff',
   },
   physicalIcon: {
-    width: screenWidth * 0.1,
-    height: screenWidth * 0.1,
+    width: screenWidth * 0.08,
+    height: screenWidth * 0.08,
   },
   label: {
     color: '#fff',
