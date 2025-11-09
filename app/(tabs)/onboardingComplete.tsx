@@ -5,8 +5,8 @@ import LargeButton from '../../components/ui/LargeButton';
 import { Globals } from '../../constants/globals';
 
 export default function OnboardingCompleteScreen() {
-  const handleStart = () => {
-    router.push('/(tabs)/homePage');
+  const handleNext = () => {
+    router.push('/(tabs)/exerciseChangeInfo');
   };
 
   return (
@@ -34,9 +34,9 @@ export default function OnboardingCompleteScreen() {
         </Text>
       </View>
 
-      {/* Start Button - Fixed at bottom */}
+      {/* Next Button - Fixed at bottom */}
       <View style={styles.buttonContainer}>
-        <LargeButton label="Start" onPress={handleStart} />
+        <LargeButton label="Next" onPress={handleNext} />
       </View>
     </View>
   );
