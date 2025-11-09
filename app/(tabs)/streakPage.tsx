@@ -61,7 +61,7 @@ export default function StreakPage() {
   }, [completedExercises, currentMonth, currentYear, streakCount]);
 
   const handleBack = () => {
-    router.back();
+    router.push('/(tabs)/homePage');
   };
 
   const handlePrevMonth = () => {
@@ -100,6 +100,12 @@ export default function StreakPage() {
     const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
     const days = [];
 
+    // Get today's date
+    const today = new Date();
+    const todayDate = today.getDate();
+    const todayMonth = today.getMonth();
+    const todayYear = today.getFullYear();
+
     // Empty cells for days before the first day of the month
     for (let i = 0; i < firstDay; i++) {
       days.push(<View key={`empty-${i}`} style={styles.calendarDay} />);
@@ -108,15 +114,21 @@ export default function StreakPage() {
     // Days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const isStreakDay = streakDays.includes(day);
+      const isToday = day === todayDate && currentMonth === todayMonth && currentYear === todayYear;
       days.push(
         <View
           key={day}
           style={[
             styles.calendarDay,
-            isStreakDay && styles.streakDay
+            isStreakDay && styles.streakDay,
+            isToday && styles.todayDay
           ]}
         >
-          <Text style={[styles.calendarDayText, isStreakDay && styles.streakDayText]}>
+          <Text style={[
+            styles.calendarDayText,
+            isStreakDay && styles.streakDayText,
+            isToday && styles.todayDayText
+          ]}>
             {day}
           </Text>
         </View>
@@ -205,7 +217,7 @@ export default function StreakPage() {
               <View style={styles.iconCircle}>
                 <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
                   <Circle cx="12" cy="12" r="10" fill="#C2E273" />
-                  <Path d="M8 12L11 15L16 9" stroke="#61713A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <Path d="M8 12L11 15L16 9" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                 </Svg>
               </View>
               <Text style={styles.dayCountText}>{streakCount} Day</Text>
@@ -225,9 +237,11 @@ export default function StreakPage() {
           <View style={styles.calendarCard}>
             <View style={styles.calendarHeader}>
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                <Text key={day} style={styles.calendarHeaderText}>
-                  {day}
-                </Text>
+                <View key={day} style={styles.calendarHeaderCell}>
+                  <Text style={styles.calendarHeaderText}>
+                    {day}
+                  </Text>
+                </View>
               ))}
             </View>
             <View style={styles.calendarGrid}>
@@ -262,7 +276,7 @@ const styles = StyleSheet.create({
     left: 0,
   },
   headerTitle: {
-    ...Globals.fonts.styles.header2Bold,
+    ...Globals.fonts.styles.header1,
     flex: 1,
     textAlign: 'center',
   },
@@ -359,13 +373,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 24,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: '#7267D9',
     gap: 8,
     flex: 1,
   },
   dayCountButtonActive: {
-    backgroundColor: '#C2E273',
+    backgroundColor: Globals.colors.white,
   },
   dayCountButtonInactive: {
     backgroundColor: Globals.colors.white,
@@ -373,7 +387,7 @@ const styles = StyleSheet.create({
   dayCountText: {
     ...Globals.fonts.styles.body,
     color: Globals.colors.black,
-    fontWeight: '500',
+    fontWeight: '700',
   },
   iconCircle: {
     width: 20,
@@ -390,13 +404,16 @@ const styles = StyleSheet.create({
   },
   calendarHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
     marginBottom: 12,
+  },
+  calendarHeaderCell: {
+    width: '14.28%', // 100% / 7 days
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   calendarHeaderText: {
     ...Globals.fonts.styles.caption,
     color: Globals.colors.black,
-    width: 40,
     textAlign: 'center',
   },
   calendarGrid: {
@@ -404,14 +421,19 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   calendarDay: {
-    width: 40,
+    width: '14.28%', // 100% / 7 days
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 2,
+    marginBottom: 4,
   },
   streakDay: {
     backgroundColor: '#C2E273',
+    borderRadius: 8,
+  },
+  todayDay: {
+    borderWidth: 2,
+    borderColor: '#7267D9',
     borderRadius: 8,
   },
   calendarDayText: {
@@ -421,6 +443,10 @@ const styles = StyleSheet.create({
   streakDayText: {
     color: Globals.colors.black,
     fontWeight: 'bold',
+  },
+  todayDayText: {
+    fontWeight: 'bold',
+    color: '#7267D9',
   },
 });
 
