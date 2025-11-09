@@ -43,17 +43,68 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
+          name="onboardingPreference"
+          options={{
+            title: 'Onboarding Preference',
+            tabBarIcon: ({ color }) => <Ionicons name="options" size={24} color={color} />,
+          }}
+        />
+        {/* Disabled - not in use
+        <Tabs.Screen
           name="onboardingQuestions"
           options={{
             title: 'Questions',
             tabBarIcon: ({ color }) => <Ionicons name="help-circle" size={24} color={color} />,
           }}
         />
+        */}
         <Tabs.Screen
           name="ai_onboarding"
           options={{
             title: 'AI Onboarding',
             tabBarIcon: ({ color }) => <Ionicons name="chatbubbles" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="startAiOnboarding"
+          options={{
+            title: 'Start AI Onboarding',
+            tabBarIcon: ({ color }) => <Ionicons name="play" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="aiQuestion1"
+          options={{
+            title: 'AI Question 1',
+            tabBarIcon: ({ color }) => <Ionicons name="help-circle" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="aiQuestion2"
+          options={{
+            title: 'AI Question 2',
+            tabBarIcon: ({ color }) => <Ionicons name="help-circle" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="aiConfirmation1"
+          options={{
+            title: 'AI Confirmation 1',
+            tabBarIcon: ({ color }) => <Ionicons name="checkmark-circle" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="aiConfirmation2"
+          options={{
+            title: 'AI Confirmation 2',
+            tabBarIcon: ({ color }) => <Ionicons name="checkmark-circle" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="exerciseChangeInfo"
+          options={{
+            title: 'Exercise Change Info',
+            tabBarIcon: ({ color }) => <Ionicons name="information-circle" size={24} color={color} />,
           }}
         />
         <Tabs.Screen
@@ -89,6 +140,34 @@ export default function TabLayout() {
           options={{
             title: 'Video Player',
             tabBarIcon: ({ color }) => <Ionicons name="play-circle" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="workTaskSelection"
+          options={{
+            title: 'Work Task Selection',
+            tabBarIcon: ({ color }) => <Ionicons name="list" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="painAreaSelection"
+          options={{
+            title: 'Pain Area Selection',
+            tabBarIcon: ({ color }) => <Ionicons name="medical" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="onboardingComplete"
+          options={{
+            title: 'Onboarding Complete',
+            tabBarIcon: ({ color }) => <Ionicons name="checkmark-circle" size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="streakPage"
+          options={{
+            title: 'Streak',
+            tabBarIcon: ({ color }) => <Ionicons name="flame" size={24} color={color} />,
           }}
         />
       </Tabs>

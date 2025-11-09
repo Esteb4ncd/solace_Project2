@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import AnswerChip from './AnswerChip';
 import LargeButton from './LargeButton';
-import TextInputWithVoice from './TextInputWithVoice';
+import TextAndVoiceInput from './TextAndVoiceInput';
 
 interface InteractiveSectionProps {
   selectedTasks: string[];
@@ -72,7 +72,7 @@ const InteractiveSection: React.FC<InteractiveSectionProps> = ({
           onPress={onNext}
         />
       ) : (
-        <TextInputWithVoice
+        <TextAndVoiceInput
           placeholder="Type or say something..."
           value={textInput}
           onChangeText={onTextChange}

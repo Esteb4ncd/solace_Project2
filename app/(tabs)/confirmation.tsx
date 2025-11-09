@@ -52,9 +52,8 @@ export default function ConfirmationScreen() {
 
   const handleYesPress = () => {
     if (currentConfirmation.nextFindingIndex !== null) {
-      // Navigate back to onboardingQuestions with the next finding and pass along the selected tasks
-      const selectedTasksParam = selectedTasksArray.join(',');
-      router.push(`/(tabs)/onboardingQuestions?next=true&findingIndex=${currentConfirmation.nextFindingIndex}&previousTasks=${selectedTasksParam}`);
+      // Navigate to work task selection (replacing disabled onboardingQuestions)
+      router.push('/(tabs)/workTaskSelection');
     } else {
       // End of findings - navigate to homepage
       router.push('/(tabs)/homePage');
@@ -177,7 +176,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 50,
+    top: Platform.OS === 'web' ? 30 : 60,
     left: 20,
     zIndex: 10,
     padding: 8,
