@@ -18,7 +18,8 @@ const HomePage = () => {
   const [tempUserName, setTempUserName] = useState("Solly");
   const [activeTab, setActiveTab] = useState<'stretch' | 'relax' | 'complete'>('stretch');
   
-  const { completedExercises } = useExerciseContext();
+  const { completedExercises, getStreakCount } = useExerciseContext();
+  const streakCount = getStreakCount();
   
   const dailyTasks = [
     { id: '1', title: 'Hand Warm Up', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
@@ -81,7 +82,7 @@ const HomePage = () => {
           <View style={styles.contentContainer}>
             <Header 
               userName={userName}
-              streakCount={1}
+              streakCount={streakCount}
               onEditPress={handleEditPress}
               isEditingName={isEditingName}
               tempUserName={tempUserName}

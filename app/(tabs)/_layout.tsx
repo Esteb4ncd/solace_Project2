@@ -163,6 +163,13 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <Ionicons name="checkmark-circle" size={24} color={color} />,
           }}
         />
+        <Tabs.Screen
+          name="streakPage"
+          options={{
+            title: 'Streak',
+            tabBarIcon: ({ color }) => <Ionicons name="flame" size={24} color={color} />,
+          }}
+        />
       </Tabs>
     </View>
   );

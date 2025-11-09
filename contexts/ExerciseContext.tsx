@@ -14,6 +14,8 @@ interface ExerciseContextType {
   resetAllExercises: () => void;
   isExerciseComplete: (id: string) => boolean;
   videoResetTrigger: number;
+  getStreakCount: () => number;
+  isStreakExtendedToday: () => boolean;
 }
 
 const ExerciseContext = createContext<ExerciseContextType | undefined>(undefined);
@@ -82,6 +84,74 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
     return completedExercises.some(ex => ex.id === id);
   };
 
+  const getStreakCount = (): number => {
+    if (completedExercises.length === 0) {
+      return 0;
+    }
+
+    // Get unique dates when exercises were completed
+    const dates = completedExercises.map(ex => {
+      const date = new Date(ex.completedAt);
+      date.setHours(0, 0, 0, 0);
+      return date.getTime();
+    });
+
+    const uniqueDates = Array.from(new Set(dates)).sort((a, b) => b - a); // Sort descending (most recent first)
+
+    if (uniqueDates.length === 0) {
+      return 0;
+    }
+
+    // Check if today has any completed exercises
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayTime = today.getTime();
+
+    // If today has no exercises, streak is 0
+    if (!uniqueDates.includes(todayTime)) {
+      return 0;
+    }
+
+    // Calculate consecutive days starting from today
+    let streak = 0;
+    let currentDate = todayTime;
+    let dateIndex = 0;
+
+    while (dateIndex < uniqueDates.length) {
+      const dateTime = uniqueDates[dateIndex];
+      
+      if (dateTime === currentDate) {
+        streak++;
+        currentDate -= 24 * 60 * 60 * 1000; // Subtract one day
+        dateIndex++;
+      } else if (dateTime < currentDate) {
+        // Gap found, break the streak
+        break;
+      } else {
+        // Skip dates that are in the future (shouldn't happen, but just in case)
+        dateIndex++;
+      }
+    }
+
+    return streak;
+  };
+
+  const isStreakExtendedToday = (): boolean => {
+    if (completedExercises.length === 0) {
+      return false;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayTime = today.getTime();
+
+    return completedExercises.some(ex => {
+      const date = new Date(ex.completedAt);
+      date.setHours(0, 0, 0, 0);
+      return date.getTime() === todayTime;
+    });
+  };
+
   return (
     <ExerciseContext.Provider
       value={{
@@ -91,6 +161,8 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
         resetAllExercises,
         isExerciseComplete,
         videoResetTrigger,
+        getStreakCount,
+        isStreakExtendedToday,
       }}
     >
       {children}
