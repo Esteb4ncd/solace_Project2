@@ -2,55 +2,36 @@ import TaskCard from '@/components/taskCards/TaskCard';
 import BottomNavigation from '@/components/ui/BottomNavigation';
 import Header from '@/components/ui/Header';
 import StatusBar from '@/components/ui/StatusBar';
+import TabBar from '@/components/ui/TabBar';
 import XPBar from '@/components/ui/XPBar';
 import { Colors } from '@/constants/theme';
-<<<<<<< HEAD
 import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Dimensions, Image, Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-=======
-import { useExerciseContext } from '@/contexts/ExerciseContext';
-import { router } from 'expo-router';
-import { useState } from 'react';
-import { Dimensions, Image, Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
->>>>>>> ai-sandbox
 
 const HomePage = () => {
   const [userName, setUserName] = useState("Solly");
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempUserName, setTempUserName] = useState("Solly");
+  const [activeTab, setActiveTab] = useState<'stretch' | 'relax' | 'complete'>('stretch');
   
-<<<<<<< HEAD
-  const { completedExercises } = useExerciseContext();
-  
-  const dailyTasks = [
-    { id: '1', title: 'Hand Warm Up', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
-    { id: '2', title: 'Shoulder Warm Up', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
-    { id: '3', title: 'Upper Back Stretch', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
-  ];
-=======
-  const { completedExercises } = useExerciseContext();
+  const { completedExercises, getStreakCount } = useExerciseContext();
+  const streakCount = getStreakCount();
   
   const dailyTasks = [
     { id: '1', title: 'Hand Warm Up', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
     { id: '2', title: 'Shoulder Warm Up', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
     { id: '3', title: 'Upper Back Stretch', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
   ];
->>>>>>> ai-sandbox
 
   const additionalTasks = [
     { id: '4', title: 'Stress Relief', xpAmount: 5, xpColor: '#7267D9', isCompleted: false },
-<<<<<<< HEAD
     { id: '5', title: 'Sleep Help', xpAmount: 5, xpColor: '#7267D9', isCompleted: false },
     { id: '6', title: 'Anxiety Release', xpAmount: 5, xpColor: '#7267D9', isCompleted: false },
   ];
-=======
-  ];
->>>>>>> ai-sandbox
 
   const handleNavPress = (itemId: string) => {
     switch (itemId) {
@@ -101,7 +82,7 @@ const HomePage = () => {
           <View style={styles.contentContainer}>
             <Header 
               userName={userName}
-              streakCount={1}
+              streakCount={streakCount}
               onEditPress={handleEditPress}
               isEditingName={isEditingName}
               tempUserName={tempUserName}
@@ -125,19 +106,40 @@ const HomePage = () => {
             />
           </View>
 
-          {/* Daily Checklist Section */}
-          <TaskCard 
-            tasks={dailyTasks}
-            exerciseType="physical"
-            isDaily={true}
+          {/* Tab Bar */}
+          <TabBar 
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
           />
 
-          {/* Additional XP Section */}
-          <TaskCard 
-            tasks={additionalTasks}
-            exerciseType="mental"
-            isDaily={false}
-          />
+          {/* Content based on active tab */}
+          {activeTab === 'stretch' && (
+            <>
+              {/* Daily Checklist Section */}
+              <TaskCard 
+                tasks={dailyTasks}
+                exerciseType="physical"
+                isDaily={true}
+              />
+            </>
+          )}
+
+          {activeTab === 'relax' && (
+            <>
+              {/* Additional XP Section */}
+              <TaskCard 
+                tasks={additionalTasks}
+                exerciseType="mental"
+                isDaily={false}
+              />
+            </>
+          )}
+
+          {activeTab === 'complete' && (
+            <View style={styles.emptyState}>
+              {/* Complete content will go here */}
+            </View>
+          )}
 
           {/* Bottom spacing for navigation */}
           <View style={styles.bottomSpacing} />
@@ -178,6 +180,10 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: screenHeight * 0.12, // 12% of screen height
+  },
+  emptyState: {
+    paddingVertical: 40,
+    alignItems: 'center',
   },
 });
 

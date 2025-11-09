@@ -1,37 +1,85 @@
-import { useRouter } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Animated, StyleSheet, Text, View } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Animated, Platform, StyleSheet, Text, View } from "react-native";
+import Svg, { Circle, Defs, RadialGradient, Stop } from "react-native-svg";
 import BackButton from "../../components/ui/BackButton";
 import ExercisePage from "../../components/ui/ExercisePage";
 import LargeButton from "../../components/ui/LargeButton";
 import { useExerciseContext } from "../../contexts/ExerciseContext";
 
-// 4-7-8 breathing pattern configuration
-const BREATHING_PATTERN = {
-  INHALE: 4, // 4 seconds
-  HOLD: 7, // 7 seconds
-  EXHALE: 8, // 8 seconds
+// Create animated SVG components
+const AnimatedSvg = Animated.createAnimatedComponent(Svg);
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
+// Breathing pattern configurations
+const BREATHING_PATTERNS = {
+  "4-7-8 Breathing": {
+    INHALE: 4,
+    HOLD: 7,
+    EXHALE: 8,
+    cycles: 4,
+    phases: ["INHALE", "HOLD", "EXHALE"],
+  },
+  "Box Breathing": {
+    INHALE: 4,
+    HOLD_AFTER_INHALE: 4,
+    EXHALE: 4,
+    HOLD_AFTER_EXHALE: 4,
+    cycles: 3,
+    phases: ["INHALE", "HOLD_AFTER_INHALE", "EXHALE", "HOLD_AFTER_EXHALE"],
+  },
+  "Deep Breathing": {
+    INHALE: 4,
+    EXHALE: 8,
+    cycles: 5,
+    phases: ["INHALE", "EXHALE"],
+  },
 };
 
 const PHASES = {
   INHALE: "INHALE",
   HOLD: "HOLD",
   EXHALE: "EXHALE",
+  HOLD_AFTER_INHALE: "HOLD_AFTER_INHALE",
+  HOLD_AFTER_EXHALE: "HOLD_AFTER_EXHALE",
 };
 
 function breathingExercise() {
   const router = useRouter();
+  const { exerciseType } = useLocalSearchParams();
   const { markExerciseComplete } = useExerciseContext();
 
+  // Get the current breathing pattern based on exercise type
+  const currentExerciseType = exerciseType || "4-7-8 Breathing";
+
+  const breathingConfig = useMemo(() => {
+    const pattern = BREATHING_PATTERNS[currentExerciseType];
+    return {
+      pattern,
+      maxCycles: pattern.cycles,
+      phaseSequence: pattern.phases,
+    };
+  }, [currentExerciseType]);
+
+  const {
+    pattern: BREATHING_PATTERN,
+    maxCycles,
+    phaseSequence,
+  } = breathingConfig;
+
   // Core states
-  const [isStarted, setIsStarted] = useState(true);
+  const [showConfirmation, setShowConfirmation] = useState(true);
+  const [isStarted, setIsStarted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
   // Breathing state
-  const [currentPhase, setCurrentPhase] = useState(PHASES.INHALE);
+  const initialPhase = PHASES[phaseSequence[0]];
+  const [currentPhase, setCurrentPhase] = useState(initialPhase);
   const [currentCycle, setCurrentCycle] = useState(1);
-  const [timeRemaining, setTimeRemaining] = useState(BREATHING_PATTERN.INHALE);
+  const [timeRemaining, setTimeRemaining] = useState(() => {
+    return BREATHING_PATTERN[phaseSequence[0]];
+  });
 
   // Animation
   const circleSize = useRef(new Animated.Value(145)).current; // Start at 145px
@@ -41,23 +89,31 @@ function breathingExercise() {
   const colorAnimationRef = useRef(null);
 
   // Get phase duration
-  const getPhaseDuration = useCallback((phase) => {
-    return BREATHING_PATTERN[phase];
-  }, []);
+  const getPhaseDuration = useCallback(
+    (phase) => {
+      const duration = BREATHING_PATTERN[phase];
+      if (currentExerciseType === "Deep Breathing") {
+        console.log(
+          `Deep Breathing - Phase: ${phase}, Duration: ${duration}, Pattern:`,
+          BREATHING_PATTERN
+        );
+      }
+      return duration;
+    },
+    [breathingConfig, currentExerciseType]
+  );
 
   // Get next phase in sequence
-  const getNextPhase = useCallback((phase) => {
-    switch (phase) {
-      case PHASES.INHALE:
-        return PHASES.HOLD;
-      case PHASES.HOLD:
-        return PHASES.EXHALE;
-      case PHASES.EXHALE:
-        return PHASES.INHALE;
-      default:
-        return PHASES.INHALE;
-    }
-  }, []);
+  const getNextPhase = useCallback(
+    (phase) => {
+      const currentIndex = phaseSequence.indexOf(phase);
+      if (currentIndex === -1) return PHASES.INHALE;
+
+      const nextIndex = (currentIndex + 1) % phaseSequence.length;
+      return PHASES[phaseSequence[nextIndex]];
+    },
+    [breathingConfig]
+  );
 
   // Get phase display text
   const getPhaseText = useCallback((phase) => {
@@ -65,6 +121,8 @@ function breathingExercise() {
       case PHASES.INHALE:
         return "Breathe In";
       case PHASES.HOLD:
+      case PHASES.HOLD_AFTER_INHALE:
+      case PHASES.HOLD_AFTER_EXHALE:
         return "Hold";
       case PHASES.EXHALE:
         return "Breathe Out";
@@ -91,6 +149,7 @@ function breathingExercise() {
           colorToValue = 1; // Change to darker color #332E62
           break;
         case PHASES.HOLD:
+        case PHASES.HOLD_AFTER_INHALE:
           sizeToValue = 275; // Stay at 275px
           colorToValue = 1; // Stay at darker color
           break;
@@ -98,13 +157,21 @@ function breathingExercise() {
           sizeToValue = 145; // Shrink to 145px
           colorToValue = 0; // Back to original color #7267D9
           break;
+        case PHASES.HOLD_AFTER_EXHALE:
+          sizeToValue = 145; // Stay at 145px
+          colorToValue = 0; // Stay at original color
+          break;
         default:
           sizeToValue = 145;
           colorToValue = 0;
       }
 
-      // For HOLD phase, don't animate (stay at current size and color)
-      if (phase === PHASES.HOLD) {
+      // For HOLD phases, don't animate (stay at current size and color)
+      if (
+        phase === PHASES.HOLD ||
+        phase === PHASES.HOLD_AFTER_INHALE ||
+        phase === PHASES.HOLD_AFTER_EXHALE
+      ) {
         return;
       }
 
@@ -149,17 +216,24 @@ function breathingExercise() {
         // Phase completed, move to next
         const nextPhase = getNextPhase(currentPhase);
 
-        // Check if we completed a full cycle (exhale -> inhale)
-        if (currentPhase === PHASES.EXHALE && nextPhase === PHASES.INHALE) {
+        // Check if we completed a full cycle (last phase -> first phase)
+        const lastPhaseInSequence =
+          PHASES[phaseSequence[phaseSequence.length - 1]];
+        const firstPhaseInSequence = PHASES[phaseSequence[0]];
+
+        if (
+          currentPhase === lastPhaseInSequence &&
+          nextPhase === firstPhaseInSequence
+        ) {
           const nextCycle = currentCycle + 1;
           setCurrentCycle(nextCycle);
 
-          // Check if we completed all 4 cycles
-          if (nextCycle > 4) {
+          // Check if we completed all cycles
+          if (nextCycle > maxCycles) {
             setIsCompleted(true);
             setIsStarted(false);
             clearInterval(timerRef.current);
-            markExerciseComplete('4', 'Stress Relief', 5);
+            markExerciseComplete(maxCycles.toString(), currentExerciseType, 5);
             return;
           }
 
@@ -190,8 +264,8 @@ function breathingExercise() {
     getPhaseDuration,
     getNextPhase,
     startPhaseAnimation,
+    breathingConfig,
   ]);
-
 
   // Pause exercise
   const handlePause = useCallback(() => {
@@ -212,14 +286,22 @@ function breathingExercise() {
     setIsPaused(false);
   }, []);
 
+  // Start exercise from confirmation
+  const handleStartExercise = useCallback(() => {
+    setShowConfirmation(false);
+    setIsStarted(true);
+    setIsPaused(false);
+  }, []);
+
   // Reset exercise
   const handleReset = useCallback(() => {
+    setShowConfirmation(false);
     setIsStarted(false);
     setIsPaused(false);
     setIsCompleted(false);
-    setCurrentPhase(PHASES.INHALE);
+    setCurrentPhase(PHASES[phaseSequence[0]]);
     setCurrentCycle(1);
-    setTimeRemaining(BREATHING_PATTERN.INHALE);
+    setTimeRemaining(getPhaseDuration(PHASES[phaseSequence[0]]));
 
     // Clear timer and animation
     clearInterval(timerRef.current);
@@ -235,8 +317,32 @@ function breathingExercise() {
     circleColor.setValue(0);
 
     // Navigate back to home page
-    router.push("/(tabs)/homePage");
-  }, [circleSize, circleColor, router]);
+    router.push("/(tabs)/mentalHomePage");
+  }, [circleSize, circleColor, router, breathingConfig, getPhaseDuration]);
+
+  // Go back to confirmation
+  const handleBackToConfirmation = useCallback(() => {
+    setShowConfirmation(true);
+    setIsStarted(false);
+    setIsPaused(false);
+    setIsCompleted(false);
+    setCurrentPhase(PHASES[phaseSequence[0]]);
+    setCurrentCycle(1);
+    setTimeRemaining(getPhaseDuration(PHASES[phaseSequence[0]]));
+
+    // Clear timer and animation
+    clearInterval(timerRef.current);
+    if (animationRef.current) {
+      animationRef.current.stop();
+    }
+    if (colorAnimationRef.current) {
+      colorAnimationRef.current.stop();
+    }
+
+    // Reset circle
+    circleSize.setValue(145);
+    circleColor.setValue(0);
+  }, [circleSize, circleColor, breathingConfig, getPhaseDuration]);
 
   // Run timer when started and not paused
   useEffect(() => {
@@ -278,18 +384,28 @@ function breathingExercise() {
   const { label: buttonLabel, onPress: buttonAction } = getButtonConfig();
   const phaseText = getPhaseText(currentPhase);
 
-  // Interpolate color based on animation value
-  const backgroundColor = circleColor.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["#7267D9", "#332E62"], // Original purple to darker purple
-  });
+  // Show confirmation page before starting
+  if (showConfirmation) {
+    return (
+      <ExercisePage
+        title={currentExerciseType}
+        subtitle={`+5 XP • ${maxCycles} cycles`}
+        characterImage={require("@/assets/hompageAssets/SollySitting.png")}
+        bottomText="Ready to begin your breathing exercise?"
+        buttonLabel="Start Exercise"
+        onButtonPress={handleStartExercise}
+        onBack={() => router.push("/(tabs)/mentalHomePage")}
+        showBackButton={true}
+      />
+    );
+  }
 
   // If completed, show the XP gain page as full screen
   if (isCompleted) {
     return (
       <ExercisePage
         title="Congrats!"
-        characterImage={require('@/assets/SollyStates/SollyXPGain.png')}
+        characterImage={require("@/assets/SollyStates/SollyXPGain.png")}
         bottomText="You've gained 5 xp"
         buttonLabel="Back to Home"
         onButtonPress={handleReset}
@@ -302,27 +418,57 @@ function breathingExercise() {
     <View style={styles.page}>
       <BackButton
         style={styles.backButton}
-        onPress={() => router.push("/(tabs)/homePage")}
+        onPress={handleBackToConfirmation}
       />
 
       <View style={styles.container}>
         <View style={styles.breathingContainer}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.exerciseTitle}>{currentExerciseType}</Text>
+          </View>
+
           <View style={styles.circleContainer}>
-            <Animated.View
-              style={[
-                styles.breathingCircle,
-                {
-                  width: circleSize,
-                  height: circleSize,
-                  borderRadius: Animated.divide(circleSize, 2),
-                  backgroundColor: backgroundColor,
-                },
-              ]}
-            />
+            <AnimatedSvg
+              width={circleSize}
+              height={circleSize}
+              style={styles.breathingCircle}
+            >
+              <Defs>
+                {/* Regular purple gradient (smaller circle) */}
+                <RadialGradient id="regularGradient" cx="50%" cy="50%" r="50%">
+                  <Stop offset="0%" stopColor="#9F97E9" />
+                  <Stop offset="100%" stopColor="#6657F5" />
+                </RadialGradient>
+
+                {/* Darker purple gradient (bigger circle) */}
+                <RadialGradient id="darkGradient" cx="50%" cy="50%" r="50%">
+                  <Stop offset="0%" stopColor="#685EC8" />
+                  <Stop offset="100%" stopColor="#332E62" />
+                </RadialGradient>
+              </Defs>
+
+              <AnimatedCircle
+                cx={Animated.divide(circleSize, 2)}
+                cy={Animated.divide(circleSize, 2)}
+                r={Animated.divide(circleSize, 2)}
+                fill="url(#regularGradient)"
+                opacity={Animated.subtract(1, circleColor)}
+              />
+
+              <AnimatedCircle
+                cx={Animated.divide(circleSize, 2)}
+                cy={Animated.divide(circleSize, 2)}
+                r={Animated.divide(circleSize, 2)}
+                fill="url(#darkGradient)"
+                opacity={circleColor}
+              />
+            </AnimatedSvg>
           </View>
 
           <View style={styles.infoContainer}>
-            <Text style={styles.cycleText}>Cycle {currentCycle} of 4</Text>
+            <Text style={styles.cycleText}>
+              Cycle {currentCycle} of {maxCycles}
+            </Text>
             <Text style={styles.phaseText}>{phaseText}</Text>
             <Text style={styles.timerText}>{timeRemaining}</Text>
           </View>
@@ -362,6 +508,12 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingVertical: 40,
   },
+  titleContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 20,
+    paddingBottom: 10,
+  },
   circleContainer: {
     flex: 1,
     justifyContent: "center",
@@ -388,15 +540,22 @@ const styles = StyleSheet.create({
     color: "#7267D9",
     marginBottom: 10,
   },
+  exerciseTitle: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "black",
+    marginBottom: 10,
+    textAlign: "center",
+  },
   cycleText: {
     fontSize: 18,
     color: "#666",
     marginBottom: 20,
   },
   backButton: {
-    position: 'absolute',
-    top: 55,
-    left: 25.5,
+    position: "absolute",
+    top: Platform.OS === 'web' ? 30 : 60,
+    left: 20,
     zIndex: 10,
   },
   completionContainer: {
@@ -405,7 +564,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
   },
-    image: {
+  image: {
     width: 200,
     height: 200,
     marginVertical: 20,
