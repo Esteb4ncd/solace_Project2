@@ -1,5 +1,7 @@
 // Real AI service for handling conversations and voice processing
 
+import { Exercise, RecommendedExercise, recommendExercises, getSecondaryExercises } from '@/constants/exercises';
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
@@ -15,6 +17,8 @@ export interface AIResponse {
     exerciseTypes: string[];
     description: string;
     difficulty: 'beginner' | 'intermediate' | 'advanced';
+    recommendedExercises?: RecommendedExercise[]; // AI-assigned exercises (10 XP)
+    allExercises?: RecommendedExercise[]; // All exercises with assignment status (10 XP if recommended, 5 XP if secondary)
   };
   nextAction?: 'continue' | 'confirm' | 'complete';
 }
@@ -158,25 +162,43 @@ class AIService {
   }
 
   private generateRecommendations() {
-    const exerciseMap: { [key: string]: string[] } = {
-      'heavy lifting': ['core strengthening', 'posture exercises', 'back strengthening'],
-      'overhead work': ['shoulder mobility', 'upper body stretching', 'rotator cuff exercises'],
-      'repetitive tool use': ['wrist flexibility', 'forearm strengthening', 'ergonomic exercises'],
-      'kneeling': ['hip mobility', 'knee strengthening', 'lower body flexibility']
-    };
+    // Use the exercise database to find matching exercises (AI-assigned, worth 10 XP)
+    const recommendedExercises = recommendExercises(
+      this.currentContext.painAreas,
+      this.currentContext.workTasks,
+      [], // Additional keywords can be extracted from conversation
+      5 // Get top 5 recommendations
+    );
     
-    const exercises: string[] = [];
-    this.currentContext.workTasks.forEach(task => {
-      if (exerciseMap[task]) {
-        exercises.push(...exerciseMap[task]);
-      }
-    });
+    // Get IDs of recommended exercises
+    const recommendedIds = recommendedExercises.map(ex => ex.exercise.id);
+    
+    // Get all other exercises as secondary (worth 5 XP)
+    const secondaryExercises = getSecondaryExercises(recommendedIds);
+    
+    // Combine recommended and secondary exercises (all videos will show)
+    const allExercises = [...recommendedExercises, ...secondaryExercises];
+    
+    // Extract unique exercise types from recommended exercises
+    const exerciseTypes = [...new Set(
+      recommendedExercises.flatMap(ex => ex.exercise.exerciseTypes)
+    )];
+    
+    // Determine overall difficulty (use most common difficulty from recommendations)
+    const difficulties = recommendedExercises.map(ex => ex.exercise.difficulty);
+    const difficulty = difficulties.length > 0 
+      ? (difficulties.filter(d => d === 'intermediate').length >= difficulties.length / 2 
+          ? 'intermediate' 
+          : difficulties[0] || 'beginner')
+      : 'beginner';
     
     return {
       targetAreas: this.currentContext.painAreas,
-      exerciseTypes: [...new Set(exercises)],
+      exerciseTypes,
       description: `Your exercises will target your ${this.currentContext.painAreas.join(' and ')}.\n\nYour exercises will help you with ${this.currentContext.workTasks.join(' and ')}.`,
-      difficulty: 'intermediate' as const
+      difficulty: difficulty as 'beginner' | 'intermediate' | 'advanced',
+      recommendedExercises, // AI-assigned exercises (10 XP)
+      allExercises // All exercises with assignment status (for displaying all videos)
     };
   }
 
