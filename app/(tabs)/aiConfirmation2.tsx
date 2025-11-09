@@ -2,12 +2,13 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
-import { Dimensions, Image, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Dimensions, Image, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 import BackButton from '../../components/ui/BackButton';
 import LargeButton from '../../components/ui/LargeButton';
 import TextAndVoiceInput from '../../components/ui/TextAndVoiceInput';
 import { Globals } from '../../constants/globals';
+import { recordingStorage } from '../../services/recordingStorage';
 
 const { width: screenWidth } = Dimensions.get('window');
 const BUTTON_WIDTH = 352;
@@ -17,7 +18,35 @@ export default function AIConfirmation2Screen() {
   const [showModal, setShowModal] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
-  const handleYesPress = () => {
+  const handleYesPress = async () => {
+    // Save question 2 recording to JSON file before navigating
+    try {
+      // If data wasn't stored yet, store it now from the answer parameter
+      const storedData = recordingStorage.getQuestion2Data();
+      if (!storedData && secondAnswer) {
+        console.log('📝 Storing question 2 data from answer parameter...');
+        recordingStorage.storeQuestion2(
+          'Where do you usually feel pain or discomfort?',
+          secondAnswer as string,
+          null
+        );
+      }
+      
+      const filePath = await recordingStorage.saveQuestion2ToJSON();
+      console.log('✅ Question 2 recording saved to:', filePath);
+      
+      // Show success message (optional)
+      if (Platform.OS === 'web') {
+        Alert.alert('Success', 'Question 2 recording saved! Check your downloads folder.');
+      } else {
+        Alert.alert('Success', `Question 2 recording saved to:\n${filePath}`);
+      }
+    } catch (error: any) {
+      console.error('Error saving question 2 recording:', error);
+      const errorMessage = error?.message || String(error);
+      Alert.alert('Error', `Failed to save recording:\n${errorMessage}\n\nContinuing anyway...`);
+    }
+    
     // Navigate to exercise change info page
     router.push('/(tabs)/exerciseChangeInfo');
   };

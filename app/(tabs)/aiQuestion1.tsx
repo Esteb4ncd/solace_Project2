@@ -7,6 +7,8 @@ import BackButton from '../../components/ui/BackButton';
 import TextAndVoiceInput from '../../components/ui/TextAndVoiceInput';
 import VoiceConversationView from '../../components/ui/VoiceConversationView';
 import { Globals } from '../../constants/globals';
+import { recordingStorage } from '../../services/recordingStorage';
+import { speechService } from '../../services/speechService';
 
 export default function AIQuestion1Screen() {
   const [inputValue, setInputValue] = useState('');
@@ -28,9 +30,14 @@ export default function AIQuestion1Screen() {
     };
   }, []);
 
-  const handleBackPress = () => {
-    // If in recording view, reset to normal state
+  const handleBackPress = async () => {
+    // If in recording view, cancel recording and reset to normal state
     if (isRecording) {
+      try {
+        await speechService.cancelRecording();
+      } catch (error) {
+        console.error('Error canceling recording:', error);
+      }
       setIsRecording(false);
       setTranscribedText('');
       setInputValue('');
@@ -40,19 +47,63 @@ export default function AIQuestion1Screen() {
     }
   };
 
-  const handleVoicePress = () => {
+  const handleVoicePress = async () => {
     if (isKeyboardVisible) {
       // When keyboard is visible, send functionality
       handleNext();
     } else {
       // Start recording
-      setIsRecording(true);
+      try {
+        await speechService.startRecording();
+        setIsRecording(true);
+      } catch (error) {
+        console.error('Error starting recording:', error);
+        // Still show recording view even if there's an error
+        setIsRecording(true);
+      }
     }
   };
 
   const handleSend = async () => {
-    // Navigate directly to next page without showing transcribed text
+    // Stop recording and transcribe
+    try {
+      const { transcription, audioUri } = await speechService.stopAndTranscribeWithUri();
+      if (transcription) {
+        setTranscribedText(transcription);
+        setInputValue(transcription);
+        // Store the recording data
+        recordingStorage.storeQuestion1(
+          'What iron work tasks do you typically do?',
+          transcription,
+          audioUri
+        );
+      }
+    } catch (error) {
+      console.error('Error transcribing audio:', error);
+    }
+    // Navigate to next page
     handleNext();
+  };
+
+  const handleStopRecording = async () => {
+    // Stop recording and transcribe
+    try {
+      const { transcription, audioUri } = await speechService.stopAndTranscribeWithUri();
+      if (transcription) {
+        setTranscribedText(transcription);
+        setInputValue(transcription);
+        // Store the recording data
+        recordingStorage.storeQuestion1(
+          'What iron work tasks do you typically do?',
+          transcription,
+          audioUri
+        );
+      }
+      setIsRecording(false);
+    } catch (error) {
+      console.error('Error stopping recording:', error);
+      setIsRecording(false);
+    }
   };
 
   const handlePlayRecording = () => {
@@ -63,6 +114,16 @@ export default function AIQuestion1Screen() {
   const handleNext = () => {
     // Use a default answer or input value
     const answer = inputValue.trim() || 'Voice input';
+    
+    // If we have text input but no recording was made, store it
+    if (answer && !transcribedText) {
+      recordingStorage.storeQuestion1(
+        'What iron work tasks do you typically do?',
+        answer,
+        null // No audio URI for text input
+      );
+    }
+    
     router.push({
       pathname: '/(tabs)/aiConfirmation1',
       params: { answer }
@@ -94,7 +155,7 @@ export default function AIQuestion1Screen() {
             isRecording={isRecording}
             onSend={handleSend}
             onPlay={handlePlayRecording}
-            onStopRecording={handleSend}
+            onStopRecording={handleStopRecording}
           />
         </ScrollView>
       </ThemedView>
