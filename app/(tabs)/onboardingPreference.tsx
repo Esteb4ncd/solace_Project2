@@ -14,8 +14,8 @@ export default function OnboardingPreferenceScreen() {
   };
 
   const handleManuallySelectPress = () => {
-    // Navigate to manual selection flow
-    router.push('/(tabs)/onboardingQuestions');
+    // Navigate to manual selection flow - start with work task selection
+    router.push('/(tabs)/workTaskSelection');
   };
 
   const handleBackPress = () => {
