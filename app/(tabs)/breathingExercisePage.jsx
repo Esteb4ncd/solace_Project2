@@ -475,11 +475,13 @@ function breathingExercise() {
         </View>
       </View>
 
-      <LargeButton
-        label={buttonLabel}
-        onPress={buttonAction}
-        disabled={!buttonAction}
-      />
+      <View style={styles.buttonContainer}>
+        <LargeButton
+          label={buttonLabel}
+          onPress={buttonAction}
+          disabled={!buttonAction}
+        />
+      </View>
     </View>
   );
 }
@@ -492,7 +494,6 @@ const styles = StyleSheet.create({
     paddingLeft: 25.5,
     paddingTop: 55,
     paddingBottom: 55,
-    alignItems: "center",
   },
   container: {
     flex: 1,
@@ -553,16 +554,17 @@ const styles = StyleSheet.create({
     color: "#666",
     marginBottom: 20,
   },
-  backButton: {
-    position: "absolute",
-    top: 55,
-    left: 25.5,
-    zIndex: 10,
-  },
   completionContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    width: "100%",
+  },
+  buttonContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 20,
+    paddingBottom: 20,
     width: "100%",
   },
   image: {

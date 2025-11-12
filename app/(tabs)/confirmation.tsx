@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import LargeButton from '../../components/ui/LargeButton';
 import OnboardingMascot from '../../components/ui/OnboardingMascot';
+import BackButton from "../../components/ui/BackButton";
 import TextInputWithVoice from '../../components/ui/TextInputWithVoice';
 import { Globals } from '../../constants/globals';
 
@@ -94,9 +95,7 @@ export default function ConfirmationScreen() {
       >
         <ThemedView style={styles.container}>
       {/* Back Button */}
-      <Pressable style={styles.backButton} onPress={handleBackPress}>
-        <Ionicons name="arrow-back" size={24} color="#000" />
-      </Pressable>
+      <BackButton onPress={handleBackPress} style={{}} />
 
       {/* Mascot */}
       <View style={[
@@ -174,13 +173,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     width: 393,
     height: 852,
-  },
-  backButton: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-    zIndex: 10,
-    padding: 8,
   },
   mascotContainer: {
     marginBottom: 5,

@@ -16,16 +16,25 @@ const BackButton = ({onPress, style}) => {
   );
 
   return (
+    <View style={[styles.container, style]}>
     <Pressable
       {...buttonProps}
-      style={[styles.button, style]}
+      style={styles.button}
     >
       <View style={styles.LeftArrow}></View>
     </Pressable>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    top: 80,
+    left: 16,
+    zIndex: 1000,
+    alignItems: "flex-start",
+  },
   button: {
     display: 'flex',
     height: 48,

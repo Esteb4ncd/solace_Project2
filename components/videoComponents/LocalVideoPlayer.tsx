@@ -216,8 +216,8 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 55,
-    left: 25.5,
+    top: 80,
+    left: 16,
     zIndex: 10,
   },
   videoContainer: {
