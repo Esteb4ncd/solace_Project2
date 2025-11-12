@@ -1,8 +1,3 @@
-import BottomNavigation from "@/components/ui/BottomNavigation";
-import ExerciseButton from "@/components/ui/ExerciseButton";
-import ExerciseChip from "@/components/ui/ExerciseChip";
-import StatusBar from "@/components/ui/StatusBar";
-import XPBar from "@/components/ui/XPBar";
 import { Globals } from "@/constants/globals";
 import { Colors } from "@/constants/theme";
 import { router } from "expo-router";
@@ -15,6 +10,13 @@ import {
   Text,
   View,
 } from "react-native";
+import ExerciseChip from "../..//components/ui/ExerciseChip";
+import XPBar from "../..//components/ui/XPBar";
+import GeneralTaskCard from "../../components/taskCards/generalTaskCard";
+import BottomNavigation from "../../components/ui/BottomNavigation";
+import ExerciseButton from "../../components/ui/ExerciseButton";
+import StatusBar from "../../components/ui/StatusBar";
+ 
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -52,6 +54,15 @@ const MentalHomePage = () => {
       router.push({
         pathname: "/(tabs)/breathingExercisePage",
         params: { exerciseType: exerciseName },
+      });
+    } else if (
+      exerciseName === "Rain Sounds" ||
+      exerciseName === "Plane Sounds" ||
+      exerciseName === "Ocean Waves"
+    ) {
+      router.push({
+        pathname: "/(tabs)/whiteNoise" as unknown as any,
+        params: { soundType: exerciseName },
       });
     }
   };
@@ -145,63 +156,57 @@ const MentalHomePage = () => {
             </View>
           </View>
         )}
-        {/* Show 3 ExerciseButtons when white noise category is selected */}
+        {/* Show white noise task cards when white noise category is selected */}
         {selectedCategory === "noise" && (
-          <View style={styles.multipleButtonsContainer}>
-            <View style={styles.buttonRow}>
-              <View style={styles.buttonColumn}>
-                <ExerciseButton
-                  title="Rain Sounds"
-                  image={
-                    <Image
-                      source={require("../../assets/images/Breathing01.png")}
-                      style={styles.exerciseImage}
-                      resizeMode="contain"
-                    />
-                  }
-                  xp={3}
-                  onPress={() => handleExercisePress("Rain Sounds")}
-                />
-              </View>
-              <View style={styles.buttonColumn}>
-                <ExerciseButton
-                  title="Ocean Waves"
-                  image={
-                    <Image
-                      source={require("../../assets/images/Breathing02.png")}
-                      style={styles.exerciseImage}
-                      resizeMode="contain"
-                    />
-                  }
-                  xp={3}
-                  onPress={() => handleExercisePress("Ocean Waves")}
-                />
-              </View>
-            </View>
-            <View style={styles.buttonRow}>
-              <View style={styles.buttonColumn}>
-                <ExerciseButton
-                  title="Forest Sounds"
-                  image={
-                    <Image
-                      source={require("../../assets/images/Breathing03.png")}
-                      style={styles.exerciseImage}
-                      resizeMode="contain"
-                    />
-                  }
-                  xp={3}
-                  onPress={() => handleExercisePress("Forest Sounds")}
-                />
-              </View>
-              <View style={styles.buttonColumn}>
-                {/* Empty column for symmetry */}
-              </View>
-            </View>
+          <View style={styles.whiteNoiseContainer}>
+            <GeneralTaskCard
+              task="Rain Sounds"
+              xp={3}
+              onPress={() => handleExercisePress("Rain Sounds")}
+            />
+            <GeneralTaskCard
+              task="Plane Sounds"
+              xp={3}
+              onPress={() => handleExercisePress("Plane Sounds")}
+            />
+            <GeneralTaskCard
+              task="Ocean Waves"
+              xp={3}
+              onPress={() => handleExercisePress("Ocean Waves")}
+            />
           </View>
         )}
       </ScrollView>
 
-      <BottomNavigation onItemPress={handleNavPress} />
+      <BottomNavigation
+        onItemPress={handleNavPress}
+        items={[
+          {
+            id: "home",
+            label: "Home",
+            iconSource: require("@/assets/navbarSvgs/Home-Icon.png"),
+            isActive: false,
+          },
+          {
+            id: "physical",
+            label: "Physical",
+            iconSource: require("@/assets/navbarSvgs/Physical-Icon.png"),
+            isActive: false,
+          },
+          {
+            id: "mental",
+            label: "Mental",
+            iconSource: require("@/assets/navbarSvgs/Mental-Icon.png"),
+            isActive: true,
+          },
+          {
+            id: "account",
+            label: "Account",
+            iconSource: require("@/assets/navbarSvgs/Account-Icon.png"),
+            isActive: false,
+          },
+        ]}
+      />
     </View>
   );
 };
@@ -286,6 +291,10 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: screenHeight * 0.12, // 12% of screen height
+  },
+  whiteNoiseContainer: {
+    alignItems: "center",
+    paddingHorizontal: screenWidth * 0.04, // 4% of screen width
   },
 });
 
