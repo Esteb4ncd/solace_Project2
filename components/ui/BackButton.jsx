@@ -1,54 +1,49 @@
+import { useButton } from "@react-native-aria/button";
+import { useNavigation } from "@react-navigation/native";
+import { useToggleState } from "@react-stately/toggle";
+import { Pressable, StyleSheet, View } from "react-native";
 
-import { useButton } from '@react-native-aria/button';
-import { useNavigation } from '@react-navigation/native';
-import { useToggleState } from '@react-stately/toggle';
-import { Pressable, StyleSheet, View } from 'react-native';
-
-const BackButton = ({onPress, style}) => {
+const BackButton = ({ onPress, style }) => {
   const state = useToggleState({});
   const navigation = useNavigation();
-  const {buttonProps} = useButton(
+  const { buttonProps } = useButton(
     {
       onPress: onPress ? onPress : () => navigation.goBack(),
-      isDisabled: false
+      isDisabled: false,
     },
-    state,
+    state
   );
 
   return (
     <View style={[styles.container, style]}>
-    <Pressable
-      {...buttonProps}
-      style={styles.button}
-    >
-      <View style={styles.LeftArrow}></View>
-    </Pressable>
+      <Pressable {...buttonProps} style={styles.button}>
+        <View style={styles.LeftArrow}></View>
+      </Pressable>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
+    position: "absolute",
     top: 80,
     left: 16,
     zIndex: 1000,
     alignItems: "flex-start",
   },
   button: {
-    display: 'flex',
+    display: "flex",
     height: 48,
     width: 48,
     paddingTop: 10,
     paddingBottom: 10,
     paddingLeft: 20,
     paddingRight: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 25,
-    overflow: 'hidden',
-    backgroundColor: '#D3D0F3',
-    
+    overflow: "hidden",
+    backgroundColor: "#D3D0F3",
   },
   LeftArrow: {
     left: 2.3,

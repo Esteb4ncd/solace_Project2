@@ -1,16 +1,16 @@
-import { ResizeMode, Video } from 'expo-av';
+import { ResizeMode, Video } from "expo-av";
 import { useEffect, useRef, useState } from "react";
 import {
-    Dimensions,
-    Image,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Dimensions,
+  Image,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import BackButton from '../ui/BackButton';
-import LargeButton from '../ui/LargeButton';
+import BackButton from "../ui/BackButton";
+import LargeButton from "../ui/LargeButton";
 
 interface LocalVideoPlayerProps {
   videoSource: any; // require() or { uri: string }
@@ -22,19 +22,19 @@ interface LocalVideoPlayerProps {
   resetTrigger?: number; // Add reset trigger prop
 }
 
-export default function LocalVideoPlayer({ 
-  videoSource, 
+export default function LocalVideoPlayer({
+  videoSource,
   videoTitle = "Hand Warm Up",
   onBack,
   onEnd,
   onError,
   onDone,
-  resetTrigger
+  resetTrigger,
 }: LocalVideoPlayerProps) {
   const videoRef = useRef<Video>(null);
-  const screenHeight = Dimensions.get('window').height;
-  const screenWidth = Dimensions.get('window').width;
-  
+  const screenHeight = Dimensions.get("window").height;
+  const screenWidth = Dimensions.get("window").width;
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -51,13 +51,13 @@ export default function LocalVideoPlayer({
           setIsPlaying(false);
           setIsVideoEnded(false);
         } catch (error) {
-          console.log('Error resetting video:', error);
+          console.log("Error resetting video:", error);
         }
       };
       resetVideo();
     }
   }, [resetTrigger]);
-  
+
   const handlePlayPause = async () => {
     if (videoRef.current && !isVideoEnded) {
       if (isPlaying) {
@@ -90,7 +90,7 @@ export default function LocalVideoPlayer({
       setCurrentTime(status.positionMillis / 1000);
       setDuration(status.durationMillis / 1000);
       setIsLoading(false);
-      
+
       if (status.didJustFinish) {
         setIsVideoEnded(true);
         setIsPlaying(false);
@@ -99,7 +99,7 @@ export default function LocalVideoPlayer({
         }
       }
     } else if (status.error && onError) {
-      console.error('Video error:', status.error);
+      console.error("Video error:", status.error);
       onError(status.error);
     }
   };
@@ -107,13 +107,17 @@ export default function LocalVideoPlayer({
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-      
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
+
       {/* Back Button */}
       <BackButton style={styles.backButton} onPress={onBack} />
 
@@ -128,7 +132,7 @@ export default function LocalVideoPlayer({
           onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
           onLoad={() => setIsLoading(false)}
         />
-        
+
         {isLoading && (
           <View style={styles.loadingContainer}>
             <Text style={styles.loadingText}>Loading...</Text>
@@ -137,14 +141,14 @@ export default function LocalVideoPlayer({
 
         {/* Play/Pause Button Overlay */}
         {!isVideoEnded && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.playButtonOverlay}
             onPress={handlePlayPause}
             activeOpacity={0.7}
           >
             {!isPlaying && (
-              <Image 
-                source={require('@/assets/physicalFlowAssets/PlayButton.png')}
+              <Image
+                source={require("@/assets/physicalFlowAssets/PlayButton.png")}
                 style={styles.playButtonImage}
                 resizeMode="contain"
               />
@@ -155,13 +159,13 @@ export default function LocalVideoPlayer({
         {/* Replay Overlay */}
         {isVideoEnded && (
           <View style={styles.replayOverlay}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.replayButton}
               onPress={handleReplay}
               activeOpacity={0.7}
             >
-              <Image 
-                source={require('@/assets/physicalFlowAssets/ReplayButton.png')}
+              <Image
+                source={require("@/assets/physicalFlowAssets/ReplayButton.png")}
                 style={styles.replayButtonImage}
                 resizeMode="contain"
               />
@@ -173,24 +177,24 @@ export default function LocalVideoPlayer({
       {/* Caption - Show when playing */}
       {isPlaying && (
         <View style={styles.captionContainer}>
-          <Text style={styles.captionText}>Move your hands in a circular motion</Text>
+          <Text style={styles.captionText}>
+            Move your hands in a circular motion
+          </Text>
         </View>
       )}
 
       {/* Bottom Controls */}
       <View style={styles.bottomControls}>
         {/* Title - Show when paused */}
-        {!isPlaying && (
-          <Text style={styles.videoTitle}>{videoTitle}</Text>
-        )}
-        
+        {!isPlaying && <Text style={styles.videoTitle}>{videoTitle}</Text>}
+
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
-            <View 
+            <View
               style={[
-                styles.progressFill, 
-                { width: `${(currentTime / duration) * 100}%` }
-              ]} 
+                styles.progressFill,
+                { width: `${(currentTime / duration) * 100}%` },
+              ]}
             />
           </View>
         </View>
@@ -199,10 +203,7 @@ export default function LocalVideoPlayer({
       {/* Done Button - Only show when video has ended */}
       {isVideoEnded && (
         <View style={styles.doneButtonContainer}>
-          <LargeButton 
-            label="Done" 
-            onPress={handleDone}
-          />
+          <LargeButton label="Done" onPress={handleDone} />
         </View>
       )}
     </View>
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 80,
     left: 16,
     zIndex: 10,

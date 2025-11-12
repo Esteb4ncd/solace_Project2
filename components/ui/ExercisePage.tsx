@@ -1,13 +1,7 @@
-import BackButton from '@/components/ui/BackButton';
-import LargeButton from '@/components/ui/LargeButton';
-import React from 'react';
-import {
-  Image,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
+import BackButton from "@/components/ui/BackButton";
+import LargeButton from "@/components/ui/LargeButton";
+import React from "react";
+import { Image, StatusBar, StyleSheet, Text, View } from "react-native";
 
 interface ExercisePageProps {
   title: string;
@@ -28,12 +22,12 @@ const ExercisePage: React.FC<ExercisePageProps> = ({
   buttonLabel,
   onButtonPress,
   onBack,
-  showBackButton = true
+  showBackButton = true,
 }) => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="white" />
-      
+
       {/* Back Button */}
       {showBackButton && (
         <BackButton style={styles.backButton} onPress={onBack} />
@@ -41,15 +35,13 @@ const ExercisePage: React.FC<ExercisePageProps> = ({
 
       {/* Title */}
       <Text style={styles.title}>{title}</Text>
-      
+
       {/* Subtitle */}
-      {subtitle && (
-        <Text style={styles.subtitle}>{subtitle}</Text>
-      )}
+      {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
 
       {/* Character Illustration */}
       <View style={styles.characterContainer}>
-        <Image 
+        <Image
           source={characterImage}
           style={styles.characterImage}
           resizeMode="contain"
@@ -57,16 +49,11 @@ const ExercisePage: React.FC<ExercisePageProps> = ({
       </View>
 
       {/* Bottom Text */}
-      {bottomText && (
-        <Text style={styles.bottomText}>{bottomText}</Text>
-      )}
+      {bottomText && <Text style={styles.bottomText}>{bottomText}</Text>}
 
       {/* Action Button */}
       <View style={styles.buttonContainer}>
-        <LargeButton 
-          label={buttonLabel} 
-          onPress={onButtonPress}
-        />
+        <LargeButton label={buttonLabel} onPress={onButtonPress} />
       </View>
     </View>
   );
@@ -75,11 +62,11 @@ const ExercisePage: React.FC<ExercisePageProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     paddingTop: 60, // Account for status bar
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 80,
     left: 16,
     zIndex: 10,
