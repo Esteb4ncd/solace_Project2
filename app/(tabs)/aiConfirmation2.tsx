@@ -1,8 +1,8 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { Alert, Dimensions, Image, Keyboard, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Alert, Animated, Dimensions, Image, Keyboard, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 import BackButton from '../../components/ui/BackButton';
 import LargeButton from '../../components/ui/LargeButton';
@@ -24,6 +24,11 @@ export default function AIConfirmation2Screen() {
   const [isModalRecording, setIsModalRecording] = useState(false);
   const [isModalKeyboardVisible, setIsModalKeyboardVisible] = useState(false);
   const { setRecommendedExercises, updateDailyTasks } = useExerciseContext();
+  
+  // Animation values for recording dots
+  const dot1Anim = useRef(new Animated.Value(0)).current;
+  const dot2Anim = useRef(new Animated.Value(0)).current;
+  const dot3Anim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (showModal) {
@@ -40,6 +45,64 @@ export default function AIConfirmation2Screen() {
       };
     }
   }, [showModal]);
+
+  // Recording animation effect
+  useEffect(() => {
+    if (isModalRecording) {
+      const createAnimation = (animValue: Animated.Value, delay: number) => {
+        return Animated.loop(
+          Animated.sequence([
+            Animated.delay(delay),
+            Animated.timing(animValue, {
+              toValue: 1,
+              duration: 600,
+              useNativeDriver: true,
+            }),
+            Animated.timing(animValue, {
+              toValue: 0,
+              duration: 600,
+              useNativeDriver: true,
+            }),
+          ])
+        );
+      };
+
+      const anim1 = createAnimation(dot1Anim, 0);
+      const anim2 = createAnimation(dot2Anim, 200);
+      const anim3 = createAnimation(dot3Anim, 400);
+
+      Animated.parallel([anim1, anim2, anim3]).start();
+    } else {
+      dot1Anim.setValue(0);
+      dot2Anim.setValue(0);
+      dot3Anim.setValue(0);
+    }
+  }, [isModalRecording, dot1Anim, dot2Anim, dot3Anim]);
+
+  const dot1Scale = dot1Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.5],
+  });
+  const dot1Opacity = dot1Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.5, 1],
+  });
+  const dot2Scale = dot2Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.5],
+  });
+  const dot2Opacity = dot2Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.5, 1],
+  });
+  const dot3Scale = dot3Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.5],
+  });
+  const dot3Opacity = dot3Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.5, 1],
+  });
 
   const handleYesPress = async () => {
     try {
@@ -151,12 +214,14 @@ export default function AIConfirmation2Screen() {
     if (finalText) {
       try {
         await aiService.sendMessage(finalText, isModalRecording);
-        // Update the answer and close modal
+        // Close modal and navigate to confirmation page
         setShowModal(false);
-        // Navigate back to question to show updated answer
         router.push({
-          pathname: '/(tabs)/aiQuestion2',
-          params: { firstAnswer: firstAnswer as string }
+          pathname: '/(tabs)/aiConfirmation2',
+          params: { 
+            firstAnswer: firstAnswer as string,
+            secondAnswer: finalText 
+          }
         });
       } catch (error) {
         console.error('Error processing with AI in modal:', error);
@@ -266,14 +331,43 @@ export default function AIConfirmation2Screen() {
                   </Svg>
                 </View>
                 <View style={styles.greetingContainer}>
-                  <ThemedText style={styles.greetingText}>Recording...</ThemedText>
+                  <ThemedText style={styles.greetingText}>Recording</ThemedText>
+                  <View style={styles.dotsContainer}>
+                    <Animated.View
+                      style={[
+                        styles.recordingDot,
+                        {
+                          transform: [{ scale: dot1Scale }],
+                          opacity: dot1Opacity,
+                        },
+                      ]}
+                    />
+                    <Animated.View
+                      style={[
+                        styles.recordingDot,
+                        {
+                          transform: [{ scale: dot2Scale }],
+                          opacity: dot2Opacity,
+                        },
+                      ]}
+                    />
+                    <Animated.View
+                      style={[
+                        styles.recordingDot,
+                        {
+                          transform: [{ scale: dot3Scale }],
+                          opacity: dot3Opacity,
+                        },
+                      ]}
+                    />
+                  </View>
                 </View>
               </View>
-              <View style={styles.modalInputContainer}>
+              <View style={styles.modalButtonContainer}>
                 <LargeButton 
                   label="Stop & Send" 
                   onPress={handleModalSend}
-                  style={{}}
+                  style={styles.modalStopButton}
                 />
               </View>
             </Pressable>
@@ -530,5 +624,28 @@ const styles = StyleSheet.create({
   },
   modalInputContainer: {
     marginTop: 8,
+  },
+  dotsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+    gap: 6,
+  },
+  recordingDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#7267D9',
+  },
+  modalButtonContainer: {
+    width: '100%',
+    paddingHorizontal: 0,
+    marginTop: 24,
+    alignItems: 'center',
+  },
+  modalStopButton: {
+    width: '100%',
+    maxWidth: '100%',
   },
 });
