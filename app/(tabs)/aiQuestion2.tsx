@@ -9,6 +9,7 @@ import VoiceConversationView from '../../components/ui/VoiceConversationView';
 import { Globals } from '../../constants/globals';
 import { recordingStorage } from '../../services/recordingStorage';
 import { speechService } from '../../services/speechService';
+import { aiService } from '@/services/aiService';
 
 export default function AIQuestion2Screen() {
   const { firstAnswer } = useLocalSearchParams();
@@ -48,40 +49,62 @@ export default function AIQuestion2Screen() {
     }
   };
 
+  const handleStartRecording = async () => {
+    // Start recording when mic button is clicked
+    // Note: startRecording() handles permissions internally
+    try {
+      await speechService.startRecording();
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      // Still show recording view even if there's an error
+      setIsRecording(true);
+    }
+  };
+
   const handleVoicePress = async () => {
     if (isKeyboardVisible) {
       // When keyboard is visible, send functionality
       handleNext();
     } else {
       // Start recording
-      try {
-        await speechService.startRecording();
-        setIsRecording(true);
-      } catch (error) {
-        console.error('Error starting recording:', error);
-        // Still show recording view even if there's an error
-        setIsRecording(true);
-      }
+      await handleStartRecording();
     }
   };
 
   const handleSend = async () => {
     // Stop recording and transcribe
-    try {
-      const { transcription, audioUri } = await speechService.stopAndTranscribeWithUri();
-      if (transcription) {
-        setTranscribedText(transcription);
-        setInputValue(transcription);
-        // Store the recording data
-        recordingStorage.storeQuestion2(
-          'Where do you usually feel pain or discomfort?',
-          transcription,
-          audioUri
-        );
+    let finalText = inputValue.trim();
+    
+    if (isRecording) {
+      try {
+        const { transcription, audioUri } = await speechService.stopAndTranscribeWithUri();
+        if (transcription) {
+          finalText = transcription;
+          setTranscribedText(transcription);
+          setInputValue(transcription);
+          // Store the recording data
+          recordingStorage.storeQuestion2(
+            'Where do you usually feel pain or discomfort?',
+            transcription,
+            audioUri
+          );
+        }
+      } catch (error) {
+        console.error('Error transcribing audio:', error);
       }
-    } catch (error) {
-      console.error('Error transcribing audio:', error);
+      setIsRecording(false);
     }
+    
+    // Process with AI service
+    if (finalText) {
+      try {
+        await aiService.sendMessage(finalText, isRecording);
+      } catch (error) {
+        console.error('Error processing with AI:', error);
+      }
+    }
+    
     // Navigate to next page
     handleNext();
   };
@@ -114,10 +137,10 @@ export default function AIQuestion2Screen() {
 
   const handleNext = () => {
     // Use a default answer or input value
-    const answer = inputValue.trim() || 'Voice input';
+    const answer = inputValue.trim() || transcribedText || '';
     
     // If we have text input but no recording was made, store it
-    if (answer && !transcribedText) {
+    if (answer && !transcribedText && !isRecording) {
       recordingStorage.storeQuestion2(
         'Where do you usually feel pain or discomfort?',
         answer,
@@ -218,7 +241,7 @@ export default function AIQuestion2Screen() {
               value={inputValue}
               onChangeText={setInputValue}
               onVoicePress={handleVoicePress}
-              onStartRecording={() => setIsRecording(true)}
+              onStartRecording={handleStartRecording}
               onSend={handleSend}
               isKeyboardVisible={isKeyboardVisible}
               autoFocus={false}

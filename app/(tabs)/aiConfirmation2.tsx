@@ -9,6 +9,9 @@ import LargeButton from '../../components/ui/LargeButton';
 import TextAndVoiceInput from '../../components/ui/TextAndVoiceInput';
 import { Globals } from '../../constants/globals';
 import { recordingStorage } from '../../services/recordingStorage';
+import { aiService } from '@/services/aiService';
+import { useExerciseContext } from '@/contexts/ExerciseContext';
+import { recommendExercises, getExerciseXpReward } from '@/constants/exercises';
 
 const { width: screenWidth } = Dimensions.get('window');
 const BUTTON_WIDTH = 352;
@@ -17,34 +20,57 @@ export default function AIConfirmation2Screen() {
   const { secondAnswer, firstAnswer } = useLocalSearchParams();
   const [showModal, setShowModal] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const { setRecommendedExercises, updateDailyTasks } = useExerciseContext();
 
   const handleYesPress = async () => {
-    // Save question 2 recording to JSON file before navigating
     try {
-      // If data wasn't stored yet, store it now from the answer parameter
-      const storedData = recordingStorage.getQuestion2Data();
-      if (!storedData && secondAnswer) {
-        console.log('📝 Storing question 2 data from answer parameter...');
-        recordingStorage.storeQuestion2(
-          'Where do you usually feel pain or discomfort?',
-          secondAnswer as string,
-          null
+      // Get context from AI service
+      const context = aiService.getCurrentContext();
+      
+      console.log('Generating recommendations with context:', context);
+      
+      // Generate recommendations using exercises.ts
+      if (context.workTasks.length > 0 && context.painAreas.length > 0) {
+        const recommendedExercises = recommendExercises(
+          context.painAreas,
+          context.workTasks,
+          [],
+          3 // Get top 3 recommendations
         );
+        
+        if (recommendedExercises.length > 0) {
+          setRecommendedExercises(recommendedExercises);
+          
+          // Convert to daily tasks format
+          const dailyTasks = recommendedExercises.map((recEx) => ({
+            id: recEx.exercise.id,
+            title: recEx.exercise.name,
+            xpAmount: getExerciseXpReward(recEx.exercise, recEx.isRecommended),
+            xpColor: '#7267D9',
+            isCompleted: false,
+          }));
+          
+          updateDailyTasks(dailyTasks);
+          console.log('✅ Generated recommendations:', dailyTasks);
+        }
       }
       
-      const filePath = await recordingStorage.saveQuestion2ToJSON();
-      console.log('✅ Question 2 recording saved to:', filePath);
-      
-      // Show success message (optional)
-      if (Platform.OS === 'web') {
-        Alert.alert('Success', 'Question 2 recording saved! Check your downloads folder.');
-      } else {
-        Alert.alert('Success', `Question 2 recording saved to:\n${filePath}`);
+      // Save question 2 recording to JSON file before navigating
+      try {
+        const storedData = recordingStorage.getQuestion2Data();
+        if (!storedData && secondAnswer) {
+          recordingStorage.storeQuestion2(
+            'Where do you usually feel pain or discomfort?',
+            secondAnswer as string,
+            null
+          );
+        }
+        await recordingStorage.saveQuestion2ToJSON();
+      } catch (error: any) {
+        console.error('Error saving recording:', error);
       }
-    } catch (error: any) {
-      console.error('Error saving question 2 recording:', error);
-      const errorMessage = error?.message || String(error);
-      Alert.alert('Error', `Failed to save recording:\n${errorMessage}\n\nContinuing anyway...`);
+    } catch (error) {
+      console.error('Error generating recommendations:', error);
     }
     
     // Navigate to exercise change info page
@@ -70,6 +96,18 @@ export default function AIConfirmation2Screen() {
 
   const answerText = (secondAnswer as string) || '';
 
+  // Get AI summary of what was picked up
+  const getAISummary = () => {
+    const context = aiService.getCurrentContext();
+    if (context.painAreas.length > 0) {
+      const painAreas = context.painAreas.join(', ');
+      return `your ${painAreas}.`;
+    }
+    return '';
+  };
+
+  const aiSummary = getAISummary();
+
   return (
     <ThemedView style={styles.container}>
       {/* Back Button */}
@@ -94,8 +132,14 @@ export default function AIConfirmation2Screen() {
 
       {/* Confirmation Message */}
       <View style={styles.confirmationContainer}>
-        <ThemedText style={styles.confirmationLabel}>You usually feel pain or discomfort in</ThemedText>
-        <ThemedText style={styles.confirmationText}>{answerText}</ThemedText>
+        <ThemedText style={styles.confirmationLabel}>
+          You usually feel pain or discomfort in {aiSummary || answerText}
+        </ThemedText>
+        {aiSummary && (
+          <ThemedText style={styles.summarySubtext}>
+            Is this what you meant?
+          </ThemedText>
+        )}
       </View>
 
       {/* Buttons Container */}
@@ -270,6 +314,23 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#000',
     textAlign: 'center',
+    marginBottom: 16,
+  },
+  summaryText: {
+    ...Globals.fonts.styles.body,
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 12,
+    fontStyle: 'italic',
+    lineHeight: 22,
+  },
+  summarySubtext: {
+    ...Globals.fonts.styles.body,
+    fontSize: 14,
+    color: '#999',
+    textAlign: 'center',
+    marginTop: 8,
   },
   buttonContainer: {
     position: 'absolute',
