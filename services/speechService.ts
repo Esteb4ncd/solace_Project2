@@ -2,7 +2,6 @@
 
 import { Audio } from 'expo-av';
 import Constants from 'expo-constants';
-import { OPENAI_API_KEY as CONFIG_API_KEY } from '../config/apiKey';
 
 export interface SpeechResult {
   text: string;
@@ -78,7 +77,6 @@ class SpeechService {
     try {
       // Try multiple ways to get the API key (Expo can be tricky with env vars)
       const OPENAI_API_KEY = 
-        CONFIG_API_KEY ||
         Constants.expoConfig?.extra?.openaiApiKey ||
         Constants.expoConfig?.extra?.EXPO_PUBLIC_OPENAI_API_KEY ||
         (typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_OPENAI_API_KEY) ||
@@ -88,10 +86,8 @@ class SpeechService {
         hasKey: !!OPENAI_API_KEY,
         keyLength: OPENAI_API_KEY?.length || 0,
         keyPrefix: OPENAI_API_KEY?.substring(0, 7) || 'none',
-        fromConfig: !!CONFIG_API_KEY,
         fromConstants: !!Constants.expoConfig?.extra?.openaiApiKey,
         fromProcessEnv: !!(typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_OPENAI_API_KEY),
-        constantsExtra: Constants.expoConfig?.extra,
       });
       
       if (!OPENAI_API_KEY || OPENAI_API_KEY === 'your-api-key-here') {
