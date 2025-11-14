@@ -1,4 +1,5 @@
 import React, { createContext, ReactNode, useContext, useState } from 'react';
+import { RecommendedExercise } from '@/constants/exercises';
 
 interface CompletedExercise {
   id: string;
@@ -7,8 +8,18 @@ interface CompletedExercise {
   completedAt: Date;
 }
 
+interface DailyTask {
+  id: string;
+  title: string;
+  xpAmount: number;
+  xpColor: string;
+  isCompleted: boolean;
+}
+
 interface ExerciseContextType {
   completedExercises: CompletedExercise[];
+  recommendedExercises: RecommendedExercise[];
+  dailyTasks: DailyTask[];
   markExerciseComplete: (id: string, name: string, xpGained: number) => void;
   markAllDailyExercisesComplete: () => void;
   resetAllExercises: () => void;
@@ -16,6 +27,8 @@ interface ExerciseContextType {
   videoResetTrigger: number;
   getStreakCount: () => number;
   isStreakExtendedToday: () => boolean;
+  setRecommendedExercises: (exercises: RecommendedExercise[]) => void;
+  updateDailyTasks: (tasks: DailyTask[]) => void;
 }
 
 const ExerciseContext = createContext<ExerciseContextType | undefined>(undefined);
@@ -34,6 +47,8 @@ interface ExerciseProviderProps {
 
 export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) => {
   const [completedExercises, setCompletedExercises] = useState<CompletedExercise[]>([]);
+  const [recommendedExercises, setRecommendedExercises] = useState<RecommendedExercise[]>([]);
+  const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
   const [videoResetTrigger, setVideoResetTrigger] = useState(0);
 
   const markAllDailyExercisesComplete = () => {
@@ -152,10 +167,16 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
     });
   };
 
+  const updateDailyTasks = (tasks: DailyTask[]) => {
+    setDailyTasks(tasks);
+  };
+
   return (
     <ExerciseContext.Provider
       value={{
         completedExercises,
+        recommendedExercises,
+        dailyTasks,
         markExerciseComplete,
         markAllDailyExercisesComplete,
         resetAllExercises,
@@ -163,6 +184,8 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
         videoResetTrigger,
         getStreakCount,
         isStreakExtendedToday,
+        setRecommendedExercises,
+        updateDailyTasks,
       }}
     >
       {children}

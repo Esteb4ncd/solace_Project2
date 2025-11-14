@@ -9,6 +9,7 @@ import LargeButton from '../../components/ui/LargeButton';
 import TextAndVoiceInput from '../../components/ui/TextAndVoiceInput';
 import { Globals } from '../../constants/globals';
 import { recordingStorage } from '../../services/recordingStorage';
+import { aiService } from '@/services/aiService';
 
 const { width: screenWidth } = Dimensions.get('window');
 const BUTTON_WIDTH = 352;
@@ -72,6 +73,18 @@ export default function AIConfirmation1Screen() {
   const answerText = (answer as string) || '';
   const answerParts = answerText.split(' ');
 
+  // Get AI summary of what was picked up
+  const getAISummary = () => {
+    const context = aiService.getCurrentContext();
+    if (context.workTasks.length > 0) {
+      const tasks = context.workTasks.join(', ');
+      return `${tasks}.`;
+    }
+    return '';
+  };
+
+  const aiSummary = getAISummary();
+
   return (
     <ThemedView style={styles.container}>
       {/* Back Button */}
@@ -96,8 +109,14 @@ export default function AIConfirmation1Screen() {
 
       {/* Confirmation Message */}
       <View style={styles.confirmationContainer}>
-        <ThemedText style={styles.confirmationLabel}>Your tasks involve</ThemedText>
-        <ThemedText style={styles.confirmationText}>{answerText}</ThemedText>
+        <ThemedText style={styles.confirmationLabel}>
+          Your tasks involve {aiSummary || answerText}
+        </ThemedText>
+        {aiSummary && (
+          <ThemedText style={styles.summarySubtext}>
+            Is this what you meant?
+          </ThemedText>
+        )}
       </View>
 
       {/* Buttons Container */}
@@ -272,6 +291,23 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#000',
     textAlign: 'center',
+    marginBottom: 16,
+  },
+  summaryText: {
+    ...Globals.fonts.styles.body,
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 12,
+    fontStyle: 'italic',
+    lineHeight: 22,
+  },
+  summarySubtext: {
+    ...Globals.fonts.styles.body,
+    fontSize: 14,
+    color: '#999',
+    textAlign: 'center',
+    marginTop: 8,
   },
   buttonContainer: {
     position: 'absolute',
