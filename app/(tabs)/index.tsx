@@ -18,6 +18,7 @@ export default function HomeScreen() {
     username: "",
     password: "",
     terms: false,
+    
   });
   const [isLogin, setIsLogin] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
