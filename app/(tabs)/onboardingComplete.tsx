@@ -1,10 +1,54 @@
-import { router } from 'expo-router';
-import React from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect } from 'react';
 import { Image, Platform, StyleSheet, Text, View } from 'react-native';
 import LargeButton from '../../components/ui/LargeButton';
 import { Globals } from '../../constants/globals';
+import { useExerciseContext } from '@/contexts/ExerciseContext';
+import { recommendExercises, getExerciseXpReward } from '@/constants/exercises';
 
 export default function OnboardingCompleteScreen() {
+  const { selectedWorkTasks, selectedPainAreas } = useLocalSearchParams();
+  const { setRecommendedExercises, updateDailyTasks } = useExerciseContext();
+
+  useEffect(() => {
+    // Generate recommendations when component mounts
+    if (selectedWorkTasks && selectedPainAreas) {
+      try {
+        const workTasks = JSON.parse(selectedWorkTasks as string);
+        const painAreas = JSON.parse(selectedPainAreas as string);
+        
+        console.log('Generating recommendations from manual selection:', { workTasks, painAreas });
+        
+        if (workTasks.length > 0 && painAreas.length > 0) {
+          const recommendedExercises = recommendExercises(
+            painAreas,
+            workTasks,
+            [],
+            3 // Get top 3 recommendations
+          );
+          
+          if (recommendedExercises.length > 0) {
+            setRecommendedExercises(recommendedExercises);
+            
+            // Convert to daily tasks format
+            const dailyTasks = recommendedExercises.map((recEx) => ({
+              id: recEx.exercise.id,
+              title: recEx.exercise.name,
+              xpAmount: getExerciseXpReward(recEx.exercise, recEx.isRecommended),
+              xpColor: '#7267D9',
+              isCompleted: false,
+            }));
+            
+            updateDailyTasks(dailyTasks);
+            console.log('✅ Generated recommendations from manual selection:', dailyTasks);
+          }
+        }
+      } catch (error) {
+        console.error('Error generating recommendations from manual selection:', error);
+      }
+    }
+  }, [selectedWorkTasks, selectedPainAreas, setRecommendedExercises, updateDailyTasks]);
+
   const handleNext = () => {
     router.push('/(tabs)/exerciseChangeInfo');
   };

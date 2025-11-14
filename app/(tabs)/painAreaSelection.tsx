@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import BackButton from '../../components/ui/BackButton';
@@ -47,6 +47,7 @@ const painAreas: PainArea[] = [
 ];
 
 export default function PainAreaSelectionScreen() {
+  const { selectedWorkTasks } = useLocalSearchParams();
   const [selectedAreas, setSelectedAreas] = useState<Set<string>>(new Set());
 
   const handleAreaPress = (areaId: string) => {
@@ -62,8 +63,29 @@ export default function PainAreaSelectionScreen() {
   };
 
   const handleNext = () => {
-    // Navigate to onboarding complete screen
-    router.push('/(tabs)/onboardingComplete');
+    // Convert selected areas to array and map to AI service format
+    const selectedAreasArray = Array.from(selectedAreas);
+    const mappedAreas = selectedAreasArray.map(areaId => {
+      // Map manual selection IDs to AI service pain area format
+      const areaMap: { [key: string]: string } = {
+        'back': 'back',
+        'shoulder': 'shoulder',
+        'chest': 'chest',
+        'hand': 'wrist', // Map hand to wrist for exercises
+        'hip': 'hip',
+        'legs': 'knee' // Map legs to knee for exercises
+      };
+      return areaMap[areaId] || areaId;
+    });
+    
+    // Navigate to onboarding complete with both selections
+    router.push({
+      pathname: '/(tabs)/onboardingComplete',
+      params: {
+        selectedWorkTasks: selectedWorkTasks as string,
+        selectedPainAreas: JSON.stringify(mappedAreas)
+      }
+    });
   };
 
   const handleBack = () => {

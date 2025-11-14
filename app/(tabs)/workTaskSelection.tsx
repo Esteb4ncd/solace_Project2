@@ -62,8 +62,28 @@ export default function WorkTaskSelectionScreen() {
   };
 
   const handleNext = () => {
-    // Navigate to pain area selection
-    router.push('/(tabs)/painAreaSelection');
+    // Convert selected tasks to array and map to AI service format
+    const selectedTasksArray = Array.from(selectedTasks);
+    const mappedTasks = selectedTasksArray.map(taskId => {
+      // Map manual selection IDs to AI service work task format
+      const taskMap: { [key: string]: string } = {
+        'kneeling': 'kneeling',
+        'overhead': 'overhead work',
+        'repetitive': 'repetitive tool use',
+        'heavy': 'heavy lifting',
+        'standing': 'standing long hours',
+        'awkward': 'awkward postures'
+      };
+      return taskMap[taskId] || taskId;
+    });
+    
+    // Navigate to pain area selection with selected tasks
+    router.push({
+      pathname: '/(tabs)/painAreaSelection',
+      params: { 
+        selectedWorkTasks: JSON.stringify(mappedTasks)
+      }
+    });
   };
 
   const handleBack = () => {
