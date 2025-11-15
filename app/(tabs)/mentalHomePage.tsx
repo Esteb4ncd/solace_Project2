@@ -16,7 +16,6 @@ import GeneralTaskCard from "../../components/taskCards/generalTaskCard";
 import BottomNavigation from "../../components/ui/BottomNavigation";
 import ExerciseButton from "../../components/ui/ExerciseButton";
 import StatusBar from "../../components/ui/StatusBar";
- 
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -57,8 +56,8 @@ const MentalHomePage = () => {
       });
     } else if (
       exerciseName === "Rain Sounds" ||
-      exerciseName === "Plane Sounds" ||
-      exerciseName === "Ocean Waves"
+      exerciseName === "Soft Piano" ||
+      exerciseName === "Sea Waves"
     ) {
       router.push({
         pathname: "/(tabs)/whiteNoise" as unknown as any,
@@ -161,18 +160,18 @@ const MentalHomePage = () => {
           <View style={styles.whiteNoiseContainer}>
             <GeneralTaskCard
               task="Rain Sounds"
-              xp={3}
+              xp={1}
               onPress={() => handleExercisePress("Rain Sounds")}
             />
             <GeneralTaskCard
-              task="Plane Sounds"
-              xp={3}
-              onPress={() => handleExercisePress("Plane Sounds")}
+              task="Soft Piano"
+              xp={1}
+              onPress={() => handleExercisePress("Soft Piano")}
             />
             <GeneralTaskCard
-              task="Ocean Waves"
-              xp={3}
-              onPress={() => handleExercisePress("Ocean Waves")}
+              task="Sea Waves"
+              xp={1}
+              onPress={() => handleExercisePress("Sea Waves")}
             />
           </View>
         )}

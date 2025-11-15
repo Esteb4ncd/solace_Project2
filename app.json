@@ -9,7 +9,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "This app uses the microphone for audio recording.",
+        "NSCameraUsageDescription": "This app uses the camera for video recording."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +23,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
       "output": "static",
@@ -39,7 +44,15 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone for audio recording.",
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera for video recording.",
+          "recordAudioAndroid": "Allow $(PRODUCT_NAME) to record audio for audio recording."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
