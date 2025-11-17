@@ -34,7 +34,7 @@ const MentalHomePage = () => {
         // Already on mental page
         break;
       case "account":
-        router.push("/(tabs)/signInPage");
+        router.push("/(tabs)/accountSettingsPage");
         break;
       default:
         console.log(`Navigating to ${itemId}`);

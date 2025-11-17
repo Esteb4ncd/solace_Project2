@@ -30,6 +30,7 @@ const HomePage = () => {
 
   const handleNavPress = (itemId: string) => {
     console.log(`Navigating to ${itemId}`);
+    // Navigation logic can be added here if needed
   };
 
   return (

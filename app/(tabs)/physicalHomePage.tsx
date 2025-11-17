@@ -25,7 +25,7 @@ const PhysicalHomePage = () => {
         router.push('/(tabs)/mentalHomePage');
         break;
       case 'account':
-        router.push('/(tabs)/signInPage');
+        router.push('/(tabs)/accountSettingsPage');
         break;
       default:
         console.log(`Navigating to ${itemId}`);

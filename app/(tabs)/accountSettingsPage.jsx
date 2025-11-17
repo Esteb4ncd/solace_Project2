@@ -40,6 +40,25 @@ function AccountSettingsPage() {
     setActiveSection(null);
   };
 
+  const handleNavPress = (itemId) => {
+    switch (itemId) {
+      case 'home':
+        router.push('/(tabs)/homePage');
+        break;
+      case 'physical':
+        router.push('/(tabs)/physicalHomePage');
+        break;
+      case 'mental':
+        router.push('/(tabs)/mentalHomePage');
+        break;
+      case 'account':
+        // Already on account page
+        break;
+      default:
+        console.log(`Navigating to ${itemId}`);
+    }
+  };
+
   const renderSectionContent = () => {
     switch (activeSection) {
       case "General":
@@ -124,7 +143,7 @@ function AccountSettingsPage() {
       )}
 
       <View>
-        <BottomNavigation styles={styles.navigationBar} />
+        <BottomNavigation onItemPress={handleNavPress} />
       </View>
     </View>
   );

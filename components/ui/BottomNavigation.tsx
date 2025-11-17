@@ -34,7 +34,7 @@ const BottomNavigation = ({
     } else if (itemId === 'mental') {
       return pathname === '/(tabs)/mentalHomePage' || pathname.includes('/mentalHomePage');
     } else if (itemId === 'account') {
-      return pathname === '/(tabs)/signInPage' || pathname.includes('/signInPage');
+      return pathname === '/(tabs)/accountSettingsPage' || pathname.includes('/accountSettingsPage');
     }
     return false;
   };
