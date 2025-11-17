@@ -1,13 +1,13 @@
 import { ResizeMode, Video } from 'expo-av';
 import { useEffect, useRef, useState } from "react";
 import {
-    Dimensions,
-    Image,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Dimensions,
+  Image,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import BackButton from '../ui/BackButton';
 import LargeButton from '../ui/LargeButton';
@@ -204,6 +204,7 @@ export default function LocalVideoPlayer({
           <LargeButton 
             label="Done" 
             onPress={handleDone}
+            style={undefined}
           />
         </View>
       )}

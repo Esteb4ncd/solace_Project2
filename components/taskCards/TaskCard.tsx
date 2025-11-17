@@ -1,6 +1,6 @@
 import CompletedTask from '@/components/ui/CompletedTask';
-import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { getExerciseById, getExerciseXpReward } from '@/constants/exercises';
+import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -124,6 +124,13 @@ const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDai
     });
   };
 
+  const getSectionTitle = () => {
+    if (isDaily) {
+      return 'Daily Checklist';
+    }
+    return exerciseType === 'physical' ? 'Physical Exercises' : 'Mental Exercises';
+  };
+
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{getSectionTitle()}</Text>
@@ -163,6 +170,12 @@ const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDai
 const styles = StyleSheet.create({
   section: {
     paddingVertical: 16, // 16px margin from element above
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 16,
   },
   taskContainer: {
     backgroundColor: '#fff',

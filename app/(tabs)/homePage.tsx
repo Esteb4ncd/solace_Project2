@@ -6,16 +6,10 @@ import TabBar from '@/components/ui/TabBar';
 import XPBar from '@/components/ui/XPBar';
 import { Colors } from '@/constants/theme';
 import { useExerciseContext } from '@/contexts/ExerciseContext';
-<<<<<<< HEAD
-import { router } from 'expo-router';
-import { useState } from 'react';
-import { Dimensions, Image, Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
-=======
 import { ThemedText } from '@/components/themed-text';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Dimensions, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
->>>>>>> origin/VideosAPI
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -25,18 +19,8 @@ const HomePage = () => {
   const [tempUserName, setTempUserName] = useState("Solly");
   const [activeTab, setActiveTab] = useState<'stretch' | 'relax' | 'complete'>('stretch');
   
-<<<<<<< HEAD
-  const { completedExercises } = useExerciseContext();
-  
-  const dailyTasks = [
-    { id: '1', title: 'Hand Warm Up', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
-    { id: '2', title: 'Shoulder Warm Up', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
-    { id: '3', title: 'Upper Back Stretch', xpAmount: 10, xpColor: '#7267D9', isCompleted: false },
-  ];
-=======
   const { completedExercises, getStreakCount, dailyTasks } = useExerciseContext();
   const streakCount = getStreakCount();
->>>>>>> origin/VideosAPI
 
   const additionalTasks = [
     { id: '4', title: 'Stress Relief', xpAmount: 5, xpColor: '#7267D9', isCompleted: false },
@@ -206,8 +190,6 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: screenHeight * 0.12, // 12% of screen height
-<<<<<<< HEAD
-=======
   },
   emptyState: {
     paddingVertical: 40,
@@ -242,7 +224,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
->>>>>>> origin/VideosAPI
   },
 });
 

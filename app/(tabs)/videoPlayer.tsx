@@ -1,19 +1,5 @@
 import LocalVideoPlayer from '@/components/videoComponents/LocalVideoPlayer';
 import { useExerciseContext } from '@/contexts/ExerciseContext';
-<<<<<<< HEAD
-import { router, useLocalSearchParams } from 'expo-router';
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-
-const VideoPlayerScreen = () => {
-  const { videoId, type } = useLocalSearchParams<{ videoId: string; type: string }>();
-  const { videoResetTrigger } = useExerciseContext();
-
-  console.log('VideoPlayerScreen loaded with:', { videoId, type });
-
-  // Use the local HandWarmUp.mp4 file
-  const videoSource = require('@/assets/videos/HandWarmUp.mp4');
-=======
 import { getExerciseById, getExerciseVideoSource } from '@/constants/exercises';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useMemo } from 'react';
@@ -52,7 +38,6 @@ const VideoPlayerScreen = () => {
   const xpAmount = exercise 
     ? String(exercise.recommendedXpReward) 
     : (xpReward || '10');
->>>>>>> origin/VideosAPI
 
   const handleBack = () => {
     console.log('Back button pressed');
@@ -72,14 +57,6 @@ const VideoPlayerScreen = () => {
     router.push({
       pathname: '/xpGain',
       params: { 
-<<<<<<< HEAD
-        xpAmount: '10',
-        exerciseId: '1',
-        exerciseName: 'Hand Warm Up'
-      }
-    });
-  };
-=======
         xpAmount: xpAmount,
         exerciseId: exerciseId || exercise?.id || '1',
         exerciseName: displayName
@@ -89,18 +66,13 @@ const VideoPlayerScreen = () => {
 
   // Get instructions from exercise if available
   const instructions = exercise?.instructions || '';
->>>>>>> origin/VideosAPI
 
   return (
     <View style={styles.container}>
       <LocalVideoPlayer 
         videoSource={videoSource}
-<<<<<<< HEAD
-        videoTitle="Hand Warm Up"
-=======
         videoTitle={displayName}
         instructions={instructions}
->>>>>>> origin/VideosAPI
         onBack={handleBack}
         onEnd={handleVideoEnd}
         onError={handleVideoError}
