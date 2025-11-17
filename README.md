@@ -1,12 +1,67 @@
 # UI Library
 https://react-native-aria.geekyants.com/docs/?utm_
 
-
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Get started
+## 🚀 Quick Start for New Developers
+
+**Just run:**
+```bash
+npm install
+npm run dev
+```
+
+**That's it!** This automatically starts:
+- ✅ Express server on `http://localhost:3001` (proxies videos from Google Drive)
+- ✅ Expo app
+- ✅ Videos work automatically - no separate server command needed!
+
+**You do NOT need to run `npm run server` separately** - `npm run dev` does it all!
+
+### Quick Setup (Using Production API)
+
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+2. **Configure API**:
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your API URL and key
+   ```
+
+3. **Start the app**:
+   ```bash
+   npm start
+   ```
+
+### Quick Setup (Using Local Server)
+
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+2. **Install videos**:
+   ```bash
+   npm run install-videos
+   ```
+   (Or manually get videos and place in `assets/videos/`)
+
+3. **Configure and start**:
+   ```bash
+   cp .env.example .env
+   # Edit .env: EXPO_PUBLIC_API_URL=http://localhost:3001
+   # Set API_KEY environment variable
+   export API_KEY=your-secret-key
+   npm run server  # Terminal 1
+   npm start       # Terminal 2
+   ```
+
+## Get started (Original Instructions)
 
 1. Install dependencies
 
@@ -45,6 +100,76 @@ To learn more about developing your project with Expo, look at the following res
 
 - [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
 - [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+
+## Video API Configuration
+
+Exercise videos are served from a production API server. **No local video files are required** - the app fetches videos from your API.
+
+### Production Setup (Required)
+
+1. **Host your videos on a production server**:
+   - Upload all video files to your production API server
+   - Ensure videos are accessible at: `https://your-api.com/videos/{filename}`
+   - Example: `https://api.solace-app.com/videos/HandWarmUp.mov`
+
+2. **Configure the API URL**:
+   - Create a `.env` file (copy from `.env.example`)
+   - Set `EXPO_PUBLIC_API_URL=https://your-api.com`
+   - Or update `services/api.ts` directly with your production URL
+
+3. **Deploy and run**:
+   ```bash
+   npm install
+   npm start
+   ```
+   The app will automatically fetch videos from your production API.
+
+### Local Development (Optional)
+
+If you want to test with local videos:
+
+1. **Place videos in `assets/videos/`** (not in git)
+2. **Start the local API server**:
+   ```bash
+   npm run server
+   ```
+3. **Set local API URL** in `.env`:
+   ```
+   EXPO_PUBLIC_API_URL=http://localhost:3001
+   ```
+
+### API Endpoints Required
+
+Your production API must provide:
+- `GET /videos/:filename` - Stream video files
+- Example: `GET https://api.solace-app.com/videos/HandWarmUp.mov`
+
+### Video Hosting Options
+
+You can host videos on:
+- **Your own server** (Node.js/Express like `server/index.js`)
+- **Cloud storage** (AWS S3, Google Cloud Storage, Azure Blob)
+- **CDN** (Cloudflare, CloudFront)
+- **Static hosting** (Vercel, Netlify with proper video support)
+
+### Configuration
+
+- **Environment Variable**: `EXPO_PUBLIC_API_URL` (recommended)
+- **Fallback**: Uses `http://localhost:3001` in development, `https://api.solace-app.com` in production
+- **Override**: Edit `services/api.ts` if needed
+
+### Video Files
+The following video files are required (currently stored locally but should be hosted on your API):
+- HandWarmUp.mov
+- BumperStretch.mov
+- HamstringStretch.mov
+- HipFlexorStretch.mov
+- ChestStretch.mov
+- LowerBackMuscleRelease.mov
+- ResetSpineStretch.mov
+- WarmUpSpineStretch.mov
+- ShoulderWarmUp.mov
+- UpperBackStretch.mov
 
 ## Join the community
 

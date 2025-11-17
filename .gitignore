@@ -34,7 +34,9 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
+# Note: .env.example should be committed (it's a template)
 
 # typescript
 *.tsbuildinfo
@@ -44,3 +46,8 @@ app-example
 # generated native folders
 /ios
 /android
+
+# video files (served via API, too large for git)
+assets/videos/
+*.mov
+*.mp4

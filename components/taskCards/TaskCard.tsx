@@ -1,5 +1,6 @@
 import CompletedTask from '@/components/ui/CompletedTask';
 import { useExerciseContext } from '@/contexts/ExerciseContext';
+import { getExerciseById, getExerciseXpReward } from '@/constants/exercises';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -20,14 +21,6 @@ interface TaskCardProps {
 
 const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDaily = false }) => {
   const { isExerciseComplete } = useExerciseContext();
-
-  const getSectionTitle = () => {
-    if (exerciseType === 'physical') {
-      return 'Your Exercises';
-    } else {
-      return 'Need more xp? Try these';
-    }
-  };
 
   const handleTaskPress = (taskId: string) => {
     console.log('Task pressed:', taskId, 'isDaily:', isDaily);
@@ -82,13 +75,51 @@ const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDai
 
     const exerciseDetails = getExerciseDetails(taskId);
     console.log('Exercise details:', exerciseDetails);
+    // Find the task from the tasks array
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) {
+      console.warn(`Task not found for ID: ${taskId}`);
+      return;
+    }
+    
+    // Get exercise from exercises.json database
+    const exercise = getExerciseById(taskId);
+    
+    if (!exercise) {
+      console.warn(`Exercise not found for ID: ${taskId} - using task data`);
+      // Fallback for non-exercise tasks (like mental health exercises)
+      router.push({
+        pathname: '/exerciseConfirmation',
+        params: { 
+          exerciseId: taskId,
+          exerciseName: task.title,
+          xpReward: String(task.xpAmount),
+          duration: '2 minutes'
+        }
+      });
+      return;
+    }
+
+    // Determine if this is a recommended exercise (worth 10 XP) or secondary (5 XP)
+    // Check if task XP matches recommended reward
+    const isRecommended = task.xpAmount >= exercise.recommendedXpReward;
+    const xpReward = getExerciseXpReward(exercise, isRecommended);
+
+    console.log('Exercise details from database:', {
+      id: exercise.id,
+      name: exercise.name,
+      duration: exercise.duration,
+      xpReward,
+      isRecommended
+    });
 
     router.push({
       pathname: '/exerciseConfirmation',
       params: { 
-        exerciseName: exerciseDetails.name,
-        xpReward: exerciseDetails.xpReward,
-        duration: exerciseDetails.duration
+        exerciseId: exercise.id,
+        exerciseName: exercise.name,
+        xpReward: String(xpReward),
+        duration: exercise.duration
       }
     });
   };
@@ -133,25 +164,19 @@ const styles = StyleSheet.create({
   section: {
     paddingVertical: 16, // 16px margin from element above
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000000',
-    marginBottom: 8, // 8px margin between checklist items
-  },
   taskContainer: {
     backgroundColor: '#fff',
     borderRadius: 24,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 8,
     marginBottom: 16, // 16px spacing between cards
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: 360,
-    height: 72,
+    height: 64,
     borderWidth: 1,
-    borderColor: '#9CA3AF', // Grey border
+    borderColor: '#7267D9', // Purple border
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

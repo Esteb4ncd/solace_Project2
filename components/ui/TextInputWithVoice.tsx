@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Dimensions, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Globals } from '../../constants/globals';
+import { speechService } from '../../services/speechService';
 import VoiceRecordingVisual from './VoiceRecordingVisual';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -30,28 +31,71 @@ const TextInputWithVoice: React.FC<TextInputWithVoiceProps> = ({
   blurOnSubmit = false,
 }) => {
   const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
 
-  const handleVoicePress = () => {
+  const handleVoicePress = async () => {
     if (isKeyboardVisible) {
       // When keyboard is visible, call the original onVoicePress (for send functionality)
       onVoicePress?.();
     } else {
       // When keyboard is not visible, start recording
-      setIsRecording(true);
+      try {
+        await speechService.startListening();
+        setIsRecording(true);
+      } catch (error) {
+        console.error('Error starting recording:', error);
+        // If permission is denied or other error, still show the UI but it won't actually record
+        setIsRecording(true);
+      }
     }
   };
 
-  const handleSendRecording = () => {
+  const handleSendRecording = async () => {
+    if (!isRecording) return;
+    
     setIsRecording(false);
-    // Call the onSend function to navigate to next page
-    onSend?.();
+    setIsTranscribing(true);
+
+    try {
+      // Stop recording and transcribe
+      const transcribedText = await speechService.stopAndTranscribe();
+      
+      // Update the text input with transcribed text
+      if (transcribedText && onChangeText) {
+        onChangeText(transcribedText);
+      }
+      
+      setIsTranscribing(false);
+      
+      // Call the onSend function to navigate to next page
+      onSend?.();
+    } catch (error) {
+      console.error('Error transcribing audio:', error);
+      setIsTranscribing(false);
+      // Still allow navigation even if transcription fails
+      onSend?.();
+    }
   };
 
-  // If recording, show the voice recording visual
-  if (isRecording) {
+  const handleCancelRecording = async () => {
+    if (isRecording) {
+      try {
+        await speechService.cancelRecording();
+      } catch (error) {
+        console.error('Error canceling recording:', error);
+      }
+      setIsRecording(false);
+      setIsTranscribing(false);
+    }
+  };
+
+  // If recording or transcribing, show the voice recording visual
+  if (isRecording || isTranscribing) {
     return (
       <VoiceRecordingVisual
         onSend={handleSendRecording}
+        onCancel={handleCancelRecording}
+        isTranscribing={isTranscribing}
       />
     );
   }

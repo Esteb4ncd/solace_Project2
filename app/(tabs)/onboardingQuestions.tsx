@@ -1,10 +1,12 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
-import InteractiveSection, { questions } from '../../components/ui/InteractiveSection';
+import { Alert, Button, FlatList, Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TextInput, TouchableWithoutFeedback, View } from 'react-native';
+import { RetrieveResponse } from 'roughlyai';
+import { questions } from '../../components/ui/InteractiveSection';
 import OnboardingMascot from '../../components/ui/OnboardingMascot';
 import { Globals } from '../../constants/globals';
 
@@ -14,6 +16,12 @@ export default function OnboardingQuestionsScreen() {
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const { next, findingIndex, previousTasks } = useLocalSearchParams();
+
+  const [title, setTitle] = useState<string>('What are your Iron Worker daily tasks?');
+  const [message, setMessage] = useState<string>('');
+  // const [suggest, setSuggest] = useState<string[]>([]);
+  const [suggest, setSuggest] = useState<string[]>([]);
+  const [num, setNum] = useState<number>(1);
 
   useEffect(() => {
     // If coming from confirmation page, advance to next finding
@@ -25,13 +33,64 @@ export default function OnboardingQuestionsScreen() {
     }
   }, [next, findingIndex]);
 
+  const GetTasks = async () => {
+    try {
+
+      const _resp = await fetch("https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/", {
+        method: "POST",
+        body: JSON.stringify({
+          prompt: `Using "worker_tasts.txt", suggest 5 tasks that an iron worker typically do. Return in an array format [], do not include \`\`\`json.`,
+          project_name: "solace"
+        })
+      });
+
+      const _json_string = await _resp.json();
+      const _json: { url: string } = JSON.parse(_json_string);
+
+      console.log("what is _json", _json.url);
+      // console.log("url", _url)
+      const _report: any = await RetrieveResponse(_json.url);
+      setSuggest(JSON.parse(_report.answer));
+    } catch (e: any) {
+      console.log("fail parse or retrieve")
+    }
+  }
+
+  const GetMuscles = async (_tasks:string) => {
+    try {
+      const _resp = await fetch("https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/", {
+        method: "POST",
+        body: JSON.stringify({
+          prompt: `Using "paper.pdf", suggest 5 muscle groups that may be affected from these tasks, make educated guesses:
+          ${_tasks}
+          
+          Return in an array format [], do not include \`\`\`json.`,
+          project_name: "solace"
+        })
+      });
+
+      const _json_string = await _resp.json();
+      const _json: { url: string } = JSON.parse(_json_string);
+
+      console.log("what is _json", _json.url);
+      // console.log("url", _url)
+      const _report: any = await RetrieveResponse(_json.url);
+      setSuggest(JSON.parse(_report.answer));
+      setNum(2);
+    } catch (e: any) {
+      console.log("fail parse or retrieve")
+    }
+  }
+
   useEffect(() => {
+
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
       setIsKeyboardVisible(true);
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
       setIsKeyboardVisible(false);
     });
+    GetTasks();
 
     return () => {
       keyboardDidShowListener?.remove();
@@ -40,8 +99,8 @@ export default function OnboardingQuestionsScreen() {
   }, []);
 
   const handleTaskToggle = (task: string) => {
-    setSelectedTasks(prev => 
-      prev.includes(task) 
+    setSelectedTasks(prev =>
+      prev.includes(task)
         ? prev.filter(t => t !== task)
         : [...prev, task]
     );
@@ -60,17 +119,36 @@ export default function OnboardingQuestionsScreen() {
     // When keyboard is not visible, the TextInputWithVoice component handles recording
   };
 
-  const handleNextQuestion = () => {
-    // Navigate to confirmation page with current finding index and selected tasks
-    const selectedTasksParam = selectedTasks.join(',');
-    
-    if (currentQuestionIndex === 1 && previousTasks) {
-      // This is the second question, pass both previous tasks and current body parts
-      router.push(`/(tabs)/confirmation?findingIndex=${currentQuestionIndex}&selectedTasks=${selectedTasksParam}&previousTasks=${previousTasks}`);
-    } else {
-      // First question, just pass current tasks
-      router.push(`/(tabs)/confirmation?findingIndex=${currentQuestionIndex}&selectedTasks=${selectedTasksParam}`);
+  const handleNextQuestion = async (_num:number) => {
+
+    try {
+      if(_num === 1){
+        await AsyncStorage.setItem('workertask', JSON.stringify(message));
+        setTitle('Do you feel discomfort in any of your muscles?')
+        // router.push(`/(tabs)/confirmation`);
+        GetMuscles(JSON.stringify(message))
+        setMessage("");
+      }
+
+      if(_num === 2){
+        await AsyncStorage.setItem('muscles', JSON.stringify(message));
+        // setTitle('Do you feel discomfort in any of your muscles?')
+        router.push(`/(tabs)/homePage`);
+      }
+    } catch (e) {
+      // saving error
     }
+    // Navigate to confirmation page with current finding index and selected tasks
+    // const selectedTasksParam = selectedTasks.join(',');
+
+
+    // if (currentQuestionIndex === 1 && previousTasks) {
+    //   // This is the second question, pass both previous tasks and current body parts
+    //   router.push(`/(tabs)/confirmation?findingIndex=${currentQuestionIndex}&selectedTasks=${selectedTasksParam}&previousTasks=${previousTasks}`);
+    // } else {
+    //   // First question, just pass current tasks
+    //   router.push(`/(tabs)/confirmation?findingIndex=${currentQuestionIndex}&selectedTasks=${selectedTasksParam}`);
+    // }
   };
 
   const handleBackPress = () => {
@@ -86,7 +164,7 @@ export default function OnboardingQuestionsScreen() {
   return (
     <ThemedView style={styles.container}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
-        <KeyboardAvoidingView 
+        <KeyboardAvoidingView
           style={styles.keyboardAvoidingView}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
@@ -96,25 +174,25 @@ export default function OnboardingQuestionsScreen() {
             <Ionicons name="arrow-back" size={24} color="#000" />
           </Pressable>
 
-        {/* Character Placeholder */}
-        <View style={[
-          styles.questionContainer,
-          isKeyboardVisible ? styles.questionContainerKeyboardVisible : styles.questionContainerKeyboardHidden
-        ]}>
-          <OnboardingMascot isKeyboardVisible={isKeyboardVisible} />
-          
-          {/* Main Question */}
-          <ThemedText style={styles.question}>
-            {currentQuestion.title}
-          </ThemedText>
-        </View>
-          
-        {/* Interactive Section */}
-        <View style={[
-          styles.interactiveSectionContainer,
-          isKeyboardVisible ? styles.interactiveSectionKeyboardVisible : styles.interactiveSectionKeyboardHidden
-        ]}>
-          <InteractiveSection
+          {/* Character Placeholder */}
+          <View style={[
+            styles.questionContainer,
+            isKeyboardVisible ? styles.questionContainerKeyboardVisible : styles.questionContainerKeyboardHidden
+          ]}>
+            <OnboardingMascot isKeyboardVisible={isKeyboardVisible} />
+
+            {/* Main Question */}
+            <ThemedText style={styles.question}>
+              {title}
+            </ThemedText>
+          </View>
+
+          {/* Interactive Section */}
+          <View style={[
+            styles.interactiveSectionContainer,
+            isKeyboardVisible ? styles.interactiveSectionKeyboardVisible : styles.interactiveSectionKeyboardHidden
+          ]}>
+            {/* <InteractiveSection
             selectedTasks={selectedTasks}
             textInput={textInput}
             onTaskToggle={handleTaskToggle}
@@ -123,8 +201,39 @@ export default function OnboardingQuestionsScreen() {
             onNext={handleNextQuestion}
             isKeyboardVisible={isKeyboardVisible}
             currentQuestion={currentQuestion}
-          />
-        </View>
+          /> */}
+
+            <ThemedText style={{ color: "#666" }}>
+              Some suggestions might include...
+            </ThemedText>
+            <View
+            // style={{ height: 150, overflow:"hidden" }}
+            >
+
+              <FlatList
+                style={{ height: 150 }}
+                showsVerticalScrollIndicator={true}
+                data={suggest}
+                ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+                renderItem={({ item }) =>
+                  <TouchableWithoutFeedback onPress={() => setMessage((p) => p + ' ' + item)}>
+
+                    <ThemedText style={{ color: "#666", backgroundColor: "#CCC", padding: 5 }}>{item}</ThemedText>
+                  </TouchableWithoutFeedback>
+                }
+              />
+            </View>
+            <TextInput
+              placeholder="Type your message here..."
+              style={{ minHeight: 100, borderColor: "#CCC", borderWidth: 1 }}
+              value={message}
+              onChangeText={setMessage}
+              multiline={true}
+              numberOfLines={4}
+              textAlignVertical="top" // ensures text starts at the top
+            />
+            <Button onPress={() => handleNextQuestion(num)} title='Next' />
+          </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </ThemedView>
@@ -134,21 +243,16 @@ export default function OnboardingQuestionsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    width: 393,
-    height: 852,
+    backgroundColor: '#fff'
   },
   keyboardAvoidingView: {
     flex: 1,
-    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 60,
   },
   backButton: {
     position: 'absolute',
-    top: Platform.OS === 'web' ? 20 : 50,
+    top: Platform.OS === 'web' ? 30 : 60,
     left: 20,
     zIndex: 10,
     padding: 8,

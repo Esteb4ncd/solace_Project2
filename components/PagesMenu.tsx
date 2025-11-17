@@ -2,7 +2,7 @@ import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useRef, useState } from 'react';
-import { Alert, Dimensions, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -107,6 +107,25 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
     );
   };
 
+  const handleResetAIOnboarding = () => {
+    Alert.alert(
+      'Reset AI Onboarding',
+      'This will reset all AI onboarding questions and navigate you back to the start.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Reset', 
+          style: 'default',
+          onPress: () => {
+            setIsMenuVisible(false);
+            // Use replace to clear navigation stack and reset state
+            router.replace('/(tabs)/startAiOnboarding');
+          }
+        }
+      ]
+    );
+  };
+
   const hideMenu = () => {
     setIsMenuVisible(false);
     setIsHidden(true);
@@ -120,7 +139,14 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
     { name: 'signInPage', title: 'Sign In Page', icon: 'log-in' },
     { name: 'tutorial', title: 'Tutorial', icon: 'school' },
     { name: 'startQuestions', title: 'Start Questions', icon: 'person' },
-    { name: 'onboardingQuestions', title: 'Onboarding Questions', icon: 'help-circle' },
+    { name: 'onboardingPreference', title: 'Onboarding Preference', icon: 'options' },
+    { name: 'startAiOnboarding', title: 'Start AI Onboarding', icon: 'chatbubble-outline' },
+    { name: 'aiQuestion1', title: 'AI Question 1', icon: 'mic-outline' },
+    { name: 'aiQuestion2', title: 'AI Question 2', icon: 'mic-outline' },
+    { name: 'aiConfirmation1', title: 'AI Confirmation 1', icon: 'checkmark-circle-outline' },
+    { name: 'aiConfirmation2', title: 'AI Confirmation 2', icon: 'checkmark-circle-outline' },
+    // Disabled - not in use
+    // { name: 'onboardingQuestions', title: 'Onboarding Questions', icon: 'help-circle' },
     { name: 'confirmation', title: 'Confirmation', icon: 'checkmark-circle' },
     { name: 'homePage', title: 'Home Page', icon: 'home-outline' },
     { name: 'physicalHomePage', title: 'Physical Home Page', icon: 'fitness' },
@@ -161,69 +187,85 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
               </Pressable>
             </View>
             
-            {menuItems.map((item) => (
-              <Pressable
-                key={item.name}
-                style={[
-                  styles.menuItem, 
-                  item.isSpecial && styles.specialMenuItem,
-                  item.isSkip && styles.skipMenuItem,
-                  item.isPhysicalFlow && styles.physicalFlowMenuItem
-                ]}
-                onPress={() => {
-                  if (item.isSpecial) {
-                    hideMenu();
-                  } else if (item.isSkip) {
-                    skipToXPGain();
-                  } else if (item.isPhysicalFlow) {
-                    startPhysicalExerciseFlow();
-                  } else {
-                    navigateToScreen(item.name);
-                  }
-                }}
-              >
-                <Ionicons 
-                  name={item.icon as any} 
-                  size={20} 
-                  color={
-                    item.isSkip ? "#FF6B35" : 
-                    item.isPhysicalFlow ? "#4CAF50" : 
-                    "#000"
-                  } 
-                />
-                <Text style={[
-                  styles.menuItemText, 
-                  item.isSkip && styles.skipText,
-                  item.isPhysicalFlow && styles.physicalFlowText
-                ]}>
-                  {item.title}
-                </Text>
-              </Pressable>
-            ))}
-
-            {/* Test Button */}
-            <View style={styles.sectionDivider} />
-            <Pressable
-              style={[styles.menuItem, styles.testButton]}
-              onPress={handleMarkAllComplete}
+            <ScrollView 
+              style={styles.scrollView}
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={true}
             >
-              <Ionicons name="checkmark-circle" size={20} color="#8B5CF6" />
-              <Text style={[styles.menuItemText, styles.testText]}>Mark All Daily Complete (Test)</Text>
-            </Pressable>
-
-            {/* Reset Button */}
-            {completedExercises.length > 0 && (
-              <>
-                <View style={styles.sectionDivider} />
+              {menuItems.map((item) => (
                 <Pressable
-                  style={[styles.menuItem, styles.resetButton]}
-                  onPress={handleResetExercises}
+                  key={item.name}
+                  style={[
+                    styles.menuItem, 
+                    item.isSpecial && styles.specialMenuItem,
+                    item.isSkip && styles.skipMenuItem,
+                    item.isPhysicalFlow && styles.physicalFlowMenuItem
+                  ]}
+                  onPress={() => {
+                    if (item.isSpecial) {
+                      hideMenu();
+                    } else if (item.isSkip) {
+                      skipToXPGain();
+                    } else if (item.isPhysicalFlow) {
+                      startPhysicalExerciseFlow();
+                    } else {
+                      navigateToScreen(item.name);
+                    }
+                  }}
                 >
-                  <Ionicons name="refresh" size={20} color="#FF4444" />
-                  <Text style={[styles.menuItemText, styles.resetText]}>Reset All Exercises</Text>
+                  <Ionicons 
+                    name={item.icon as any} 
+                    size={20} 
+                    color={
+                      item.isSkip ? "#FF6B35" : 
+                      item.isPhysicalFlow ? "#4CAF50" : 
+                      "#000"
+                    } 
+                  />
+                  <Text style={[
+                    styles.menuItemText, 
+                    item.isSkip && styles.skipText,
+                    item.isPhysicalFlow && styles.physicalFlowText
+                  ]}>
+                    {item.title}
+                  </Text>
                 </Pressable>
-              </>
-            )}
+              ))}
+
+              {/* Test Button */}
+              <View style={styles.sectionDivider} />
+              <Pressable
+                style={[styles.menuItem, styles.testButton]}
+                onPress={handleMarkAllComplete}
+              >
+                <Ionicons name="checkmark-circle" size={20} color="#8B5CF6" />
+                <Text style={[styles.menuItemText, styles.testText]}>Mark All Daily Complete (Test)</Text>
+              </Pressable>
+
+              {/* Reset AI Onboarding Button */}
+              <View style={styles.sectionDivider} />
+              <Pressable
+                style={[styles.menuItem, styles.resetAIButton]}
+                onPress={handleResetAIOnboarding}
+              >
+                <Ionicons name="refresh-outline" size={20} color="#8B5CF6" />
+                <Text style={[styles.menuItemText, styles.resetAIText]}>Reset AI Onboarding</Text>
+              </Pressable>
+
+              {/* Reset Button */}
+              {completedExercises.length > 0 && (
+                <>
+                  <View style={styles.sectionDivider} />
+                  <Pressable
+                    style={[styles.menuItem, styles.resetButton]}
+                    onPress={handleResetExercises}
+                  >
+                    <Ionicons name="refresh" size={20} color="#FF4444" />
+                    <Text style={[styles.menuItemText, styles.resetText]}>Reset All Exercises</Text>
+                  </Pressable>
+                </>
+              )}
+            </ScrollView>
           </View>
         </Pressable>
       </Modal>
@@ -264,6 +306,7 @@ const styles = StyleSheet.create({
     borderRadius: screenWidth * 0.03, // 3% of screen width
     padding: screenWidth * 0.04, // 4% of screen width
     minWidth: screenWidth * 0.5, // 50% of screen width
+    maxHeight: screenHeight * 0.8, // 80% of screen height
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -272,6 +315,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: screenWidth * 0.01, // 1% of screen width
     elevation: 5,
+  },
+  scrollView: {
+    maxHeight: screenHeight * 0.6, // 60% of screen height
+  },
+  scrollContent: {
+    paddingBottom: screenHeight * 0.01, // 1% of screen height
   },
   menuHeader: {
     flexDirection: 'row',
@@ -339,6 +388,12 @@ const styles = StyleSheet.create({
   },
   resetText: {
     color: '#FF4444',
+  },
+  resetAIButton: {
+    backgroundColor: '#f0f4ff',
+  },
+  resetAIText: {
+    color: '#8B5CF6',
   },
 });
 

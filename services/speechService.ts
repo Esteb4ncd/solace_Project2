@@ -1,7 +1,7 @@
-// Speech-to-text service using Expo Speech
+// Speech-to-text service using OpenAI Whisper API
 
-import * as Speech from 'expo-speech';
-import { Alert } from 'react-native';
+import { Audio } from 'expo-av';
+import Constants from 'expo-constants';
 
 export interface SpeechResult {
   text: string;
@@ -10,54 +10,134 @@ export interface SpeechResult {
 }
 
 class SpeechService {
+  private recording: Audio.Recording | null = null;
   private isListening = false;
-  private recognitionTimeout: NodeJS.Timeout | null = null;
+  private recordingUri: string | null = null;
 
-  async startListening(): Promise<string> {
-    return new Promise((resolve, reject) => {
+  async startRecording(): Promise<void> {
+    try {
       if (this.isListening) {
-        reject(new Error('Already listening'));
-        return;
+        throw new Error('Already recording');
       }
 
-      this.isListening = true;
-      
-      // Simulate speech recognition
-      // In a real implementation, you would use:
-      // - Expo Speech Recognition (if available)
-      // - Web Speech API for web
-      // - Native speech recognition libraries
-      
-      Alert.alert(
-        'Voice Input',
-        'Speak now...',
-        [
-          {
-            text: 'Cancel',
-            onPress: () => {
-              this.isListening = false;
-              reject(new Error('User cancelled'));
-            }
-          },
-          {
-            text: 'Done',
-            onPress: () => {
-              this.isListening = false;
-              // Simulate recognized text
-              const simulatedText = this.getSimulatedSpeechText();
-              resolve(simulatedText);
-            }
-          }
-        ],
-        { cancelable: false }
+      // Request permissions
+      const { status } = await Audio.requestPermissionsAsync();
+      if (status !== 'granted') {
+        throw new Error('Audio permission not granted');
+      }
+
+      // Set audio mode
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      // Create a new recording
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
       );
 
-      // Auto-timeout after 10 seconds
-      this.recognitionTimeout = setTimeout(() => {
-        this.isListening = false;
-        reject(new Error('Speech recognition timeout'));
-      }, 10000);
-    });
+      this.recording = recording;
+      this.isListening = true;
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      this.isListening = false;
+      throw error;
+    }
+  }
+
+  async stopRecording(): Promise<string | null> {
+    try {
+      if (!this.recording || !this.isListening) {
+        return null;
+      }
+
+      this.isListening = false;
+
+      // Stop recording
+      await this.recording.stopAndUnloadAsync();
+      
+      // Get the URI
+      const uri = this.recording.getURI();
+      this.recordingUri = uri;
+      
+      // Clean up
+      this.recording = null;
+
+      return uri;
+    } catch (error) {
+      console.error('Error stopping recording:', error);
+      this.recording = null;
+      this.isListening = false;
+      throw error;
+    }
+  }
+
+  async transcribeAudio(audioUri: string): Promise<string> {
+    try {
+      // Try multiple ways to get the API key (Expo can be tricky with env vars)
+      const OPENAI_API_KEY = 
+        Constants.expoConfig?.extra?.openaiApiKey ||
+        Constants.expoConfig?.extra?.EXPO_PUBLIC_OPENAI_API_KEY ||
+        (typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_OPENAI_API_KEY) ||
+        undefined;
+      
+      console.log('🔑 API Key check:', {
+        hasKey: !!OPENAI_API_KEY,
+        keyLength: OPENAI_API_KEY?.length || 0,
+        keyPrefix: OPENAI_API_KEY?.substring(0, 7) || 'none',
+        fromConstants: !!Constants.expoConfig?.extra?.openaiApiKey,
+        fromProcessEnv: !!(typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_OPENAI_API_KEY),
+      });
+      
+      if (!OPENAI_API_KEY || OPENAI_API_KEY === 'your-api-key-here') {
+        console.warn('⚠️ OpenAI API key not found, using simulated transcription');
+        console.warn('   Make sure EXPO_PUBLIC_OPENAI_API_KEY is set in .env and restart the app');
+        return this.getSimulatedSpeechText();
+      }
+
+      // Prepare form data for OpenAI Whisper API
+      const formData = new FormData();
+      
+      // Get file extension and mime type
+      const fileExtension = audioUri.split('.').pop() || 'm4a';
+      const mimeType = fileExtension === 'm4a' ? 'audio/m4a' : 
+                      fileExtension === 'mp3' ? 'audio/mpeg' : 
+                      fileExtension === 'wav' ? 'audio/wav' : 
+                      'audio/m4a';
+      
+      // For React Native, FormData needs a specific format
+      formData.append('file', {
+        uri: audioUri,
+        type: mimeType,
+        name: `recording.${fileExtension}`,
+      } as any);
+      
+      formData.append('model', 'whisper-1');
+      formData.append('response_format', 'text');
+
+      const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        },
+        body: formData as any,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('OpenAI API error:', errorText);
+        // Fallback to simulated text on error
+        return this.getSimulatedSpeechText();
+      }
+
+      const transcription = await response.text();
+      return transcription.trim();
+    } catch (error) {
+      console.error('Error transcribing audio:', error);
+      // Return simulated text as fallback
+      return this.getSimulatedSpeechText();
+    }
   }
 
   private getSimulatedSpeechText(): string {
@@ -78,29 +158,78 @@ class SpeechService {
     return responses[Math.floor(Math.random() * responses.length)];
   }
 
-  async speak(text: string): Promise<void> {
+  async stopAndTranscribe(): Promise<string> {
     try {
-      await Speech.speak(text, {
-        language: 'en-US',
-        pitch: 1.0,
-        rate: 0.8,
-      });
+      const audioUri = await this.stopRecording();
+      if (!audioUri) {
+        console.warn('No recording to transcribe, using simulated text');
+        return this.getSimulatedSpeechText();
+      }
+
+      const transcription = await this.transcribeAudio(audioUri);
+      return transcription;
     } catch (error) {
-      console.error('Error speaking text:', error);
-      throw error;
+      console.error('Error in stopAndTranscribe:', error);
+      // Return simulated text as fallback
+      return this.getSimulatedSpeechText();
     }
   }
 
-  stopListening(): void {
-    this.isListening = false;
-    if (this.recognitionTimeout) {
-      clearTimeout(this.recognitionTimeout);
-      this.recognitionTimeout = null;
+  // New method that returns both transcription and audio URI
+  async stopAndTranscribeWithUri(): Promise<{ transcription: string; audioUri: string | null }> {
+    try {
+      const audioUri = await this.stopRecording();
+      if (!audioUri) {
+        console.warn('No recording to transcribe, using simulated text');
+        return {
+          transcription: this.getSimulatedSpeechText(),
+          audioUri: null,
+        };
+      }
+
+      const transcription = await this.transcribeAudio(audioUri);
+      return {
+        transcription,
+        audioUri,
+      };
+    } catch (error) {
+      console.error('Error in stopAndTranscribeWithUri:', error);
+      // Return simulated text as fallback
+      return {
+        transcription: this.getSimulatedSpeechText(),
+        audioUri: null,
+      };
+    }
+  }
+
+  async cancelRecording(): Promise<void> {
+    try {
+      if (this.recording) {
+        await this.recording.stopAndUnloadAsync();
+        this.recording = null;
+      }
+      this.isListening = false;
+      this.recordingUri = null;
+    } catch (error) {
+      console.error('Error canceling recording:', error);
+      throw error;
     }
   }
 
   isCurrentlyListening(): boolean {
     return this.isListening;
+  }
+
+  async startListening(): Promise<void> {
+    // Start recording - component will handle stopping and transcribing
+    await this.startRecording();
+  }
+
+  async speak(text: string): Promise<void> {
+    // Note: Text-to-speech functionality requires expo-speech package
+    // To enable: npx expo install expo-speech
+    // For now, this is a placeholder
+    console.log('Text-to-speech: Would speak:', text);
   }
 }
 

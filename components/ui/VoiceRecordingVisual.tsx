@@ -7,9 +7,15 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 interface VoiceRecordingVisualProps {
   onSend: () => void;
+  onCancel?: () => void;
+  isTranscribing?: boolean;
 }
 
-const VoiceRecordingVisual: React.FC<VoiceRecordingVisualProps> = ({ onSend }) => {
+const VoiceRecordingVisual: React.FC<VoiceRecordingVisualProps> = ({ 
+  onSend, 
+  onCancel,
+  isTranscribing = false 
+}) => {
   const [isPaused, setIsPaused] = useState(false);
 
   // Create animated values right away (one for each bar)
@@ -41,62 +47,91 @@ const VoiceRecordingVisual: React.FC<VoiceRecordingVisualProps> = ({ onSend }) =
     });
   };
 
-  // Start animations on mount
+  // Start animations on mount (only if not transcribing)
   useEffect(() => {
-    animationLoops.current = buildAnimations();
-    animationLoops.current.forEach(loop => loop.start());
-
-    return () => animationLoops.current.forEach(loop => loop.stop());
-  }, []);
-
-  // Play/Pause logic
-  const handlePlayPause = () => {
-    console.log('Clicked. isPaused =', isPaused);
-    if (isPaused) {
-      console.log('Resuming...');
-      // rebuild and restart animations
+    if (!isTranscribing) {
       animationLoops.current = buildAnimations();
       animationLoops.current.forEach(loop => loop.start());
-      setIsPaused(false);
     } else {
-      console.log('Pausing...');
-      // stop animations
+      // Stop animations when transcribing
       animationLoops.current.forEach(loop => loop.stop());
-      setIsPaused(true);
+    }
+
+    return () => animationLoops.current.forEach(loop => loop.stop());
+  }, [isTranscribing]);
+
+  // Play/Pause logic - now used as cancel button
+  const handlePlayPause = () => {
+    if (isTranscribing) {
+      // If transcribing, do nothing (or show cancel)
+      return;
+    }
+    
+    if (onCancel) {
+      onCancel();
+    } else {
+      // Fallback behavior
+      console.log('Clicked. isPaused =', isPaused);
+      if (isPaused) {
+        console.log('Resuming...');
+        // rebuild and restart animations
+        animationLoops.current = buildAnimations();
+        animationLoops.current.forEach(loop => loop.start());
+        setIsPaused(false);
+      } else {
+        console.log('Pausing...');
+        // stop animations
+        animationLoops.current.forEach(loop => loop.stop());
+        setIsPaused(true);
+      }
     }
   };
 
   return (
     <View style={styles.container}>
-       {/* Play/Pause Button */}
-       <Pressable style={styles.controlButton} onPress={handlePlayPause}>
-         {isPaused ? (
+       {/* Cancel/Control Button */}
+       <Pressable 
+         style={styles.controlButton} 
+         onPress={handlePlayPause}
+         disabled={isTranscribing}
+       >
+         {isTranscribing ? (
+           <Ionicons name="close" size={16} color="#000" />
+         ) : isPaused ? (
            <Ionicons name="play" size={16} color="#000" />
          ) : (
            <View style={styles.stopIcon} />
          )}
        </Pressable>
 
-      {/* Animated Bars */}
+      {/* Animated Bars or Transcribing Text */}
       <View style={styles.barsContainer}>
-        {animationRefs.current.map((anim, i) => (
-          <Animated.View
-            key={i}
-            style={[
-              styles.bar,
-              {
-                height: anim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [4, 50],
-                }),
-              },
-            ]}
-          />
-        ))}
+        {isTranscribing ? (
+          <Ionicons name="hourglass-outline" size={24} color={Globals.colors.primaryButton} />
+        ) : (
+          animationRefs.current.map((anim, i) => (
+            <Animated.View
+              key={i}
+              style={[
+                styles.bar,
+                {
+                  height: anim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [4, 50],
+                  }),
+                },
+              ]}
+            />
+          ))
+        )}
       </View>
 
       {/* Send Button */}
-      <Pressable style={styles.sendButton} onPress={onSend}>
+      <Pressable 
+        style={[styles.sendButton, isTranscribing && styles.sendButtonDisabled]} 
+        onPress={onSend}
+        disabled={isTranscribing}
+      >
         <Ionicons name="arrow-up" size={16} color="#000" />
       </Pressable>
     </View>
@@ -158,6 +193,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: screenWidth * 0.03, // 3% of screen width
+  },
+  sendButtonDisabled: {
+    opacity: 0.5,
   },
 });
 

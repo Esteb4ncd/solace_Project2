@@ -1,6 +1,10 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+<<<<<<< HEAD
 import { Animated, StyleSheet, Text, View } from "react-native";
+=======
+import { Animated, Platform, StyleSheet, Text, View } from "react-native";
+>>>>>>> origin/VideosAPI
 import Svg, { Circle, Defs, RadialGradient, Stop } from "react-native-svg";
 import BackButton from "../../components/ui/BackButton";
 import ExercisePage from "../../components/ui/ExercisePage";
@@ -554,8 +558,13 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
+<<<<<<< HEAD
     top: 55,
     left: 25.5,
+=======
+    top: Platform.OS === 'web' ? 30 : 60,
+    left: 20,
+>>>>>>> origin/VideosAPI
     zIndex: 10,
   },
   completionContainer: {

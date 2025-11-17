@@ -22,7 +22,11 @@ export interface OnboardingData {
 }
 
 class ApiService {
-  private baseUrl = 'https://api.solace-app.com'; // Replace with actual API endpoint
+  // API base URL configuration
+  // In development, always use localhost server (which proxies Google Drive)
+  // In production, use your production API URL
+  private baseUrl = process.env.EXPO_PUBLIC_API_URL 
+    || (__DEV__ ? 'http://localhost:3001' : 'https://api.solace-app.com');
   
   // Simulate API calls for now - replace with actual implementations
   async submitUserResponse(response: UserResponse): Promise<void> {
@@ -130,6 +134,41 @@ class ApiService {
       console.error('Error saving onboarding data:', error);
       throw error;
     }
+  }
+
+  /**
+   * Get video URL for an exercise video
+   * Always uses the local Express server (which proxies from Google Drive if needed)
+   * @param videoFileName - The filename of the video (e.g., "HandWarmUp.mov")
+   * @returns The full API URL for the video
+   */
+  getVideoUrl(videoFileName: string): string {
+    // Always use the local server (which handles Google Drive proxying)
+    const apiKey = process.env.EXPO_PUBLIC_API_KEY || '';
+    const baseUrl = `${this.baseUrl}/videos/${encodeURIComponent(videoFileName)}`;
+    
+    if (apiKey) {
+      return `${baseUrl}?apiKey=${encodeURIComponent(apiKey)}`;
+    }
+    
+    return baseUrl;
+  }
+
+  /**
+   * Get headers for authenticated API requests
+   * @returns Headers object with API key
+   */
+  getAuthHeaders(): HeadersInit {
+    const apiKey = process.env.EXPO_PUBLIC_API_KEY || '';
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (apiKey) {
+      headers['x-api-key'] = apiKey;
+    }
+    
+    return headers;
   }
 }
 
