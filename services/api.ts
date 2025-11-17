@@ -22,10 +22,12 @@ export interface OnboardingData {
 }
 
 class ApiService {
-  // Use localhost for development, production URL for deployed app
-  private baseUrl = __DEV__ 
-    ? 'http://localhost:3001' // Local development server
-    : 'https://api.solace-app.com'; // Production API endpoint
+  // API base URL configuration
+  // For production: Set this to your production API URL
+  // For local development: Set to 'http://localhost:3001' if running local server
+  // You can also use environment variables: process.env.EXPO_PUBLIC_API_URL
+  private baseUrl = process.env.EXPO_PUBLIC_API_URL 
+    || (__DEV__ ? 'http://localhost:3001' : 'https://api.solace-app.com');
   
   // Simulate API calls for now - replace with actual implementations
   async submitUserResponse(response: UserResponse): Promise<void> {

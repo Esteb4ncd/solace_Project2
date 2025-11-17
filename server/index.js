@@ -28,30 +28,48 @@ try {
 
 // Validate all videos exist on startup
 function validateVideos() {
-  const availableVideos = fs.readdirSync(VIDEOS_DIR).filter(file => 
-    file.endsWith('.mov') || file.endsWith('.mp4') || file.endsWith('.m4v')
-  );
-  
-  const missingVideos = requiredVideos.filter(video => !availableVideos.includes(video));
-  const extraVideos = availableVideos.filter(video => !requiredVideos.includes(video));
-  
-  console.log('\n📹 Video Validation:');
-  console.log(`   ✅ Found ${availableVideos.length} video(s) in directory`);
-  console.log(`   📋 Required: ${requiredVideos.length} video(s) from exercises.json`);
-  
-  if (missingVideos.length > 0) {
-    console.log(`   ⚠️  Missing videos: ${missingVideos.join(', ')}`);
+  try {
+    // Check if videos directory exists
+    if (!fs.existsSync(VIDEOS_DIR)) {
+      console.log('\n📹 Video Validation:');
+      console.log(`   ⚠️  Videos directory does not exist: ${VIDEOS_DIR}`);
+      console.log(`   ℹ️  Videos should be hosted on your production API server`);
+      return { availableVideos: [], missingVideos: requiredVideos, extraVideos: [] };
+    }
+
+    const availableVideos = fs.readdirSync(VIDEOS_DIR).filter(file => 
+      file.endsWith('.mov') || file.endsWith('.mp4') || file.endsWith('.m4v')
+    );
+    
+    const missingVideos = requiredVideos.filter(video => !availableVideos.includes(video));
+    const extraVideos = availableVideos.filter(video => !requiredVideos.includes(video));
+    
+    console.log('\n📹 Video Validation:');
+    console.log(`   ✅ Found ${availableVideos.length} video(s) in directory`);
+    console.log(`   📋 Required: ${requiredVideos.length} video(s) from exercises.json`);
+    
+    if (missingVideos.length > 0) {
+      console.log(`   ⚠️  Missing videos: ${missingVideos.join(', ')}`);
+      console.log(`   ℹ️  These videos should be hosted on your production API server`);
+    }
+    
+    if (extraVideos.length > 0) {
+      console.log(`   ℹ️  Extra videos (not in exercises.json): ${extraVideos.join(', ')}`);
+    }
+    
+    if (missingVideos.length === 0 && requiredVideos.length > 0) {
+      console.log('   ✅ All required videos are available!\n');
+    } else if (availableVideos.length === 0) {
+      console.log('   ℹ️  No videos found locally - using production API\n');
+    }
+    
+    return { availableVideos, missingVideos, extraVideos };
+  } catch (error) {
+    console.log('\n📹 Video Validation:');
+    console.log(`   ⚠️  Error reading videos directory: ${error.message}`);
+    console.log(`   ℹ️  Videos should be hosted on your production API server`);
+    return { availableVideos: [], missingVideos: requiredVideos, extraVideos: [] };
   }
-  
-  if (extraVideos.length > 0) {
-    console.log(`   ℹ️  Extra videos (not in exercises.json): ${extraVideos.join(', ')}`);
-  }
-  
-  if (missingVideos.length === 0 && requiredVideos.length > 0) {
-    console.log('   ✅ All required videos are available!\n');
-  }
-  
-  return { availableVideos, missingVideos, extraVideos };
 }
 
 // Health check endpoint
@@ -72,6 +90,18 @@ app.get('/health', (req, res) => {
 // List all available videos with metadata
 app.get('/videos', (req, res) => {
   try {
+    // Check if videos directory exists
+    if (!fs.existsSync(VIDEOS_DIR)) {
+      return res.json({ 
+        videos: [],
+        videosWithMetadata: [],
+        total: 0,
+        required: requiredVideos.length,
+        missing: requiredVideos,
+        message: 'Videos directory not found. Videos should be hosted on production API server.'
+      });
+    }
+
     const files = fs.readdirSync(VIDEOS_DIR);
     const videoFiles = files.filter(file => 
       file.endsWith('.mov') || file.endsWith('.mp4') || file.endsWith('.m4v')
@@ -101,13 +131,26 @@ app.get('/videos', (req, res) => {
     });
   } catch (error) {
     console.error('Error reading videos directory:', error);
-    res.status(500).json({ error: 'Failed to list videos' });
+    res.status(500).json({ 
+      error: 'Failed to list videos',
+      message: error.message 
+    });
   }
 });
 
 // Serve individual video files
 app.get('/videos/:filename', (req, res) => {
   const filename = req.params.filename;
+  
+  // Check if videos directory exists
+  if (!fs.existsSync(VIDEOS_DIR)) {
+    return res.status(503).json({ 
+      error: 'Videos directory not found',
+      message: 'Videos are not available locally. Please use production API server.',
+      filename 
+    });
+  }
+
   const filePath = path.join(VIDEOS_DIR, filename);
 
   // Security: prevent directory traversal
@@ -117,7 +160,11 @@ app.get('/videos/:filename', (req, res) => {
 
   // Check if file exists
   if (!fs.existsSync(filePath)) {
-    return res.status(404).json({ error: 'Video not found', filename });
+    return res.status(404).json({ 
+      error: 'Video not found', 
+      filename,
+      message: 'Video file not found locally. Please use production API server.'
+    });
   }
 
   // Get file stats

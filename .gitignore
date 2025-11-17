@@ -36,6 +36,7 @@ yarn-error.*
 # local env files
 .env
 .env*.local
+# Note: .env.example should be committed (it's a template)
 
 # typescript
 *.tsbuildinfo

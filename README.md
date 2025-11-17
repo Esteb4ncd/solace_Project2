@@ -46,48 +46,62 @@ To learn more about developing your project with Expo, look at the following res
 - [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
 - [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
 
-## Video API Server
+## Video API Configuration
 
-Exercise videos are served via a local Express API server. Videos are **not** stored in this repository (they're too large for git).
+Exercise videos are served from a production API server. **No local video files are required** - the app fetches videos from your API.
 
-### Running the Video API Server
+### Production Setup (Required)
 
-1. **Install dependencies** (if you haven't already):
+1. **Host your videos on a production server**:
+   - Upload all video files to your production API server
+   - Ensure videos are accessible at: `https://your-api.com/videos/{filename}`
+   - Example: `https://api.solace-app.com/videos/HandWarmUp.mov`
+
+2. **Configure the API URL**:
+   - Create a `.env` file (copy from `.env.example`)
+   - Set `EXPO_PUBLIC_API_URL=https://your-api.com`
+   - Or update `services/api.ts` directly with your production URL
+
+3. **Deploy and run**:
    ```bash
    npm install
-   ```
-
-2. **Start the video API server**:
-   ```bash
-   npm run server
-   ```
-   
-   The server will run on `http://localhost:3001`
-
-3. **Start both the API server and Expo app** (in separate terminals):
-   ```bash
-   # Terminal 1: Start API server
-   npm run server
-   
-   # Terminal 2: Start Expo app
    npm start
    ```
+   The app will automatically fetch videos from your production API.
 
-### API Endpoints
+### Local Development (Optional)
 
-- `GET /health` - Health check endpoint
-- `GET /videos` - List all available videos
-- `GET /videos/:filename` - Stream a specific video file
+If you want to test with local videos:
 
-### Video Files Location
-- Local development: Videos are stored in `assets/videos/` (ignored by git)
-- The API server automatically serves videos from this directory
-- Production: Update `services/api.ts` to point to your production API URL
+1. **Place videos in `assets/videos/`** (not in git)
+2. **Start the local API server**:
+   ```bash
+   npm run server
+   ```
+3. **Set local API URL** in `.env`:
+   ```
+   EXPO_PUBLIC_API_URL=http://localhost:3001
+   ```
+
+### API Endpoints Required
+
+Your production API must provide:
+- `GET /videos/:filename` - Stream video files
+- Example: `GET https://api.solace-app.com/videos/HandWarmUp.mov`
+
+### Video Hosting Options
+
+You can host videos on:
+- **Your own server** (Node.js/Express like `server/index.js`)
+- **Cloud storage** (AWS S3, Google Cloud Storage, Azure Blob)
+- **CDN** (Cloudflare, CloudFront)
+- **Static hosting** (Vercel, Netlify with proper video support)
 
 ### Configuration
-- The API server runs on port `3001` by default
-- You can change the port by setting the `PORT` environment variable
-- The app automatically uses `http://localhost:3001` in development mode
+
+- **Environment Variable**: `EXPO_PUBLIC_API_URL` (recommended)
+- **Fallback**: Uses `http://localhost:3001` in development, `https://api.solace-app.com` in production
+- **Override**: Edit `services/api.ts` if needed
 
 ### Video Files
 The following video files are required (currently stored locally but should be hosted on your API):
