@@ -113,6 +113,7 @@ const PagesMenu = ({ hideOnTutorial = false }) => {
   };
 
   const menuItems = [
+    { name: 'accountSettingsPage', title: 'Account Settings', icon: 'settings-outline' },
     { name: 'breathingExercisePage', title: 'Breathing Exercise Page', icon: 'leaf-outline' },
     { name: 'skipBreathing', title: 'Skip Breathing Exercise', icon: 'fast-forward', isSkip: true },
     { name: 'startPhysicalFlow', title: 'Start Physical Exercise Flow', icon: 'play-circle', isPhysicalFlow: true },

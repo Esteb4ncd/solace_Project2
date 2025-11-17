@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 25,
     overflow: 'hidden',
-    backgroundColor: '#D3D0F3',
+    backgroundColor: '#B0A9F8',
     
   },
   LeftArrow: {
