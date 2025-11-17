@@ -11,6 +11,7 @@ import {
     View,
 } from "react-native";
 import LargeButton from "../../components/ui/LargeButton";
+import { saveUsername } from "../../services/userStorage";
 
 function LoginSignInPage() {
   const [form, setForm] = useState({
@@ -61,8 +62,16 @@ function LoginSignInPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateForm()) {
+      // Save username if signing up (not logging in)
+      if (!isLogin && form.username.trim()) {
+        try {
+          await saveUsername(form.username.trim());
+        } catch (error) {
+          console.error('Error saving username:', error);
+        }
+      }
       // Navigate to tutorial after successful form validation
       router.push('/(tabs)/tutorial');
     }
