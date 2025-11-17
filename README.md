@@ -1,12 +1,67 @@
 # UI Library
 https://react-native-aria.geekyants.com/docs/?utm_
 
-
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Get started
+## 🚀 Quick Start for New Developers
+
+**Just run:**
+```bash
+npm install
+npm run dev
+```
+
+**That's it!** This automatically starts:
+- ✅ Express server on `http://localhost:3001` (proxies videos from Google Drive)
+- ✅ Expo app
+- ✅ Videos work automatically - no separate server command needed!
+
+**You do NOT need to run `npm run server` separately** - `npm run dev` does it all!
+
+### Quick Setup (Using Production API)
+
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+2. **Configure API**:
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your API URL and key
+   ```
+
+3. **Start the app**:
+   ```bash
+   npm start
+   ```
+
+### Quick Setup (Using Local Server)
+
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+2. **Install videos**:
+   ```bash
+   npm run install-videos
+   ```
+   (Or manually get videos and place in `assets/videos/`)
+
+3. **Configure and start**:
+   ```bash
+   cp .env.example .env
+   # Edit .env: EXPO_PUBLIC_API_URL=http://localhost:3001
+   # Set API_KEY environment variable
+   export API_KEY=your-secret-key
+   npm run server  # Terminal 1
+   npm start       # Terminal 2
+   ```
+
+## Get started (Original Instructions)
 
 1. Install dependencies
 

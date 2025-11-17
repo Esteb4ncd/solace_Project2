@@ -17,12 +17,18 @@ This Express server serves exercise videos for the Solace app. **Deploy this to 
    # Set port (optional, defaults to 3001)
    export PORT=3001
    
+   # Set a secure API key (REQUIRED - change this!)
+   export API_KEY=your-super-secret-api-key-12345
+   
    # Start server (use PM2, systemd, or your hosting service)
    node server/index.js
    ```
+   
+   **Important**: Always set a strong, unique `API_KEY`. Never use the default!
 
 3. **Update app configuration**:
    - Set `EXPO_PUBLIC_API_URL=https://your-server.com` in `.env`
+   - Set `EXPO_PUBLIC_API_KEY=your-super-secret-api-key-12345` in `.env` (must match server's API_KEY)
    - Or update `services/api.ts` with your production URL
 
 ## Running Locally (Development)
@@ -68,6 +74,21 @@ Instead of serving from this server, you can:
 ## Environment Variables
 
 - `PORT` - Server port (default: 3001)
+- `API_KEY` - Secret API key for authentication (REQUIRED - change the default!)
+
+## Authentication
+
+The server uses API key authentication to protect videos:
+
+- **Header method** (recommended): Include `x-api-key: your-key` in request headers
+- **Query param method**: Add `?apiKey=your-key` to the URL
+
+**Security Notes**:
+- Always use a strong, unique API key
+- Never commit API keys to git
+- Use environment variables for API keys
+- Consider using HTTPS in production
+- The `/health` endpoint is public (no auth), but `/health/status` requires auth
 
 ## Notes
 
@@ -75,4 +96,5 @@ Instead of serving from this server, you can:
 - Supports HTTP range requests for video streaming
 - CORS enabled for React Native apps
 - Validates videos on startup
+- **Videos are protected** - only requests with valid API key can access them
 

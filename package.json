@@ -6,6 +6,7 @@
     "start": "expo start",
     "server": "node server/index.js",
     "dev": "concurrently \"npm run server\" \"npm start\"",
+    "postinstall": "echo '💡 Run \"npm run dev\" to start both server and app together'",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
@@ -54,6 +55,7 @@
   "devDependencies": {
     "@types/react": "~19.1.0",
     "@types/react-native": "^0.72.8",
+    "concurrently": "^8.2.2",
     "dotenv": "^17.2.3",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
