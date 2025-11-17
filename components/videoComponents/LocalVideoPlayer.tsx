@@ -15,6 +15,7 @@ import LargeButton from '../ui/LargeButton';
 interface LocalVideoPlayerProps {
   videoSource: any; // require() or { uri: string }
   videoTitle?: string;
+  instructions?: string; // Instructions/caption to show during video
   onBack?: () => void;
   onEnd?: () => void;
   onError?: (error: any) => void;
@@ -25,6 +26,7 @@ interface LocalVideoPlayerProps {
 export default function LocalVideoPlayer({ 
   videoSource, 
   videoTitle = "Hand Warm Up",
+  instructions = "",
   onBack,
   onEnd,
   onError,
@@ -171,9 +173,9 @@ export default function LocalVideoPlayer({
       </View>
 
       {/* Caption - Show when playing */}
-      {isPlaying && (
+      {isPlaying && instructions && (
         <View style={styles.captionContainer}>
-          <Text style={styles.captionText}>Move your hands in a circular motion</Text>
+          <Text style={styles.captionText}>{instructions}</Text>
         </View>
       )}
 

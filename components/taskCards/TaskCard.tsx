@@ -1,5 +1,6 @@
 import CompletedTask from '@/components/ui/CompletedTask';
 import { useExerciseContext } from '@/contexts/ExerciseContext';
+import { getExerciseById, getExerciseXpReward } from '@/constants/exercises';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -24,63 +25,51 @@ const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDai
   const handleTaskPress = (taskId: string) => {
     console.log('Task pressed:', taskId, 'isDaily:', isDaily);
     
-    // Get exercise details based on taskId
-    const getExerciseDetails = (id: string) => {
-      switch (id) {
-        case '1': // Hand Warm Up
-          return {
-            name: 'Hand Warm Up',
-            xpReward: '10',
-            duration: '10 seconds'
-          };
-        case '2': // Shoulder Relief
-          return {
-            name: 'Shoulder Relief',
-            xpReward: '15',
-            duration: '3 minutes'
-          };
-        case '3': // Joint Relief
-          return {
-            name: 'Joint Relief',
-            xpReward: '20',
-            duration: '5 minutes'
-          };
-        case '4': // Stress Relief
-          return {
-            name: 'Stress Relief',
-            xpReward: '5',
-            duration: '2 minutes'
-          };
-        case '5': // Sleep Help
-          return {
-            name: 'Sleep Help',
-            xpReward: '5',
-            duration: '2 minutes'
-          };
-        case '6': // Anxiety Release
-          return {
-            name: 'Anxiety Release',
-            xpReward: '5',
-            duration: '2 minutes'
-          };
-        default:
-          return {
-            name: 'Exercise',
-            xpReward: '10',
-            duration: '2 minutes'
-          };
-      }
-    };
+    // Find the task from the tasks array
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) {
+      console.warn(`Task not found for ID: ${taskId}`);
+      return;
+    }
+    
+    // Get exercise from exercises.json database
+    const exercise = getExerciseById(taskId);
+    
+    if (!exercise) {
+      console.warn(`Exercise not found for ID: ${taskId} - using task data`);
+      // Fallback for non-exercise tasks (like mental health exercises)
+      router.push({
+        pathname: '/exerciseConfirmation',
+        params: { 
+          exerciseId: taskId,
+          exerciseName: task.title,
+          xpReward: String(task.xpAmount),
+          duration: '2 minutes'
+        }
+      });
+      return;
+    }
 
-    const exerciseDetails = getExerciseDetails(taskId);
-    console.log('Exercise details:', exerciseDetails);
+    // Determine if this is a recommended exercise (worth 10 XP) or secondary (5 XP)
+    // Check if task XP matches recommended reward
+    const isRecommended = task.xpAmount >= exercise.recommendedXpReward;
+    const xpReward = getExerciseXpReward(exercise, isRecommended);
+
+    console.log('Exercise details from database:', {
+      id: exercise.id,
+      name: exercise.name,
+      duration: exercise.duration,
+      xpReward,
+      isRecommended
+    });
 
     router.push({
       pathname: '/exerciseConfirmation',
       params: { 
-        exerciseName: exerciseDetails.name,
-        xpReward: exerciseDetails.xpReward,
-        duration: exerciseDetails.duration
+        exerciseId: exercise.id,
+        exerciseName: exercise.name,
+        xpReward: String(xpReward),
+        duration: exercise.duration
       }
     });
   };

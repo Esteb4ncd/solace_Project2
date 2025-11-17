@@ -22,7 +22,10 @@ export interface OnboardingData {
 }
 
 class ApiService {
-  private baseUrl = 'https://api.solace-app.com'; // Replace with actual API endpoint
+  // Use localhost for development, production URL for deployed app
+  private baseUrl = __DEV__ 
+    ? 'http://localhost:3001' // Local development server
+    : 'https://api.solace-app.com'; // Production API endpoint
   
   // Simulate API calls for now - replace with actual implementations
   async submitUserResponse(response: UserResponse): Promise<void> {
@@ -130,6 +133,18 @@ class ApiService {
       console.error('Error saving onboarding data:', error);
       throw error;
     }
+  }
+
+  /**
+   * Get video URL for an exercise video
+   * @param videoFileName - The filename of the video (e.g., "HandWarmUp.mov")
+   * @returns The full API URL for the video
+   */
+  getVideoUrl(videoFileName: string): string {
+    // Construct the video URL from the API base URL
+    // In production, this would be: `${this.baseUrl}/videos/${videoFileName}`
+    // For now, using a placeholder that you can replace with your actual video API endpoint
+    return `${this.baseUrl}/videos/${encodeURIComponent(videoFileName)}`;
   }
 }
 

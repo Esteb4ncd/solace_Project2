@@ -1,17 +1,43 @@
 import LocalVideoPlayer from '@/components/videoComponents/LocalVideoPlayer';
 import { useExerciseContext } from '@/contexts/ExerciseContext';
+import { getExerciseById, getExerciseVideoSource } from '@/constants/exercises';
 import { router, useLocalSearchParams } from 'expo-router';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 const VideoPlayerScreen = () => {
-  const { videoId, type } = useLocalSearchParams<{ videoId: string; type: string }>();
+  const { exerciseId, exerciseName, xpReward } = useLocalSearchParams<{ 
+    exerciseId: string; 
+    exerciseName: string;
+    xpReward: string;
+  }>();
   const { videoResetTrigger } = useExerciseContext();
 
-  console.log('VideoPlayerScreen loaded with:', { videoId, type });
+  console.log('VideoPlayerScreen loaded with:', { exerciseId, exerciseName, xpReward });
 
-  // Use the local HandWarmUp.mp4 file
-  const videoSource = require('@/assets/videos/HandWarmUp.mp4');
+  // Get exercise data and video source from API
+  const exercise = useMemo(() => {
+    if (exerciseId) {
+      return getExerciseById(exerciseId);
+    }
+    // Fallback to first exercise if no ID provided
+    return getExerciseById('1');
+  }, [exerciseId]);
+
+  const videoSource = useMemo(() => {
+    if (exercise) {
+      return getExerciseVideoSource(exercise);
+    }
+    // Fallback
+    const fallbackExercise = getExerciseById('1');
+    return fallbackExercise ? getExerciseVideoSource(fallbackExercise) : { uri: '' };
+  }, [exercise]);
+
+  // Always use exercise data from database if available (source of truth)
+  const displayName = exercise?.name || exerciseName || 'Hand Warm Up';
+  const xpAmount = exercise 
+    ? String(exercise.recommendedXpReward) 
+    : (xpReward || '10');
 
   const handleBack = () => {
     console.log('Back button pressed');
@@ -31,18 +57,22 @@ const VideoPlayerScreen = () => {
     router.push({
       pathname: '/xpGain',
       params: { 
-        xpAmount: '10',
-        exerciseId: '1',
-        exerciseName: 'Hand Warm Up'
+        xpAmount: xpAmount,
+        exerciseId: exerciseId || exercise?.id || '1',
+        exerciseName: displayName
       }
     });
   };
+
+  // Get instructions from exercise if available
+  const instructions = exercise?.instructions || '';
 
   return (
     <View style={styles.container}>
       <LocalVideoPlayer 
         videoSource={videoSource}
-        videoTitle="Hand Warm Up"
+        videoTitle={displayName}
+        instructions={instructions}
         onBack={handleBack}
         onEnd={handleVideoEnd}
         onError={handleVideoError}

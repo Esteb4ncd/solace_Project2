@@ -5,11 +5,11 @@
  * helper functions for searching, filtering, and accessing exercises.
  * 
  * The JSON file contains the exercise metadata, while this TypeScript file
- * handles the video file mapping (since require() statements can't be in JSON)
- * and provides type-safe helper functions.
+ * handles the video file mapping using API URLs instead of local require() paths.
  */
 
 import exercisesData from './exercises.json';
+import { apiService } from '@/services/api';
 
 export interface Exercise {
   id: string;
@@ -44,20 +44,6 @@ export interface Exercise {
 export const EXERCISES_DATABASE: Exercise[] = exercisesData as Exercise[];
 
 /**
- * Video file mapping
- * Maps video filenames to their require() paths for React Native bundler
- * 
- * NOTE: When you add new videos, you MUST add them to this map
- */
-const VIDEO_MAP: { [key: string]: any } = {
-  'HandWarmUp.mp4': require('@/assets/videos/HandWarmUp.mp4'),
-  // TODO: Add mappings for your remaining 10 videos here:
-  // 'ShoulderWarmUp.mp4': require('@/assets/videos/ShoulderWarmUp.mp4'),
-  // 'UpperBackStretch.mp4': require('@/assets/videos/UpperBackStretch.mp4'),
-  // ... etc for all 11 videos
-};
-
-/**
  * Recommended Exercise with assignment status
  * Used to track whether an exercise was AI-recommended (assigned) or secondary
  */
@@ -84,18 +70,21 @@ export const getExerciseXpReward = (exercise: Exercise, isRecommended: boolean):
 };
 
 /**
- * Get video source path for an exercise
- * Returns the require() path for the video file
+ * Get video source URL for an exercise
+ * Returns the API URL for the video file as { uri: string } format
+ * This format is compatible with expo-av Video component
  */
-export const getExerciseVideoSource = (exercise: Exercise): any => {
-  const videoSource = VIDEO_MAP[exercise.videoFileName];
+export const getExerciseVideoSource = (exercise: Exercise): { uri: string } => {
+  const videoUrl = apiService.getVideoUrl(exercise.videoFileName);
   
-  if (!videoSource) {
-    console.warn(`Video file not found: ${exercise.videoFileName}. Using fallback.`);
-    return VIDEO_MAP['HandWarmUp.mp4']; // Fallback to first video
+  if (!videoUrl) {
+    console.warn(`Video URL not found for: ${exercise.videoFileName}. Using fallback.`);
+    // Fallback to first exercise's video
+    const fallbackExercise = EXERCISES_DATABASE[0];
+    return { uri: apiService.getVideoUrl(fallbackExercise.videoFileName) };
   }
   
-  return videoSource;
+  return { uri: videoUrl };
 };
 
 /**

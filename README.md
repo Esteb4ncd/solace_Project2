@@ -46,6 +46,62 @@ To learn more about developing your project with Expo, look at the following res
 - [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
 - [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
 
+## Video API Server
+
+Exercise videos are served via a local Express API server. Videos are **not** stored in this repository (they're too large for git).
+
+### Running the Video API Server
+
+1. **Install dependencies** (if you haven't already):
+   ```bash
+   npm install
+   ```
+
+2. **Start the video API server**:
+   ```bash
+   npm run server
+   ```
+   
+   The server will run on `http://localhost:3001`
+
+3. **Start both the API server and Expo app** (in separate terminals):
+   ```bash
+   # Terminal 1: Start API server
+   npm run server
+   
+   # Terminal 2: Start Expo app
+   npm start
+   ```
+
+### API Endpoints
+
+- `GET /health` - Health check endpoint
+- `GET /videos` - List all available videos
+- `GET /videos/:filename` - Stream a specific video file
+
+### Video Files Location
+- Local development: Videos are stored in `assets/videos/` (ignored by git)
+- The API server automatically serves videos from this directory
+- Production: Update `services/api.ts` to point to your production API URL
+
+### Configuration
+- The API server runs on port `3001` by default
+- You can change the port by setting the `PORT` environment variable
+- The app automatically uses `http://localhost:3001` in development mode
+
+### Video Files
+The following video files are required (currently stored locally but should be hosted on your API):
+- HandWarmUp.mov
+- BumperStretch.mov
+- HamstringStretch.mov
+- HipFlexorStretch.mov
+- ChestStretch.mov
+- LowerBackMuscleRelease.mov
+- ResetSpineStretch.mov
+- WarmUpSpineStretch.mov
+- ShoulderWarmUp.mov
+- UpperBackStretch.mov
+
 ## Join the community
 
 Join our community of developers creating universal apps.
