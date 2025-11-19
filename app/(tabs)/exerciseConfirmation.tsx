@@ -19,10 +19,19 @@ const ExerciseConfirmationScreen = () => {
     return null;
   }, [exerciseId]);
 
-  // Use exercise data from database if available, otherwise use params
+  // Always use exercise data from database (exercises.json) as source of truth
   const displayName = exercise?.name || exerciseName || 'Exercise';
   const displayXpReward = exercise ? String(exercise.recommendedXpReward) : xpReward || '10';
+  // Always prioritize duration from exercises.json - it's the source of truth
+  // Only use params duration if exercise is not found in JSON
   const displayDuration = exercise?.duration || duration || '2 minutes';
+  
+  // Log to verify we're using the correct duration from JSON
+  if (exercise) {
+    console.log(`📋 Exercise confirmation: ${exercise.name} - Duration from JSON: ${exercise.duration}`);
+  } else if (duration) {
+    console.log(`⚠️  Exercise not found in JSON, using duration from params: ${duration}`);
+  }
 
   const handleStart = () => {
     console.log('Start button pressed for:', displayName);
