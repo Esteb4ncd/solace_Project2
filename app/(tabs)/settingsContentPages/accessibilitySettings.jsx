@@ -81,7 +81,7 @@ export default function AccessibilitySettingsContent({
             style={[
               styles.fontButton,
               fontSizeIndex === 0 && styles.disabledButton,
-              { backgroundColor: darkMode ? "#7267D9" : "#EAE8F9" },
+              { backgroundColor: darkMode ? "#7267D9" : "#B0A9F8" },
             ]}
             onPress={decreaseFontSize}
             disabled={fontSizeIndex === 0}
@@ -105,7 +105,7 @@ export default function AccessibilitySettingsContent({
             style={[
               styles.fontButton,
               fontSizeIndex === fontSizes.length - 1 && styles.disabledButton,
-              { backgroundColor: darkMode ? "#7267D9" : "#EAE8F9" },
+              { backgroundColor: darkMode ? "#7267D9" : "#B0A9F8" },
             ]}
             onPress={increaseFontSize}
             disabled={fontSizeIndex === fontSizes.length - 1}
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#EAE8F9",
+    backgroundColor: "#B0A9F8",
     alignItems: "center",
     justifyContent: "center",
   },

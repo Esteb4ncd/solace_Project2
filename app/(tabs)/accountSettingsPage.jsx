@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Image, Platform, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import BackButton from "../../components/ui/BackButton";
 import BottomNavigation from "../../components/ui/BottomNavigation";
 import SettingsButton from "../../components/ui/SettingsButton";
@@ -197,10 +197,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backButton: {
-    position: "absolute",
-    top: Platform.OS === 'web' ? 30 : 60,
-    left: 20,
-    zIndex: 10,
+    // keep default positioning so the button sits in the header flow
+    marginRight: 12,
   },
   headerRow: {
     flexDirection: "row",
