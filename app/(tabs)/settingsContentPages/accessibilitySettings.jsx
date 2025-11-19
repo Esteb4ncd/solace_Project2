@@ -35,9 +35,6 @@ export default function AccessibilitySettingsContent({
 
   return (
     <View style={[styles.container, darkMode && styles.containerDark]}>
-      <Text style={styles.description}>
-        Customize accessibility features to improve your app experience.
-      </Text>
 
       {/* Add more accessibility settings content here */}
       <SettingsToggle
