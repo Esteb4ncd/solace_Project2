@@ -44,7 +44,12 @@ const ExerciseConfirmationScreen = () => {
 
   const handleBack = () => {
     console.log('Back button pressed');
-    router.back();
+    // Never allow navigation back to sign in page
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.push('/(tabs)/homePage');
+    }
   };
 
   return (

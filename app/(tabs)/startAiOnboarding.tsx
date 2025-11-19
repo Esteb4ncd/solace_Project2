@@ -1,19 +1,26 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Image, Platform, StyleSheet, View } from 'react-native';
 import BackButton from '../../components/ui/BackButton';
 import LargeButton from '../../components/ui/LargeButton';
 import { Globals } from '../../constants/globals';
+import { aiService } from '@/services/aiService';
 
 export default function StartAIOnboardingScreen() {
+  // Reset AI service when starting onboarding to ensure clean state
+  useEffect(() => {
+    aiService.resetConversation();
+    console.log('✅ AI service reset for new onboarding session');
+  }, []);
+
   const handleStartPress = () => {
     router.push('/(tabs)/aiQuestion1');
   };
 
   const handleBackPress = () => {
-    router.push('/(tabs)/onboardingPreference');
+    router.back();
   };
 
   return (

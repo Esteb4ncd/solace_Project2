@@ -23,62 +23,19 @@ const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDai
   const { isExerciseComplete } = useExerciseContext();
 
   const handleTaskPress = (taskId: string) => {
-    console.log('Task pressed:', taskId, 'isDaily:', isDaily);
+    console.log('Task pressed:', taskId, 'isDaily:', isDaily, 'exerciseType:', exerciseType);
     
-    // Get exercise details based on taskId
-    const getExerciseDetails = (id: string) => {
-      switch (id) {
-        case '1': // Hand Warm Up
-          return {
-            name: 'Hand Warm Up',
-            xpReward: '10',
-            duration: '10 seconds'
-          };
-        case '2': // Shoulder Relief
-          return {
-            name: 'Shoulder Relief',
-            xpReward: '15',
-            duration: '3 minutes'
-          };
-        case '3': // Joint Relief
-          return {
-            name: 'Joint Relief',
-            xpReward: '20',
-            duration: '5 minutes'
-          };
-        case '4': // Stress Relief
-          return {
-            name: 'Stress Relief',
-            xpReward: '5',
-            duration: '2 minutes'
-          };
-        case '5': // Sleep Help
-          return {
-            name: 'Sleep Help',
-            xpReward: '5',
-            duration: '2 minutes'
-          };
-        case '6': // Anxiety Release
-          return {
-            name: 'Anxiety Release',
-            xpReward: '5',
-            duration: '2 minutes'
-          };
-        default:
-          return {
-            name: 'Exercise',
-            xpReward: '10',
-            duration: '2 minutes'
-          };
-      }
-    };
-
-    const exerciseDetails = getExerciseDetails(taskId);
-    console.log('Exercise details:', exerciseDetails);
     // Find the task from the tasks array
     const task = tasks.find(t => t.id === taskId);
     if (!task) {
       console.warn(`Task not found for ID: ${taskId}`);
+      return;
+    }
+    
+    // If this is a mental exercise (relax section), navigate to breathing exercises
+    if (exerciseType === 'mental' && !isDaily) {
+      console.log('Navigating to breathing exercises for mental exercise:', task.title);
+      router.push('/(tabs)/breathingExercisePage');
       return;
     }
     

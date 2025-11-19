@@ -1,15 +1,52 @@
-
 import { useButton } from '@react-native-aria/button';
-import { useNavigation } from '@react-navigation/native';
+import { router, usePathname } from 'expo-router';
 import { useToggleState } from '@react-stately/toggle';
+import { useEffect } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 const BackButton = ({onPress, style}) => {
   const state = useToggleState({});
-  const navigation = useNavigation();
+  const pathname = usePathname();
+  
+  // Intercept navigation to sign in page and redirect to homePage
+  useEffect(() => {
+    if (pathname?.includes('signInPage') || pathname === '/(tabs)' || pathname === '/') {
+      // If we somehow ended up on sign in page, redirect to homePage
+      router.push('/(tabs)/homePage');
+    }
+  }, [pathname]);
+  
+  const handleBack = () => {
+    if (onPress) {
+      onPress();
+    } else {
+      // Never allow navigation back to sign in page
+      // If current path is sign in page, go to homePage
+      if (pathname?.includes('signInPage') || pathname === '/(tabs)' || pathname === '/') {
+        router.push('/(tabs)/homePage');
+        return;
+      }
+      
+      // Check if we can go back
+      if (router.canGoBack()) {
+        router.back();
+        // Use setTimeout to check if we navigated to sign in page and redirect if so
+        setTimeout(() => {
+          const currentPath = router.pathname || pathname;
+          if (currentPath?.includes('signInPage') || currentPath === '/(tabs)' || currentPath === '/') {
+            router.push('/(tabs)/homePage');
+          }
+        }, 100);
+      } else {
+        // If no history, go to homePage instead of defaulting to index (sign in page)
+        router.push('/(tabs)/homePage');
+      }
+    }
+  };
+  
   const {buttonProps} = useButton(
     {
-      onPress: onPress ? onPress : () => navigation.goBack(),
+      onPress: handleBack,
       isDisabled: false
     },
     state,

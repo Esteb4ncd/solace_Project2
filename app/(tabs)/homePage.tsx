@@ -64,6 +64,7 @@ const HomePage = () => {
     Keyboard.dismiss();
   };
 
+
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };

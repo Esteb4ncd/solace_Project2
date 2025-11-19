@@ -1,5 +1,6 @@
 // Real AI service for handling conversations and voice processing
 
+import Constants from 'expo-constants';
 import { Exercise, RecommendedExercise, recommendExercises, getSecondaryExercises } from '@/constants/exercises';
 
 export interface ChatMessage {
@@ -35,7 +36,17 @@ class AIService {
     userPreferences: []
   };
 
-  // Simulate OpenAI API call
+  // Get OpenAI API key from environment
+  private getOpenAIApiKey(): string | undefined {
+    return (
+      Constants.expoConfig?.extra?.openaiApiKey ||
+      Constants.expoConfig?.extra?.EXPO_PUBLIC_OPENAI_API_KEY ||
+      (typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_OPENAI_API_KEY) ||
+      undefined
+    );
+  }
+
+  // Call OpenAI API for chat completion
   async sendMessage(userMessage: string, isVoice: boolean = false): Promise<AIResponse> {
     try {
       // Add user message to conversation
@@ -52,67 +63,190 @@ class AIService {
       // Process the message and extract information
       this.extractContextFromMessage(userMessage);
       
-      // Generate AI response based on context
-      const aiResponse = await this.generateAIResponse(userMessage);
+      // Get API key
+      const apiKey = this.getOpenAIApiKey();
       
-      // Add AI response to conversation
-      const aiChatMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: aiResponse.message,
-        timestamp: new Date()
-      };
+      console.log('🔑 AI Service API Key check:', {
+        hasKey: !!apiKey,
+        keyLength: apiKey?.length || 0,
+        keyPrefix: apiKey?.substring(0, 7) || 'none',
+        fromConstants: !!Constants.expoConfig?.extra?.openaiApiKey,
+        fromProcessEnv: !!(typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_OPENAI_API_KEY),
+      });
       
-      this.conversationHistory.push(aiChatMessage);
+      if (!apiKey || apiKey === 'your-api-key-here') {
+        console.warn('⚠️ OpenAI API key not found, using simulated AI response');
+        console.warn('   Make sure EXPO_PUBLIC_OPENAI_API_KEY is set in .env and restart the app');
+        // Fallback to simulated response
+        const aiResponse = await this.generateSimulatedAIResponse(userMessage);
+        this.addAIResponseToHistory(aiResponse.message);
+        return aiResponse;
+      }
       
-      return aiResponse;
+      console.log('✅ Using OpenAI API for AI responses');
+
+      // Call OpenAI API
+      try {
+        const aiResponse = await this.callOpenAIAPI(userMessage);
+        this.addAIResponseToHistory(aiResponse.message);
+        console.log('✅ AI Response generated:', {
+          messageLength: aiResponse.message.length,
+          hasRecommendations: !!aiResponse.recommendations,
+          nextAction: aiResponse.nextAction
+        });
+        return aiResponse;
+      } catch (apiError: any) {
+        console.error('❌ OpenAI API error:', apiError);
+        // Fallback to simulated response if API fails
+        console.warn('⚠️ Falling back to simulated AI response');
+        const aiResponse = await this.generateSimulatedAIResponse(userMessage);
+        this.addAIResponseToHistory(aiResponse.message);
+        console.log('✅ Simulated AI Response generated:', {
+          messageLength: aiResponse.message.length,
+          hasRecommendations: !!aiResponse.recommendations,
+          nextAction: aiResponse.nextAction
+        });
+        return aiResponse;
+      }
     } catch (error) {
       console.error('Error in AI service:', error);
-      throw new Error('Failed to process message');
+      // Fallback to simulated response
+      const aiResponse = await this.generateSimulatedAIResponse(userMessage);
+      this.addAIResponseToHistory(aiResponse.message);
+      return aiResponse;
     }
+  }
+
+  private addAIResponseToHistory(message: string): void {
+    const aiChatMessage: ChatMessage = {
+      id: (Date.now() + 1).toString(),
+      role: 'assistant',
+      content: message,
+      timestamp: new Date()
+    };
+    this.conversationHistory.push(aiChatMessage);
+  }
+
+  private async callOpenAIAPI(userMessage: string): Promise<AIResponse> {
+    const apiKey = this.getOpenAIApiKey();
+    if (!apiKey) {
+      throw new Error('API key not available');
+    }
+
+    // Prepare conversation history for OpenAI (last 10 messages to stay within token limits)
+    const recentHistory = this.conversationHistory.slice(-10).map(msg => ({
+      role: msg.role,
+      content: msg.content
+    }));
+
+    // Create system prompt for the AI
+    const systemPrompt = `You are Solly, a helpful AI assistant helping users set up their personalized exercise plan. 
+You ask about their work tasks and pain areas, then provide personalized exercise recommendations.
+Be friendly, concise, and conversational. Extract information about:
+- Work tasks: heavy lifting, overhead work, repetitive tool use, kneeling
+- Pain areas: shoulder, knee, back, neck, wrist
+
+After gathering enough information, provide exercise recommendations.`;
+
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...recentHistory
+    ];
+
+    console.log('📤 Calling OpenAI API...');
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini', // Using cost-effective model
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 500,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ OpenAI API error:', response.status, errorText);
+      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    const aiMessage = data.choices[0]?.message?.content || 'I apologize, but I had trouble processing that. Could you try again?';
+    console.log('✅ OpenAI API response received:', aiMessage.substring(0, 100) + '...');
+
+    // Check if we have enough information to generate recommendations
+    if (this.currentContext.workTasks.length > 0 && this.currentContext.painAreas.length > 0) {
+      const recommendations = this.generateRecommendations();
+      return {
+        message: aiMessage,
+        recommendations,
+        nextAction: 'confirm'
+      };
+    }
+
+    return {
+      message: aiMessage,
+      nextAction: 'continue'
+    };
+  }
+
+  private async generateSimulatedAIResponse(userMessage: string): Promise<AIResponse> {
+    // Simulate AI processing delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return this.generateAIResponse(userMessage);
   }
 
   private extractContextFromMessage(message: string): void {
     const lowerMessage = message.toLowerCase();
     
-    // Extract pain areas
+    // Extract pain areas with more comprehensive keyword matching
     const painKeywords = {
-      'shoulder': ['shoulder', 'arm', 'upper body'],
-      'knee': ['knee', 'leg', 'lower body'],
-      'back': ['back', 'spine', 'lower back'],
-      'neck': ['neck', 'cervical'],
-      'wrist': ['wrist', 'hand', 'forearm']
+      'shoulder': ['shoulder', 'shoulders', 'arm', 'arms', 'upper body', 'upper arm', 'deltoid', 'rotator'],
+      'knee': ['knee', 'knees', 'leg', 'legs', 'lower body', 'patella', 'knee cap'],
+      'back': ['back', 'spine', 'lower back', 'upper back', 'lumbar', 'spine', 'spinal'],
+      'neck': ['neck', 'cervical', 'cervical spine', 'neck pain'],
+      'wrist': ['wrist', 'wrists', 'hand', 'hands', 'forearm', 'forearms', 'carpal']
     };
     
     Object.entries(painKeywords).forEach(([area, keywords]) => {
       if (keywords.some(keyword => lowerMessage.includes(keyword))) {
         if (!this.currentContext.painAreas.includes(area)) {
           this.currentContext.painAreas.push(area);
+          console.log(`✅ Extracted pain area: ${area}`);
         }
       }
     });
     
-    // Extract work tasks
+    // Extract work tasks with more comprehensive keyword matching
     const workKeywords = {
-      'heavy lifting': ['lift', 'heavy', 'weight', 'carry'],
-      'overhead work': ['overhead', 'above', 'reach up'],
-      'repetitive tool use': ['tool', 'repetitive', 'hammer', 'drill'],
-      'kneeling': ['kneel', 'knee', 'crouch', 'squat']
+      'heavy lifting': ['lift', 'lifting', 'heavy', 'weight', 'weights', 'carry', 'carrying', 'load', 'loading', 'move', 'moving objects'],
+      'overhead work': ['overhead', 'above', 'reach up', 'reaching up', 'upward', 'above head', 'ceiling', 'high'],
+      'repetitive tool use': ['tool', 'tools', 'repetitive', 'hammer', 'hammers', 'drill', 'drills', 'screwdriver', 'wrench', 'repetitive motion', 'repeating'],
+      'kneeling': ['kneel', 'kneeling', 'knee', 'crouch', 'crouching', 'squat', 'squatting', 'on knees', 'down on']
     };
     
     Object.entries(workKeywords).forEach(([task, keywords]) => {
       if (keywords.some(keyword => lowerMessage.includes(keyword))) {
         if (!this.currentContext.workTasks.includes(task)) {
           this.currentContext.workTasks.push(task);
+          console.log(`✅ Extracted work task: ${task}`);
         }
       }
     });
+    
+    // Log current context for debugging
+    console.log('📊 Current AI Context:', {
+      painAreas: this.currentContext.painAreas,
+      workTasks: this.currentContext.workTasks,
+      conversationLength: this.conversationHistory.length
+    });
   }
 
-  private async generateAIResponse(userMessage: string): Promise<AIResponse> {
-    // Simulate AI processing delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+  private generateAIResponse(userMessage: string): AIResponse {
     const lowerMessage = userMessage.toLowerCase();
     
     // Determine response based on conversation stage

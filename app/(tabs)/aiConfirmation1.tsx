@@ -196,8 +196,7 @@ export default function AIConfirmation1Screen() {
   };
 
   const handleBackPress = () => {
-    // Go back to question 1
-    router.push('/(tabs)/aiQuestion1');
+    router.back();
   };
 
   // Format the answer text - split into parts for styling
@@ -207,11 +206,37 @@ export default function AIConfirmation1Screen() {
   // Get AI summary of what was picked up
   const getAISummary = () => {
     const context = aiService.getCurrentContext();
+    console.log('📊 AI Context in confirmation 1:', context);
+    
     if (context.workTasks.length > 0) {
       const tasks = context.workTasks.join(', ');
       return `${tasks}.`;
     }
-    return '';
+    
+    // Fallback: if no context extracted, try to extract from answer parameter
+    if (answer && context.workTasks.length === 0) {
+      const lowerAnswer = (answer as string).toLowerCase();
+      const extractedTasks: string[] = [];
+      
+      if (lowerAnswer.includes('lift') || lowerAnswer.includes('heavy') || lowerAnswer.includes('weight')) {
+        extractedTasks.push('heavy lifting');
+      }
+      if (lowerAnswer.includes('overhead') || lowerAnswer.includes('above') || lowerAnswer.includes('reach')) {
+        extractedTasks.push('overhead work');
+      }
+      if (lowerAnswer.includes('tool') || lowerAnswer.includes('repetitive') || lowerAnswer.includes('hammer') || lowerAnswer.includes('drill')) {
+        extractedTasks.push('repetitive tool use');
+      }
+      if (lowerAnswer.includes('kneel') || lowerAnswer.includes('crouch') || lowerAnswer.includes('squat')) {
+        extractedTasks.push('kneeling');
+      }
+      
+      if (extractedTasks.length > 0) {
+        return `${extractedTasks.join(', ')}.`;
+      }
+    }
+    
+    return 'your work tasks.';
   };
 
   const aiSummary = getAISummary();

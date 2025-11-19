@@ -394,7 +394,7 @@ function breathingExercise() {
         bottomText="Ready to begin your breathing exercise?"
         buttonLabel="Start Exercise"
         onButtonPress={handleStartExercise}
-        onBack={() => router.push("/(tabs)/mentalHomePage")}
+        onBack={() => router.back()}
         showBackButton={true}
       />
     );

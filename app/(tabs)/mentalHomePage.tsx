@@ -1,8 +1,3 @@
-import BottomNavigation from "@/components/ui/BottomNavigation";
-import ExerciseButton from "@/components/ui/ExerciseButton";
-import ExerciseChip from "@/components/ui/ExerciseChip";
-import StatusBar from "@/components/ui/StatusBar";
-import XPBar from "@/components/ui/XPBar";
 import { Globals } from "@/constants/globals";
 import { Colors } from "@/constants/theme";
 import { router } from "expo-router";
@@ -15,31 +10,17 @@ import {
   Text,
   View,
 } from "react-native";
+import ExerciseChip from "../..//components/ui/ExerciseChip";
+import XPBar from "../..//components/ui/XPBar";
+import GeneralTaskCard from "../../components/taskCards/generalTaskCard";
+import ExerciseButton from "../../components/ui/ExerciseButton";
+import StatusBar from "../../components/ui/StatusBar";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 const MentalHomePage = () => {
   const [userName] = useState("Sarah");
   const [selectedCategory, setSelectedCategory] = useState("breathing");
-
-  const handleNavPress = (itemId: string) => {
-    switch (itemId) {
-      case "home":
-        router.push("/(tabs)/homePage");
-        break;
-      case "physical":
-        router.push("/(tabs)/physicalHomePage");
-        break;
-      case "mental":
-        // Already on mental page
-        break;
-      case "account":
-        router.push("/(tabs)/accountSettingsPage");
-        break;
-      default:
-        console.log(`Navigating to ${itemId}`);
-    }
-  };
 
   const handleExercisePress = (exerciseName: string) => {
     console.log(`Starting exercise: ${exerciseName}`);
@@ -52,6 +33,15 @@ const MentalHomePage = () => {
       router.push({
         pathname: "/(tabs)/breathingExercisePage",
         params: { exerciseType: exerciseName },
+      });
+    } else if (
+      exerciseName === "Rain Sounds" ||
+      exerciseName === "Soft Piano" ||
+      exerciseName === "Sea Waves"
+    ) {
+      router.push({
+        pathname: "/(tabs)/whiteNoise" as unknown as any,
+        params: { soundType: exerciseName },
       });
     }
   };
@@ -145,63 +135,27 @@ const MentalHomePage = () => {
             </View>
           </View>
         )}
-        {/* Show 3 ExerciseButtons when white noise category is selected */}
+        {/* Show white noise task cards when white noise category is selected */}
         {selectedCategory === "noise" && (
-          <View style={styles.multipleButtonsContainer}>
-            <View style={styles.buttonRow}>
-              <View style={styles.buttonColumn}>
-                <ExerciseButton
-                  title="Rain Sounds"
-                  image={
-                    <Image
-                      source={require("../../assets/images/Breathing01.png")}
-                      style={styles.exerciseImage}
-                      resizeMode="contain"
-                    />
-                  }
-                  xp={3}
-                  onPress={() => handleExercisePress("Rain Sounds")}
-                />
-              </View>
-              <View style={styles.buttonColumn}>
-                <ExerciseButton
-                  title="Ocean Waves"
-                  image={
-                    <Image
-                      source={require("../../assets/images/Breathing02.png")}
-                      style={styles.exerciseImage}
-                      resizeMode="contain"
-                    />
-                  }
-                  xp={3}
-                  onPress={() => handleExercisePress("Ocean Waves")}
-                />
-              </View>
-            </View>
-            <View style={styles.buttonRow}>
-              <View style={styles.buttonColumn}>
-                <ExerciseButton
-                  title="Forest Sounds"
-                  image={
-                    <Image
-                      source={require("../../assets/images/Breathing03.png")}
-                      style={styles.exerciseImage}
-                      resizeMode="contain"
-                    />
-                  }
-                  xp={3}
-                  onPress={() => handleExercisePress("Forest Sounds")}
-                />
-              </View>
-              <View style={styles.buttonColumn}>
-                {/* Empty column for symmetry */}
-              </View>
-            </View>
+          <View style={styles.whiteNoiseContainer}>
+            <GeneralTaskCard
+              task="Rain Sounds"
+              xp={1}
+              onPress={() => handleExercisePress("Rain Sounds")}
+            />
+            <GeneralTaskCard
+              task="Soft Piano"
+              xp={1}
+              onPress={() => handleExercisePress("Soft Piano")}
+            />
+            <GeneralTaskCard
+              task="Sea Waves"
+              xp={1}
+              onPress={() => handleExercisePress("Sea Waves")}
+            />
           </View>
         )}
       </ScrollView>
-
-      <BottomNavigation onItemPress={handleNavPress} />
     </View>
   );
 };
@@ -286,6 +240,10 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: screenHeight * 0.12, // 12% of screen height
+  },
+  whiteNoiseContainer: {
+    alignItems: "center",
+    paddingHorizontal: screenWidth * 0.04, // 4% of screen width
   },
 });
 

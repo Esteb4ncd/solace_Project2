@@ -152,7 +152,7 @@ export default function OnboardingQuestionsScreen() {
   };
 
   const handleBackPress = () => {
-    router.push('/(tabs)/startQuestions');
+    router.back();
   };
 
   const dismissKeyboard = () => {

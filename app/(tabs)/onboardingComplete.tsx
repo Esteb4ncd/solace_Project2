@@ -24,7 +24,7 @@ export default function OnboardingCompleteScreen() {
             painAreas,
             workTasks,
             [],
-            3 // Get top 3 recommendations
+            3 // Get top 3 recommendations for daily checklist
           );
           
           if (recommendedExercises.length > 0) {

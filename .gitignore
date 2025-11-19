@@ -35,6 +35,7 @@ yarn-error.*
 
 # local env files
 .env
+env
 .env*.local
 # Note: .env.example should be committed (it's a template)
 

@@ -61,7 +61,7 @@ export default function StreakPage() {
   }, [completedExercises, currentMonth, currentYear, streakCount]);
 
   const handleBack = () => {
-    router.push('/(tabs)/homePage');
+    router.back();
   };
 
   const handlePrevMonth = () => {
@@ -271,9 +271,10 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   backButton: {
-    position: 'relative',
-    top: 0,
-    left: 0,
+    position: 'absolute',
+    top: Platform.OS === 'web' ? 30 : 60,
+    left: 20,
+    zIndex: 10,
   },
   headerTitle: {
     ...Globals.fonts.styles.header1,

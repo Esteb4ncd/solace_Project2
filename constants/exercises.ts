@@ -91,8 +91,17 @@ export const getExerciseVideoSource = (exercise: Exercise): { uri: string; heade
   }
   
   if (!videoUrl) {
-    console.warn(`Video URL not found for: ${exercise.videoFileName}. Using fallback.`);
-    // Fallback to first exercise's video
+    console.warn(`Video URL not found for: ${exercise.videoFileName}. Using HandWarmUp as placeholder.`);
+    // Fallback to Hand Warm Up video (ID: "1") as placeholder
+    const handWarmUpExercise = getExerciseById('1');
+    if (handWarmUpExercise) {
+      const fallbackUrl = apiService.getVideoUrl(handWarmUpExercise.videoFileName);
+      return { 
+        uri: fallbackUrl,
+        headers: apiKey ? { 'x-api-key': apiKey } : undefined
+      };
+    }
+    // Ultimate fallback to first exercise if HandWarmUp not found
     const fallbackExercise = EXERCISES_DATABASE[0];
     const fallbackUrl = apiService.getVideoUrl(fallbackExercise.videoFileName);
     return { 

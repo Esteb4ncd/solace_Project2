@@ -61,7 +61,12 @@ export default function ConfirmationScreen() {
   };
 
   const handleBackPress = () => {
-    router.back();
+    // Never allow navigation back to sign in page
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.push('/(tabs)/homePage');
+    }
   };
 
   const handleVoicePress = () => {

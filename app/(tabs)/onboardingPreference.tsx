@@ -19,7 +19,7 @@ export default function OnboardingPreferenceScreen() {
   };
 
   const handleBackPress = () => {
-    router.push('/(tabs)/startQuestions');
+    router.back();
   };
 
   return (

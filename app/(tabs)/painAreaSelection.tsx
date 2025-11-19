@@ -89,7 +89,7 @@ export default function PainAreaSelectionScreen() {
   };
 
   const handleBack = () => {
-    router.push('/(tabs)/workTaskSelection');
+    router.back();
   };
 
   return (
@@ -157,8 +157,8 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
+    top: Platform.OS === 'web' ? 30 : 60,
     left: 20,
-    top: 20,
     zIndex: 10,
   },
   progressContainer: {

@@ -98,13 +98,23 @@ export default function AIQuestion1Screen() {
     // Process with AI service
     if (finalText) {
       try {
-        await aiService.sendMessage(finalText, isRecording);
+        const aiResponse = await aiService.sendMessage(finalText, isRecording);
+        console.log('✅ AI Response received:', {
+          message: aiResponse.message.substring(0, 100) + '...',
+          hasRecommendations: !!aiResponse.recommendations,
+          nextAction: aiResponse.nextAction
+        });
+        // AI response is processed and context is extracted
+        // The response will be used in the confirmation page
       } catch (error) {
-        console.error('Error processing with AI:', error);
+        console.error('❌ Error processing with AI:', error);
+        // Continue with flow even if AI fails - context extraction might still work
       }
+    } else {
+      console.warn('⚠️ No text to process with AI');
     }
     
-    // Navigate to next page
+    // Navigate to next page (always navigate, even if AI processing failed)
     handleNext();
   };
 

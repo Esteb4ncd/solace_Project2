@@ -3,6 +3,7 @@ import LargeButton from '@/components/ui/LargeButton';
 import React from 'react';
 import {
   Image,
+  Platform,
   StatusBar,
   StyleSheet,
   Text,
@@ -80,8 +81,8 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 55,
-    left: 25.5,
+    top: Platform.OS === 'web' ? 30 : 60,
+    left: 20,
     zIndex: 10,
   },
   title: {

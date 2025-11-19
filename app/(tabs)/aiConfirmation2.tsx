@@ -112,29 +112,72 @@ export default function AIConfirmation2Screen() {
       console.log('Generating recommendations with context:', context);
       
       // Generate recommendations using exercises.ts
-      if (context.workTasks.length > 0 && context.painAreas.length > 0) {
-        const recommendedExercises = recommendExercises(
-          context.painAreas,
-          context.workTasks,
-          [],
-          3 // Get top 3 recommendations
-        );
-        
-        if (recommendedExercises.length > 0) {
-          setRecommendedExercises(recommendedExercises);
-          
-          // Convert to daily tasks format
-          const dailyTasks = recommendedExercises.map((recEx) => ({
-            id: recEx.exercise.id,
-            title: recEx.exercise.name,
-            xpAmount: getExerciseXpReward(recEx.exercise, recEx.isRecommended),
-            xpColor: '#7267D9',
-            isCompleted: false,
-          }));
-          
-          updateDailyTasks(dailyTasks);
-          console.log('✅ Generated recommendations:', dailyTasks);
+      // Use context if available, otherwise use defaults from answers
+      let painAreas = [...context.painAreas]; // Create a copy to avoid mutating the original
+      let workTasks = [...context.workTasks]; // Create a copy to avoid mutating the original
+      
+      // Fallback: if context extraction didn't work well, try to extract from answers
+      if (painAreas.length === 0 && secondAnswer) {
+        const lowerAnswer = (secondAnswer as string).toLowerCase();
+        if (lowerAnswer.includes('shoulder') || lowerAnswer.includes('arm')) painAreas.push('shoulder');
+        if (lowerAnswer.includes('knee') || lowerAnswer.includes('leg')) painAreas.push('knee');
+        if (lowerAnswer.includes('back')) painAreas.push('back');
+        if (lowerAnswer.includes('neck')) painAreas.push('neck');
+        if (lowerAnswer.includes('wrist') || lowerAnswer.includes('hand')) painAreas.push('wrist');
+      }
+      
+      if (workTasks.length === 0 && firstAnswer) {
+        const lowerAnswer = (firstAnswer as string).toLowerCase();
+        if (lowerAnswer.includes('lift') || lowerAnswer.includes('heavy') || lowerAnswer.includes('weight')) {
+          workTasks.push('heavy lifting');
         }
+        if (lowerAnswer.includes('overhead') || lowerAnswer.includes('above') || lowerAnswer.includes('reach')) {
+          workTasks.push('overhead work');
+        }
+        if (lowerAnswer.includes('tool') || lowerAnswer.includes('repetitive') || lowerAnswer.includes('hammer') || lowerAnswer.includes('drill')) {
+          workTasks.push('repetitive tool use');
+        }
+        if (lowerAnswer.includes('kneel') || lowerAnswer.includes('crouch') || lowerAnswer.includes('squat')) {
+          workTasks.push('kneeling');
+        }
+      }
+      
+      // If we still don't have context, use default values
+      if (painAreas.length === 0) {
+        painAreas = ['back']; // Default to back
+        console.log('⚠️ No pain areas extracted, using default: back');
+      }
+      if (workTasks.length === 0) {
+        workTasks = ['heavy lifting']; // Default to heavy lifting
+        console.log('⚠️ No work tasks extracted, using default: heavy lifting');
+      }
+      
+      console.log('📋 Final context for recommendations:', { painAreas, workTasks });
+      
+      const recommendedExercises = recommendExercises(
+        painAreas,
+        workTasks,
+        [],
+        3 // Get top 3 recommendations for daily checklist
+      );
+      
+      if (recommendedExercises.length > 0) {
+        setRecommendedExercises(recommendedExercises);
+        
+        // Convert to daily tasks format
+        const dailyTasks = recommendedExercises.map((recEx) => ({
+          id: recEx.exercise.id,
+          title: recEx.exercise.name,
+          xpAmount: getExerciseXpReward(recEx.exercise, recEx.isRecommended),
+          xpColor: '#7267D9',
+          isCompleted: false,
+        }));
+        
+        updateDailyTasks(dailyTasks);
+        console.log('✅ Generated recommendations:', dailyTasks);
+      } else {
+        console.warn('⚠️ No exercises found for context:', { painAreas, workTasks });
+        // Still navigate even if no recommendations - user can add exercises later
       }
       
       // Save question 2 recording to JSON file before navigating
@@ -230,11 +273,7 @@ export default function AIConfirmation2Screen() {
   };
 
   const handleBackPress = () => {
-    // Go back to question 2
-    router.push({
-      pathname: '/(tabs)/aiQuestion2',
-      params: { firstAnswer: firstAnswer as string }
-    });
+    router.back();
   };
 
   const answerText = (secondAnswer as string) || '';
@@ -242,11 +281,30 @@ export default function AIConfirmation2Screen() {
   // Get AI summary of what was picked up
   const getAISummary = () => {
     const context = aiService.getCurrentContext();
+    console.log('📊 AI Context in confirmation 2:', context);
+    
     if (context.painAreas.length > 0) {
       const painAreas = context.painAreas.join(', ');
       return `your ${painAreas}.`;
     }
-    return '';
+    
+    // Fallback: if no context extracted, try to extract from answer parameter
+    if (secondAnswer && context.painAreas.length === 0) {
+      const lowerAnswer = (secondAnswer as string).toLowerCase();
+      const extractedAreas: string[] = [];
+      
+      if (lowerAnswer.includes('shoulder') || lowerAnswer.includes('arm')) extractedAreas.push('shoulder');
+      if (lowerAnswer.includes('knee') || lowerAnswer.includes('leg')) extractedAreas.push('knee');
+      if (lowerAnswer.includes('back')) extractedAreas.push('back');
+      if (lowerAnswer.includes('neck')) extractedAreas.push('neck');
+      if (lowerAnswer.includes('wrist') || lowerAnswer.includes('hand')) extractedAreas.push('wrist');
+      
+      if (extractedAreas.length > 0) {
+        return `your ${extractedAreas.join(', ')}.`;
+      }
+    }
+    
+    return 'your pain areas.';
   };
 
   const aiSummary = getAISummary();
