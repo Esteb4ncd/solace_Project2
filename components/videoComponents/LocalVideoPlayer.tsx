@@ -128,7 +128,22 @@ export default function LocalVideoPlayer({
           resizeMode={ResizeMode.COVER}
           shouldPlay={isPlaying}
           onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-          onLoad={() => setIsLoading(false)}
+          onLoad={() => {
+            console.log('✅ Video loaded successfully:', videoSource);
+            setIsLoading(false);
+          }}
+          onLoadStart={() => {
+            console.log('🔄 Video loading started:', videoSource);
+            setIsLoading(true);
+          }}
+          onError={(error) => {
+            console.error('❌ Video error:', error);
+            console.error('❌ Video source was:', videoSource);
+            setIsLoading(false);
+            if (onError) {
+              onError(error);
+            }
+          }}
         />
         
         {isLoading && (

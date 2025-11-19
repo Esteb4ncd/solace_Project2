@@ -1,6 +1,6 @@
 import LocalVideoPlayer from '@/components/videoComponents/LocalVideoPlayer';
-import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { getExerciseById, getExerciseVideoSource } from '@/constants/exercises';
+import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -15,7 +15,7 @@ const VideoPlayerScreen = () => {
 
   console.log('VideoPlayerScreen loaded with:', { exerciseId, exerciseName, xpReward });
 
-  // Get exercise data and video source from API
+  // Get exercise data and video source
   const exercise = useMemo(() => {
     if (exerciseId) {
       return getExerciseById(exerciseId);
@@ -26,11 +26,20 @@ const VideoPlayerScreen = () => {
 
   const videoSource = useMemo(() => {
     if (exercise) {
-      return getExerciseVideoSource(exercise);
+      const source = getExerciseVideoSource(exercise);
+      console.log('📹 Video source for exercise:', {
+        exerciseId: exercise.id,
+        exerciseName: exercise.name,
+        videoFileName: exercise.videoFileName,
+        videoSource: source
+      });
+      return source;
     }
     // Fallback
     const fallbackExercise = getExerciseById('1');
-    return fallbackExercise ? getExerciseVideoSource(fallbackExercise) : { uri: '' };
+    const fallbackSource = fallbackExercise ? getExerciseVideoSource(fallbackExercise) : { uri: '' };
+    console.log('📹 Using fallback video source:', fallbackSource);
+    return fallbackSource;
   }, [exercise]);
 
   // Always use exercise data from database if available (source of truth)

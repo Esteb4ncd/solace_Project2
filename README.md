@@ -7,18 +7,26 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
 ## 🚀 Quick Start for New Developers
 
-**Just run:**
-```bash
-npm install
-npm run dev
-```
+**Setup Steps:**
 
-**That's it!** This automatically starts:
-- ✅ Express server on `http://localhost:3001` (proxies videos from Google Drive)
-- ✅ Expo app
-- ✅ Videos work automatically - no separate server command needed!
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-**You do NOT need to run `npm run server` separately** - `npm run dev` does it all!
+2. **Download videos:**
+   - Download all video files from: https://drive.google.com/drive/folders/1UbOq1VWOajTtmeWCDY17bTFX7dFJ5f_c?usp=sharing
+   - Place them in `assets/videos/` folder
+   - Required videos: HandWarmUp.mov, BumperStretch.mov, HamstringStretch.mov, HipFlexorStretch.mov, ChestStretch.mov, LowerBackMuscleRelease.mov, ResetSpineStretch.mov, WarmUpSpineStretch.mov, ShoulderWarmUp.mov, UpperBackStretch.mov
+
+3. **Start the server and app:**
+   ```bash
+   npm run dev
+   ```
+   
+   This starts both:
+   - Express server on `http://localhost:3001` (serves videos)
+   - Expo app
 
 ### Quick Setup (Using Production API)
 
@@ -101,65 +109,29 @@ To learn more about developing your project with Expo, look at the following res
 - [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
 - [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
 
-## Video API Configuration
+## 📹 Video Configuration
 
-Exercise videos are served from a production API server. **No local video files are required** - the app fetches videos from your API.
+**Videos are served from a local Express server.**
 
-### Production Setup (Required)
+### Setup Instructions
 
-1. **Host your videos on a production server**:
-   - Upload all video files to your production API server
-   - Ensure videos are accessible at: `https://your-api.com/videos/{filename}`
-   - Example: `https://api.solace-app.com/videos/HandWarmUp.mov`
+1. **Download Videos:**
+   - Go to: https://drive.google.com/drive/folders/1UbOq1VWOajTtmeWCDY17bTFX7dFJ5f_c?usp=sharing
+   - Download all `.mov` video files
+   - Place them in `assets/videos/` directory
 
-2. **Configure the API URL**:
-   - Create a `.env` file (copy from `.env.example`)
-   - Set `EXPO_PUBLIC_API_URL=https://your-api.com`
-   - Or update `services/api.ts` directly with your production URL
-
-3. **Deploy and run**:
-   ```bash
-   npm install
-   npm start
-   ```
-   The app will automatically fetch videos from your production API.
-
-### Local Development (Optional)
-
-If you want to test with local videos:
-
-1. **Place videos in `assets/videos/`** (not in git)
-2. **Start the local API server**:
+2. **Start the Server:**
    ```bash
    npm run server
    ```
-3. **Set local API URL** in `.env`:
-   ```
-   EXPO_PUBLIC_API_URL=http://localhost:3001
-   ```
+   Or use `npm run dev` to start both server and app together.
 
-### API Endpoints Required
+3. **Verify Videos:**
+   - Server will validate videos on startup
+   - Check console for missing videos
+   - Videos must be in `assets/videos/` folder
 
-Your production API must provide:
-- `GET /videos/:filename` - Stream video files
-- Example: `GET https://api.solace-app.com/videos/HandWarmUp.mov`
-
-### Video Hosting Options
-
-You can host videos on:
-- **Your own server** (Node.js/Express like `server/index.js`)
-- **Cloud storage** (AWS S3, Google Cloud Storage, Azure Blob)
-- **CDN** (Cloudflare, CloudFront)
-- **Static hosting** (Vercel, Netlify with proper video support)
-
-### Configuration
-
-- **Environment Variable**: `EXPO_PUBLIC_API_URL` (recommended)
-- **Fallback**: Uses `http://localhost:3001` in development, `https://api.solace-app.com` in production
-- **Override**: Edit `services/api.ts` if needed
-
-### Video Files
-The following video files are required (currently stored locally but should be hosted on your API):
+### Required Video Files
 - HandWarmUp.mov
 - BumperStretch.mov
 - HamstringStretch.mov
@@ -170,6 +142,13 @@ The following video files are required (currently stored locally but should be h
 - WarmUpSpineStretch.mov
 - ShoulderWarmUp.mov
 - UpperBackStretch.mov
+
+### Server Endpoints
+- `GET /health` - Health check (public)
+- `GET /videos` - List all videos (requires auth in production)
+- `GET /videos/:filename` - Stream video file (requires auth in production)
+
+**Note:** Authentication is disabled in development mode for easier testing.
 
 ## Join the community
 

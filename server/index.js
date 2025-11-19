@@ -16,7 +16,14 @@ app.use(cors());
 app.use(express.json());
 
 // Authentication middleware
+// In development, allow requests without API key (for easier local testing)
+// In production, require API key
 const authenticate = (req, res, next) => {
+  // Skip authentication in development mode (when using default API key)
+  if (API_KEY === 'your-secret-api-key-change-this' || process.env.NODE_ENV !== 'production') {
+    return next();
+  }
+  
   const apiKey = req.headers['x-api-key'] || req.query.apiKey;
   
   if (!apiKey) {
@@ -36,25 +43,12 @@ const authenticate = (req, res, next) => {
   next();
 };
 
-// Serve videos from the assets/videos directory (local) or Google Drive (remote)
+// Serve videos from the assets/videos directory (local files only)
 const VIDEOS_DIR = path.join(__dirname, '..', 'assets', 'videos');
 
 // Load exercises.json to validate all required videos exist
 const EXERCISES_PATH = path.join(__dirname, '..', 'constants', 'exercises.json');
 let requiredVideos = [];
-
-// Load Google Drive video URLs if available
-let googleDriveVideos = {};
-try {
-  const videoUrlsPath = path.join(__dirname, '..', 'constants', 'videoUrls.json');
-  if (fs.existsSync(videoUrlsPath)) {
-    const videoUrls = JSON.parse(fs.readFileSync(videoUrlsPath, 'utf8'));
-    googleDriveVideos = videoUrls.videos || {};
-    console.log(`📹 Loaded ${Object.keys(googleDriveVideos).length} Google Drive video URLs`);
-  }
-} catch (error) {
-  console.warn('⚠️  Could not load videoUrls.json:', error.message);
-}
 
 try {
   const exercisesData = JSON.parse(fs.readFileSync(EXERCISES_PATH, 'utf8'));
@@ -189,82 +183,44 @@ app.get('/videos', authenticate, (req, res) => {
 app.get('/videos/:filename', authenticate, (req, res) => {
   const filename = req.params.filename;
   
-  // First, try to serve from local files
+  // Serve from local files only
   const filePath = path.join(VIDEOS_DIR, filename);
-  if (fs.existsSync(filePath)) {
-    // Serve local file
-    const stat = fs.statSync(filePath);
-    const fileSize = stat.size;
-    const range = req.headers.range;
-
-    if (range) {
-      const parts = range.replace(/bytes=/, '').split('-');
-      const start = parseInt(parts[0], 10);
-      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-      const chunksize = (end - start) + 1;
-      const file = fs.createReadStream(filePath, { start, end });
-      const head = {
-        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-        'Accept-Ranges': 'bytes',
-        'Content-Length': chunksize,
-        'Content-Type': 'video/quicktime',
-      };
-      res.writeHead(206, head);
-      file.pipe(res);
-    } else {
-      const head = {
-        'Content-Length': fileSize,
-        'Content-Type': 'video/quicktime',
-      };
-      res.writeHead(200, head);
-      fs.createReadStream(filePath).pipe(res);
-    }
-    return;
-  }
-
-  // If not local, proxy from Google Drive
-  const googleDriveFileId = googleDriveVideos[filename];
-  if (googleDriveFileId && googleDriveFileId !== 'YOUR_GOOGLE_DRIVE_FILE_ID_HERE') {
-    const googleDriveUrl = `https://drive.google.com/uc?export=download&id=${googleDriveFileId}`;
-    
-    // Proxy the video from Google Drive
-    const protocol = require('https');
-    protocol.get(googleDriveUrl, (driveResponse) => {
-      if (driveResponse.statusCode === 200 || driveResponse.statusCode === 206) {
-        // Forward headers for video streaming
-        res.setHeader('Content-Type', driveResponse.headers['content-type'] || 'video/quicktime');
-        if (driveResponse.headers['content-length']) {
-          res.setHeader('Content-Length', driveResponse.headers['content-length']);
-        }
-        if (driveResponse.headers['content-range']) {
-          res.setHeader('Content-Range', driveResponse.headers['content-range']);
-          res.writeHead(206);
-        } else {
-          res.writeHead(200);
-        }
-        driveResponse.pipe(res);
-      } else {
-        res.status(404).json({ 
-          error: 'Video not found on Google Drive', 
-          filename 
-        });
-      }
-    }).on('error', (error) => {
-      console.error('Error proxying from Google Drive:', error);
-      res.status(500).json({ 
-        error: 'Failed to fetch video from Google Drive',
-        message: error.message 
-      });
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ 
+      error: 'Video not found', 
+      filename,
+      message: `Video file not found: ${filename}. Please download videos to ${VIDEOS_DIR}`
     });
-    return;
   }
 
-  // Video not found locally or in Google Drive config
-  res.status(404).json({ 
-    error: 'Video not found', 
-    filename,
-    message: 'Video not found locally and Google Drive ID not configured. Add it to constants/videoUrls.json'
-  });
+  // Serve local file with range request support for video streaming
+  const stat = fs.statSync(filePath);
+  const fileSize = stat.size;
+  const range = req.headers.range;
+
+  if (range) {
+    const parts = range.replace(/bytes=/, '').split('-');
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+    const chunksize = (end - start) + 1;
+    const file = fs.createReadStream(filePath, { start, end });
+    const head = {
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunksize,
+      'Content-Type': 'video/quicktime',
+    };
+    res.writeHead(206, head);
+    file.pipe(res);
+  } else {
+    const head = {
+      'Content-Length': fileSize,
+      'Content-Type': 'video/quicktime',
+      'Accept-Ranges': 'bytes',
+    };
+    res.writeHead(200, head);
+    fs.createReadStream(filePath).pipe(res);
+  }
 });
 
 // Error handling middleware

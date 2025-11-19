@@ -8,7 +8,6 @@
  * handles the video file mapping using API URLs instead of local require() paths.
  */
 
-import { apiService } from '@/services/api';
 import exercisesData from './exercises.json';
 
 export interface Exercise {
@@ -75,42 +74,16 @@ export const getExerciseXpReward = (exercise: Exercise, isRecommended: boolean):
  * This format is compatible with expo-av Video component
  * Includes authentication headers if API key is configured
  */
-export const getExerciseVideoSource = (exercise: Exercise): { uri: string; headers?: Record<string, string> } => {
-  const videoUrl = apiService.getVideoUrl(exercise.videoFileName);
-  const authHeaders = apiService.getAuthHeaders();
+/**
+ * Get video source for an exercise
+ * Uses local Express server at http://localhost:3001
+ */
+export const getExerciseVideoSource = (exercise: Exercise): { uri: string } => {
+  const baseUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3001';
+  const videoUrl = `${baseUrl}/videos/${encodeURIComponent(exercise.videoFileName)}`;
   
-  // Extract API key from headers (HeadersInit can be Headers, string[][], or Record<string, string>)
-  let apiKey: string | undefined;
-  if (authHeaders instanceof Headers) {
-    apiKey = authHeaders.get('x-api-key') || undefined;
-  } else if (Array.isArray(authHeaders)) {
-    const header = authHeaders.find(([key]) => key === 'x-api-key');
-    apiKey = header ? header[1] : undefined;
-  } else {
-    apiKey = (authHeaders as Record<string, string>)['x-api-key'];
-  }
-  
-  if (!videoUrl) {
-    console.warn(`Video URL not found for: ${exercise.videoFileName}. Using fallback.`);
-    // Fallback to first exercise's video
-    const fallbackExercise = EXERCISES_DATABASE[0];
-    const fallbackUrl = apiService.getVideoUrl(fallbackExercise.videoFileName);
-    return { 
-      uri: fallbackUrl,
-      headers: apiKey ? { 'x-api-key': apiKey } : undefined
-    };
-  }
-  
-  // Extract API key from URL if present (for query param method)
-  // Or use headers for header-based auth
-  const source: { uri: string; headers?: Record<string, string> } = { uri: videoUrl };
-  
-  // If API key is available, use header-based auth (more secure than query param)
-  if (apiKey) {
-    source.headers = { 'x-api-key': apiKey };
-  }
-  
-  return source;
+  console.log(`📹 Video URL for ${exercise.videoFileName}: ${videoUrl}`);
+  return { uri: videoUrl };
 };
 
 /**
