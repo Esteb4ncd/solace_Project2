@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   floatingMenu: {
     position: 'absolute',
     top: screenHeight * 0.06, // 6% of screen height
-    right: screenWidth * 0.05, // 5% of screen width
+    right: screenWidth * 0.15, // 15% of screen width (moved left to avoid covering AI icon)
     zIndex: 1000,
   },
   menuButton: {
@@ -351,10 +351,10 @@ const styles = StyleSheet.create({
   },
   tripleTapDetector: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    top: screenHeight * 0.06, // 6% of screen height (matches menu button position)
+    right: screenWidth * 0.15, // 15% of screen width (matches menu button position)
+    width: screenWidth * 0.1, // 10% of screen width for tap area
+    height: screenWidth * 0.1, // 10% of screen width for tap area
     zIndex: 999,
   },
   specialMenuItem: {
