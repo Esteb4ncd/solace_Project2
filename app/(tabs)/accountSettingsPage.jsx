@@ -16,7 +16,7 @@ function AccountSettingsPage() {
   const [username, setUsername] = useState("User123");
   const [email, setEmail] = useState("user123@example.com");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(Globals.userSettings?.darkMode ?? false);
   const [showContent, setShowContent] = useState(true);
   const [activeSection, setActiveSection] = useState(null);
 
@@ -64,7 +64,15 @@ function AccountSettingsPage() {
       case "General":
         return <GeneralSettingsContent />;
       case "Accessibility":
-        return <AccessibilitySettingsContent />;
+        return (
+          <AccessibilitySettingsContent
+            darkMode={darkMode}
+            onDarkModeChange={(val) => {
+              setDarkMode(val);
+              Globals.userSettings = { ...(Globals.userSettings || {}), darkMode: val };
+            }}
+          />
+        );
       case "Notifications":
         return <NotificationSettingsContent />;
       case "Account":
@@ -79,17 +87,17 @@ function AccountSettingsPage() {
   return (
     <View style={styles.container}>
       {!showContent && (
-        <View style={styles.backButtonContainer}>
+        <View style={[styles.backButtonContainer, darkMode && styles.containerDark]}>
           <View style={styles.headerRow}>
             <BackButton onPress={handleBackPress} style={styles.backButton} />
-            <Text style={styles.activeSectionText}>{activeSection}</Text>
+            <Text style={[styles.activeSectionText, darkMode && { color: "#FFFFFF" }]}>{activeSection}</Text>
           </View>
           {renderSectionContent()}
         </View>
       )}
 
       {showContent && (
-        <View style={styles.contentContainer}>
+        <View style={[styles.contentContainer, darkMode && styles.containerDark]}>
           <View style={styles.mascotAndProgress}>
             <Image
               source={require("../../assets/images/Mascot-standing.png")}
@@ -108,7 +116,7 @@ function AccountSettingsPage() {
               source={require("../../assets/images/Setting_fill.png")}
               style={{ width: 33, height: 33 }}
             />
-            <Text style={styles.title}>Settings</Text>
+            <Text style={[styles.title, darkMode && { color: "#FFFFFF" }]}>Settings</Text>
           </View>
           <View style={styles.buttonContainer}>
             <SettingsButton
@@ -214,6 +222,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     justifyContent: "center",
+  },
+  containerDark: {
+    backgroundColor: "#1D1E1D",
   },
 });
 
