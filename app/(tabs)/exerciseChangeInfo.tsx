@@ -21,16 +21,23 @@ export default function ExerciseChangeInfoScreen() {
 	const contentOpacity = useRef(new Animated.Value(1)).current;
 	const overlayOpacity = useRef(new Animated.Value(0)).current;
 
-	// Calculate positions
+	// Calculate positions for precise alignment with Header achievement icon
 	const startX = screenWidth / 2; // Center of screen
 	const startY = screenHeight * 0.3; // Current icon position
-	const targetX = screenWidth * 0.9; // Near the right edge
-	const targetY = screenHeight * 0.08; // Header level
+
+	// Header positioning calculations
+	const headerPaddingHorizontal = screenWidth * 0.04; // From homePage contentContainer
+	const achievementIconSize = 40; // 40x40px from Header.tsx
+
+	// Target position: right edge minus padding minus half icon width for center alignment
+	const targetX =
+		screenWidth - headerPaddingHorizontal - achievementIconSize / 2;
+	const targetY = 12 + achievementIconSize / 2; // Header paddingVertical + half icon height
 
 	// Movement calculations
 	const moveX = targetX - startX;
 	const moveY = targetY - startY;
-	const targetScale = 0.15; // Scale down significantly
+	const targetScale = 0.225; // Scale down from ~178px to 40px (40/178 ≈ 0.225)
 
 	// Reset animation values when component mounts (for repeatability)
 	useEffect(() => {
