@@ -21,11 +21,8 @@ export default function OnboardingPreferenceScreen() {
   };
 
   const handleBackPress = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.push('/(tabs)/homePage');
-    }
+    // Always go to homePage from onboarding preference
+    router.push('/(tabs)/homePage');
   };
 
   return (

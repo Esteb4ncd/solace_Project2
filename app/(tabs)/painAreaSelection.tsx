@@ -95,7 +95,8 @@ export default function PainAreaSelectionScreen() {
   };
 
   const handleBack = () => {
-    router.back();
+    // Go back to work task selection (previous step in onboarding)
+    router.push('/(tabs)/workTaskSelection');
   };
 
   return (

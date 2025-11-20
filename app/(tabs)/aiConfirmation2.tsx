@@ -273,7 +273,8 @@ export default function AIConfirmation2Screen() {
   };
 
   const handleBackPress = () => {
-    router.back();
+    // Go back to AI question 2 (where user came from)
+    router.push('/(tabs)/aiQuestion2');
   };
 
   const answerText = (secondAnswer as string) || '';

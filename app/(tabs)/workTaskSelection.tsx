@@ -94,7 +94,12 @@ export default function WorkTaskSelectionScreen() {
   };
 
   const handleBack = () => {
-    router.back();
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      // If no history, go to onboarding preference (first onboarding screen)
+      router.push('/(tabs)/onboardingPreference');
+    }
   };
 
   return (

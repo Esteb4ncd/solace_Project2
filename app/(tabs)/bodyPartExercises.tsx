@@ -59,11 +59,8 @@ const BodyPartExercisesPage = () => {
   };
 
   const handleBackPress = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.push('/(tabs)/physicalHomePage');
-    }
+    // Always go back to physical home page for body part exercises
+    router.push('/(tabs)/physicalHomePage');
   };
 
   const handleExercisePress = (exercise: Exercise) => {

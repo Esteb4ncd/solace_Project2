@@ -235,7 +235,8 @@ export default function AIConfirmation1Screen() {
   };
 
   const handleBackPress = () => {
-    router.back();
+    // Go back to AI question 1 (where user came from)
+    router.push('/(tabs)/aiQuestion1');
   };
 
   // Format the answer text - split into parts for styling
