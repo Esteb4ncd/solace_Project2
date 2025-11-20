@@ -24,7 +24,10 @@ export default function OnboardingCompleteScreen() {
 
 				console.log(
 					"Generating recommendations from manual selection:",
-					{ workTasks, painAreas }
+					{
+						workTasks,
+						painAreas,
+					}
 				);
 
 				if (
@@ -122,6 +125,7 @@ export default function OnboardingCompleteScreen() {
 				<LargeButton
 					label='Next'
 					onPress={handleNext}
+					style={{}}
 				/>
 			</View>
 		</View>

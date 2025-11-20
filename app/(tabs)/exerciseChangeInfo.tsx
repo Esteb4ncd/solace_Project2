@@ -1,27 +1,183 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { router } from "expo-router";
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Animated, Dimensions, Easing, StyleSheet, View } from "react-native";
 import Svg, { Defs, LinearGradient, Path, Stop } from "react-native-svg";
 import LargeButton from "../../components/ui/LargeButton";
 import { Globals } from "../../constants/globals";
 
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+
 export default function ExerciseChangeInfoScreen() {
-	const handleGotItPress = () => {
-		// We navigate immediately and pass 'showIconAnimation' as a parameter.
-		// This tells the HomePage to start the flying animation instantly.
-		router.push({
-			pathname: "/(tabs)/homePage",
-			params: { showIconAnimation: "true" },
+	// Animation state that resets every time the component mounts
+	const [isAnimating, setIsAnimating] = useState(false);
+
+	// Animation values - reset on each mount for repeatability
+	const translateX = useRef(new Animated.Value(0)).current;
+	const translateY = useRef(new Animated.Value(0)).current;
+	const scale = useRef(new Animated.Value(1)).current;
+	const iconOpacity = useRef(new Animated.Value(1)).current;
+	const contentOpacity = useRef(new Animated.Value(1)).current;
+	const overlayOpacity = useRef(new Animated.Value(0)).current;
+
+	// Calculate positions
+	const startX = screenWidth / 2; // Center of screen
+	const startY = screenHeight * 0.3; // Current icon position
+	const targetX = screenWidth * 0.9; // Near the right edge
+	const targetY = screenHeight * 0.08; // Header level
+
+	// Movement calculations
+	const moveX = targetX - startX;
+	const moveY = targetY - startY;
+	const targetScale = 0.15; // Scale down significantly
+
+	// Reset animation values when component mounts (for repeatability)
+	useEffect(() => {
+		// Reset all animation values to initial state
+		translateX.setValue(0);
+		translateY.setValue(0);
+		scale.setValue(1);
+		iconOpacity.setValue(1);
+		contentOpacity.setValue(1);
+		overlayOpacity.setValue(0);
+		setIsAnimating(false);
+	}, [
+		translateX,
+		translateY,
+		scale,
+		iconOpacity,
+		contentOpacity,
+		overlayOpacity,
+	]);
+
+	// Reset animation values when screen comes into focus for repeatability
+	useFocusEffect(
+		useCallback(() => {
+			// Reset all animation values to initial state
+			translateX.setValue(0);
+			translateY.setValue(0);
+			scale.setValue(1);
+			iconOpacity.setValue(1);
+			contentOpacity.setValue(1);
+			overlayOpacity.setValue(0);
+			setIsAnimating(false);
+		}, [
+			translateX,
+			translateY,
+			scale,
+			iconOpacity,
+			contentOpacity,
+			overlayOpacity,
+		])
+	);
+
+	const startAnimation = () => {
+		setIsAnimating(true);
+
+		// Fade out content quickly
+		Animated.timing(contentOpacity, {
+			toValue: 0,
+			duration: 300,
+			easing: Easing.out(Easing.quad),
+			useNativeDriver: true,
+		}).start();
+
+		// Start overlay fade in (lighter overlay)
+		Animated.timing(overlayOpacity, {
+			toValue: 0.2,
+			duration: 150,
+			easing: Easing.out(Easing.quad),
+			useNativeDriver: true,
+		}).start();
+
+		// Start the main icon animation - faster and smoother
+		Animated.parallel([
+			// Move towards the edge
+			Animated.timing(translateX, {
+				toValue: moveX,
+				duration: 500, // Faster animation
+				easing: Easing.bezier(0.25, 0.46, 0.45, 0.94),
+				useNativeDriver: true,
+			}),
+			Animated.timing(translateY, {
+				toValue: moveY,
+				duration: 500, // Faster animation
+				easing: Easing.bezier(0.25, 0.46, 0.45, 0.94),
+				useNativeDriver: true,
+			}),
+			// Scale down
+			Animated.timing(scale, {
+				toValue: targetScale,
+				duration: 500, // Faster animation
+				easing: Easing.bezier(0.25, 0.46, 0.45, 0.94),
+				useNativeDriver: true,
+			}),
+			// Dissolve effect - start fading when 60% of the way there
+			Animated.sequence([
+				Animated.delay(300), // 60% of 500ms
+				Animated.timing(iconOpacity, {
+					toValue: 0,
+					duration: 200, // Complete fade out
+					easing: Easing.out(Easing.quad),
+					useNativeDriver: true,
+				}),
+			]),
+		]).start(() => {
+			// Ensure icon is completely hidden before navigation
+			setIsAnimating(false);
+			iconOpacity.setValue(0);
+
+			// Fade out overlay quickly
+			Animated.timing(overlayOpacity, {
+				toValue: 0,
+				duration: 100,
+				easing: Easing.out(Easing.quad),
+				useNativeDriver: true,
+			}).start(() => {
+				// Navigate after ensuring everything is clean
+				setTimeout(() => {
+					router.push("/(tabs)/homePage");
+				}, 50); // Small delay to ensure clean transition
+			});
 		});
+	};
+
+	const handleGotItPress = () => {
+		startAnimation();
 	};
 
 	return (
 		<ThemedView style={styles.container}>
+			{/* Overlay for smooth transition */}
+			<Animated.View
+				style={[
+					styles.overlay,
+					{ opacity: overlayOpacity },
+				]}
+			/>
+
 			{/* Icon Container with AI Avatar */}
 			<View style={styles.iconContainer}>
-				<View style={styles.avatarContainer}>
+				<Animated.View
+					style={[
+						styles.avatarContainer,
+						{
+							opacity: iconOpacity,
+							transform: [
+								{
+									translateX: translateX,
+								},
+								{
+									translateY: translateY,
+								},
+								{
+									scale: scale,
+								},
+							],
+						},
+					]}
+				>
 					<Svg
 						width={178}
 						height={204}
@@ -73,31 +229,46 @@ export default function ExerciseChangeInfoScreen() {
 							fill='white'
 						/>
 					</Svg>
-				</View>
+				</Animated.View>
 			</View>
 
 			{/* Question Text */}
-			<View style={styles.textContainer}>
+			<Animated.View
+				style={[
+					styles.textContainer,
+					{ opacity: contentOpacity },
+				]}
+			>
 				<ThemedText style={styles.questionText}>
 					Want to change your exercises?
 				</ThemedText>
-			</View>
+			</Animated.View>
 
 			{/* Instruction Text */}
-			<View style={styles.instructionContainer}>
+			<Animated.View
+				style={[
+					styles.instructionContainer,
+					{ opacity: contentOpacity },
+				]}
+			>
 				<ThemedText style={styles.instructionText}>
 					Look for me on your home page!
 				</ThemedText>
-			</View>
+			</Animated.View>
 
 			{/* Got it Button */}
-			<View style={styles.buttonContainer}>
+			<Animated.View
+				style={[
+					styles.buttonContainer,
+					{ opacity: contentOpacity },
+				]}
+			>
 				<LargeButton
 					label='Got it'
 					onPress={handleGotItPress}
 					style={styles.gotItButton}
 				/>
-			</View>
+			</Animated.View>
 		</ThemedView>
 	);
 }
@@ -111,6 +282,16 @@ const styles = StyleSheet.create({
 		width: "100%",
 		height: "100%",
 		paddingHorizontal: 20,
+		overflow: "hidden", // Prevent the animated icon from showing outside bounds
+	},
+	overlay: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		backgroundColor: "#000",
+		zIndex: 999,
 	},
 	iconContainer: {
 		alignItems: "center",
@@ -122,6 +303,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 		marginLeft: 20,
+		zIndex: 1000, // Ensure the icon appears above other elements during animation
 	},
 	textContainer: {
 		alignItems: "center",
