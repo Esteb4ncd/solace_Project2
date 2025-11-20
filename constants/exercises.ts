@@ -8,7 +8,7 @@
  * handles the video file mapping using API URLs instead of local require() paths.
  */
 
-import { apiService } from '@/services/api';
+import { Platform } from 'react-native';
 import exercisesData from './exercises.json';
 
 export interface Exercise {
@@ -70,56 +70,42 @@ export const getExerciseXpReward = (exercise: Exercise, isRecommended: boolean):
 };
 
 /**
- * Get video source URL for an exercise
- * Returns the API URL for the video file as { uri: string, headers?: object } format
- * This format is compatible with expo-av Video component
- * Includes authentication headers if API key is configured
+ * Get the correct API base URL for the current platform
+ * - Uses EXPO_PUBLIC_API_URL if explicitly set
+ * - For Android: uses 10.0.2.2 (maps to host's localhost in emulator)
+ * - For iOS/Web: uses localhost
+ * - For physical devices: user should set EXPO_PUBLIC_API_URL to their machine's IP
  */
-export const getExerciseVideoSource = (exercise: Exercise): { uri: string; headers?: Record<string, string> } => {
-  const videoUrl = apiService.getVideoUrl(exercise.videoFileName);
-  const authHeaders = apiService.getAuthHeaders();
-  
-  // Extract API key from headers (HeadersInit can be Headers, string[][], or Record<string, string>)
-  let apiKey: string | undefined;
-  if (authHeaders instanceof Headers) {
-    apiKey = authHeaders.get('x-api-key') || undefined;
-  } else if (Array.isArray(authHeaders)) {
-    const header = authHeaders.find(([key]) => key === 'x-api-key');
-    apiKey = header ? header[1] : undefined;
-  } else {
-    apiKey = (authHeaders as Record<string, string>)['x-api-key'];
+const getApiBaseUrl = (): string => {
+  // If explicitly set via environment variable, use that
+  if (process.env.EXPO_PUBLIC_API_URL) {
+    return process.env.EXPO_PUBLIC_API_URL;
   }
   
-  if (!videoUrl) {
-    console.warn(`Video URL not found for: ${exercise.videoFileName}. Using HandWarmUp as placeholder.`);
-    // Fallback to Hand Warm Up video (ID: "1") as placeholder
-    const handWarmUpExercise = getExerciseById('1');
-    if (handWarmUpExercise) {
-      const fallbackUrl = apiService.getVideoUrl(handWarmUpExercise.videoFileName);
-      return { 
-        uri: fallbackUrl,
-        headers: apiKey ? { 'x-api-key': apiKey } : undefined
-      };
-    }
-    // Ultimate fallback to first exercise if HandWarmUp not found
-    const fallbackExercise = EXERCISES_DATABASE[0];
-    const fallbackUrl = apiService.getVideoUrl(fallbackExercise.videoFileName);
-    return { 
-      uri: fallbackUrl,
-      headers: apiKey ? { 'x-api-key': apiKey } : undefined
-    };
+  // For Android emulator, use special IP that maps to host's localhost
+  if (Platform.OS === 'android') {
+    return 'http://10.0.2.2:3001';
   }
   
-  // Extract API key from URL if present (for query param method)
-  // Or use headers for header-based auth
-  const source: { uri: string; headers?: Record<string, string> } = { uri: videoUrl };
+  // Default to localhost (works for iOS simulator and web)
+  return 'http://localhost:3001';
+};
+
+/**
+ * Get video source for an exercise
+ * Uses local Express server at http://localhost:3001 (or configured URL)
+ * Returns the video URL in a format compatible with expo-av Video component
+ * 
+ * Note: For physical devices, set EXPO_PUBLIC_API_URL to your machine's IP address
+ * (e.g., EXPO_PUBLIC_API_URL=http://192.168.1.100:3001)
+ */
+export const getExerciseVideoSource = (exercise: Exercise): { uri: string } => {
+  const baseUrl = getApiBaseUrl();
+  const videoUrl = `${baseUrl}/videos/${encodeURIComponent(exercise.videoFileName)}`;
   
-  // If API key is available, use header-based auth (more secure than query param)
-  if (apiKey) {
-    source.headers = { 'x-api-key': apiKey };
-  }
-  
-  return source;
+  console.log(`📹 Video URL for ${exercise.videoFileName}: ${videoUrl}`);
+  console.log(`📹 Using base URL: ${baseUrl} (Platform: ${Platform.OS})`);
+  return { uri: videoUrl };
 };
 
 /**

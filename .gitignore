@@ -37,6 +37,7 @@ yarn-error.*
 .env
 env
 .env*.local
+env
 # Note: .env.example should be committed (it's a template)
 
 # typescript

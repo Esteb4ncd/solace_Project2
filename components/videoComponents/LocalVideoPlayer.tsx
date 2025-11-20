@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   Image,
+  PanResponder,
   StatusBar,
   StyleSheet,
   Text,
@@ -42,6 +43,8 @@ export default function LocalVideoPlayer({
   const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isVideoEnded, setIsVideoEnded] = useState(false);
+  const [isSeeking, setIsSeeking] = useState(false);
+  const [seekTime, setSeekTime] = useState(0);
 
   // Reset video when resetTrigger changes
   useEffect(() => {
@@ -89,7 +92,10 @@ export default function LocalVideoPlayer({
 
   const handlePlaybackStatusUpdate = (status: any) => {
     if (status.isLoaded) {
-      setCurrentTime(status.positionMillis / 1000);
+      // Only update current time if not seeking (to avoid conflicts)
+      if (!isSeeking) {
+        setCurrentTime(status.positionMillis / 1000);
+      }
       setDuration(status.durationMillis / 1000);
       setIsLoading(false);
       
@@ -112,6 +118,69 @@ export default function LocalVideoPlayer({
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  const handleSeek = async (time: number) => {
+    if (videoRef.current && duration > 0) {
+      const clampedTime = Math.max(0, Math.min(time, duration));
+      try {
+        await videoRef.current.setPositionAsync(clampedTime * 1000);
+        setCurrentTime(clampedTime);
+        setIsVideoEnded(false);
+      } catch (error) {
+        console.error('Error seeking video:', error);
+      }
+    }
+  };
+
+
+  // Handle touch on progress bar for scrubbing
+  const handleProgressBarPress = (evt: any) => {
+    if (duration > 0) {
+      const touchX = evt.nativeEvent.locationX;
+      const percentage = Math.max(0, Math.min(1, touchX / progressBarWidth));
+      const newTime = percentage * duration;
+      handleSeek(newTime);
+    }
+  };
+
+  // Pan responder for scrubbing the progress bar
+  const progressBarRef = useRef<View>(null);
+  const [progressBarWidth, setProgressBarWidth] = useState(350);
+  
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (evt) => {
+        setIsSeeking(true);
+        if (videoRef.current) {
+          videoRef.current.pauseAsync();
+        }
+        setIsPlaying(false);
+        // Calculate initial seek position
+        if (duration > 0) {
+          const touchX = evt.nativeEvent.locationX;
+          const percentage = Math.max(0, Math.min(1, touchX / progressBarWidth));
+          const newTime = percentage * duration;
+          setSeekTime(newTime);
+          setCurrentTime(newTime);
+        }
+      },
+      onPanResponderMove: (evt) => {
+        if (duration > 0) {
+          const touchX = evt.nativeEvent.locationX;
+          const percentage = Math.max(0, Math.min(1, touchX / progressBarWidth));
+          const newTime = percentage * duration;
+          setSeekTime(newTime);
+          setCurrentTime(newTime);
+        }
+      },
+      onPanResponderRelease: async () => {
+        setIsSeeking(false);
+        await handleSeek(seekTime);
+      },
+    })
+  ).current;
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
@@ -128,7 +197,22 @@ export default function LocalVideoPlayer({
           resizeMode={ResizeMode.COVER}
           shouldPlay={isPlaying}
           onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-          onLoad={() => setIsLoading(false)}
+          onLoad={() => {
+            console.log('✅ Video loaded successfully:', videoSource);
+            setIsLoading(false);
+          }}
+          onLoadStart={() => {
+            console.log('🔄 Video loading started:', videoSource);
+            setIsLoading(true);
+          }}
+          onError={(error) => {
+            console.error('❌ Video error:', error);
+            console.error('❌ Video source was:', videoSource);
+            setIsLoading(false);
+            if (onError) {
+              onError(error);
+            }
+          }}
         />
         
         {isLoading && (
@@ -187,14 +271,30 @@ export default function LocalVideoPlayer({
         )}
         
         <View style={styles.progressContainer}>
-          <View style={styles.progressBar}>
+          <Text style={styles.currentTimeText}>
+            {formatTime(currentTime)}
+          </Text>
+          <TouchableOpacity
+            ref={progressBarRef}
+            style={styles.progressBar}
+            activeOpacity={1}
+            onPress={handleProgressBarPress}
+            onLayout={(event) => {
+              const { width } = event.nativeEvent.layout;
+              setProgressBarWidth(width);
+            }}
+            {...panResponder.panHandlers}
+          >
             <View 
               style={[
                 styles.progressFill, 
-                { width: `${(currentTime / duration) * 100}%` }
+                { width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }
               ]} 
             />
-          </View>
+          </TouchableOpacity>
+          <Text style={styles.totalTimeText}>
+            {formatTime(duration)}
+          </Text>
         </View>
       </View>
 
@@ -296,28 +396,44 @@ const styles = StyleSheet.create({
   progressContainer: {
     flexDirection: "row",
     alignItems: "center",
+    width: "100%",
   },
   progressBar: {
-    width: 350,
+    flex: 1,
     height: 16,
     backgroundColor: "#D9D9D9", // Light grey background
     borderRadius: 5,
-    marginRight: 12,
+    marginRight: 0,
+    marginLeft: 0,
+    position: "relative",
+    justifyContent: "center",
   },
   progressFill: {
     height: "100%",
     backgroundColor: "#B0E06F", // Green progress
     borderRadius: 5,
   },
-  timeText: {
+  currentTimeText: {
     color: "white",
-    fontSize: 14,
-    fontWeight: "bold",
-    minWidth: 40,
+    fontSize: 12,
+    fontWeight: "500",
+    minWidth: 50,
+    textAlign: "left",
+    textShadowColor: "rgba(0, 0, 0, 0.8)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+    marginRight: 4,
+  },
+  totalTimeText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "500",
+    minWidth: 50,
     textAlign: "right",
     textShadowColor: "rgba(0, 0, 0, 0.8)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
+    marginLeft: 4,
   },
   replayOverlay: {
     position: "absolute",
