@@ -17,6 +17,8 @@ function AccountSettingsPage() {
   const [email, setEmail] = useState("user123@example.com");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const [accessibilityHighContrast, setAccessibilityHighContrast] =
+    useState(false);
   const [showContent, setShowContent] = useState(true);
   const [activeSection, setActiveSection] = useState(null);
 
@@ -64,7 +66,11 @@ function AccountSettingsPage() {
       case "General":
         return <GeneralSettingsContent />;
       case "Accessibility":
-        return <AccessibilitySettingsContent />;
+        return (
+          <AccessibilitySettingsContent
+            onHighContrastChange={setAccessibilityHighContrast}
+          />
+        );
       case "Notifications":
         return <NotificationSettingsContent />;
       case "Account":
@@ -81,7 +87,13 @@ function AccountSettingsPage() {
       {!showContent && (
         <View style={styles.backButtonContainer}>
           <View style={styles.headerRow}>
-            <BackButton onPress={handleBackPress} style={styles.backButton} />
+            <BackButton
+              onPress={handleBackPress}
+              style={styles.backButton}
+              highContrast={
+                activeSection === "Accessibility" && accessibilityHighContrast
+              }
+            />
             <Text style={styles.activeSectionText}>{activeSection}</Text>
           </View>
           {renderSectionContent()}
