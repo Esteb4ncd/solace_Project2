@@ -17,30 +17,37 @@ const ExerciseChip = ({
     }
   };
 
+  if (!Array.isArray(categories) || categories.length === 0) {
+    return null;
+  }
+
   return (
     <View style={[styles.chipContainer, containerStyle]}>
-      {categories.map((category, index) => (
-        <TouchableOpacity
-          key={index}
-          style={[
-            styles.categoryButton,
-            selectedIndex === index && styles.selectedCategoryButton,
-            index === 0 && styles.leftButton,
-            index === categories.length - 1 && styles.rightButton,
-          ]}
-          onPress={() => handleCategoryPress(index)}
-          activeOpacity={0.8}
-        >
-          <Text
+      {categories.map((category, index) => {
+        const categoryText = typeof category === 'string' ? category : String(category || '');
+        return (
+          <TouchableOpacity
+            key={index}
             style={[
-              styles.categoryText,
-              selectedIndex === index && styles.selectedCategoryText,
+              styles.categoryButton,
+              selectedIndex === index && styles.selectedCategoryButton,
+              index === 0 && styles.leftButton,
+              index === categories.length - 1 && styles.rightButton,
             ]}
+            onPress={() => handleCategoryPress(index)}
+            activeOpacity={0.8}
           >
-            {category}
-          </Text>
-        </TouchableOpacity>
-      ))}
+            <Text
+              style={[
+                styles.categoryText,
+                selectedIndex === index && styles.selectedCategoryText,
+              ]}
+            >
+              {categoryText}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 };

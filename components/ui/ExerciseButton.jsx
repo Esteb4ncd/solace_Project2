@@ -11,12 +11,12 @@ const ExerciseButton = ({ title, onPress, disabled = false, image, xp }) => {
       activeOpacity={0.8}
     >
       <View style={styles.content}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title}>{title || ''}</Text>
       </View>
       {image && <View style={styles.imageContainer}>{image}</View>}
-      {xp !== undefined && (
+      {xp !== undefined && xp !== null && (
         <View style={styles.xpContainer}>
-          <Text style={styles.xpText}>{xp} XP</Text>
+          <Text style={styles.xpText}>{String(xp)} XP</Text>
         </View>
       )}
     </TouchableOpacity>

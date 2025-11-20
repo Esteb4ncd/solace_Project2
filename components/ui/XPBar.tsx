@@ -16,17 +16,27 @@ const XPBar = ({
   const { completedExercises } = useExerciseContext();
   
   // Calculate current progress from completed exercises
-  const calculatedProgress = completedExercises.reduce((total, exercise) => total + exercise.xpGained, 0);
+  const calculatedProgress = Array.isArray(completedExercises) 
+    ? completedExercises.reduce((total, exercise) => {
+        const xp = typeof exercise.xpGained === 'number' ? exercise.xpGained : 0;
+        return total + xp;
+      }, 0)
+    : 0;
   
   // Use calculated progress if no currentProgress prop is provided
   const actualProgress = currentProgress !== undefined ? currentProgress : calculatedProgress;
   
-  const progressPercentage = Math.min((actualProgress / totalProgress) * 100, 100);
+  // Ensure progress is a valid number
+  const safeProgress = typeof actualProgress === 'number' && !isNaN(actualProgress) ? actualProgress : 0;
+  const safeTotal = typeof totalProgress === 'number' && !isNaN(totalProgress) ? totalProgress : 50;
+  const safeLevel = typeof level === 'number' && !isNaN(level) ? level : 1;
+  
+  const progressPercentage = Math.min((safeProgress / safeTotal) * 100, 100);
 
   return (
     <View style={styles.container}>
       <View style={styles.levelCircle}>
-        <Text style={styles.levelText}>{level}</Text>
+        <Text style={styles.levelText}>{String(safeLevel)}</Text>
       </View>
       
       <View style={styles.progressBar}>
@@ -38,7 +48,7 @@ const XPBar = ({
         />
         <View style={styles.textContainer}>
           <Text style={styles.progressText}>
-            {actualProgress}/{totalProgress}
+            {String(safeProgress)}/{String(safeTotal)}
           </Text>
         </View>
       </View>

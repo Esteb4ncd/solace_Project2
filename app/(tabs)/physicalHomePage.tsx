@@ -4,24 +4,24 @@ import { Colors } from "@/constants/theme";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  Dimensions,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
-import ExerciseChip from "../..//components/ui/ExerciseChip";
-import XPBar from "../..//components/ui/XPBar";
 import ExerciseButton from "../../components/ui/ExerciseButton";
+import ExerciseChip from "../../components/ui/ExerciseChip";
 import StatusBar from "../../components/ui/StatusBar";
+import XPBar from "../../components/ui/XPBar";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 const PhysicalHomePage = () => {
-  const [userName] = useState("Sarah");
-  const [selectedCategory, setSelectedCategory] = useState("For You");
+  const [userName] = useState<string>("Sarah");
+  const [selectedCategory, setSelectedCategory] = useState<string>("For You");
 
   const handleNavPress = (itemId: string) => {
     switch (itemId) {
@@ -42,13 +42,16 @@ const PhysicalHomePage = () => {
     }
   };
 
-  const handleExercisePress = (exerciseName: string) => {
-    console.log(`Starting physical exercise: ${exerciseName}`);
-    router.push({
-      pathname: "/(tabs)/physicalExercisePage",
-      params: { exerciseType: exerciseName },
-    });
-  };
+  const handleExercisePress = (exerciseName: string) => {
+    console.log(`Navigating to exercises for: ${exerciseName}`);
+    // Navigate to body part exercises page
+    router.push({
+      pathname: "/(tabs)/bodyPartExercises",
+      params: { 
+        bodyPart: exerciseName,
+      },
+    });
+  };
 
   // Exercise data with mascot images
   const forYouExercises = [
@@ -131,48 +134,46 @@ const PhysicalHomePage = () => {
           />
         </View>
 
-        {/* Exercise Cards Grid */}
-        <View style={styles.exerciseCardsContainer}>
-          {selectedCategory === "For You" && (
-            <View style={styles.cardsGrid}>
-              {forYouExercises.map((exercise) => (
-                <ExerciseButton
-                  key={exercise.name}
-                  title={exercise.name}
-                  image={
-                    <Image
-                      source={exercise.mascot}
-                      style={styles.exerciseImage}
-                      resizeMode="contain"
-                    />
-                  }
-                  xp={exercise.xp}
-                  onPress={() => handleExercisePress(exercise.name)}
-                />
-              ))}
-            </View>
-          )}
-
-          {selectedCategory === "See All" && (
-            <View style={styles.cardsGrid}>
-              {allExercises.map((exercise) => (
-                <ExerciseButton
-                  key={exercise.name}
-                  title={exercise.name}
-                  image={
-                    <Image
-                      source={exercise.mascot}
-                      style={styles.exerciseImage}
-                      resizeMode="contain"
-                    />
-                  }
-                  xp={exercise.xp}
-                  onPress={() => handleExercisePress(exercise.name)}
-                />
-              ))}
-            </View>
-          )}
-        </View>
+        {/* Exercise Cards Grid */}
+        <View style={styles.exerciseCardsContainer}>
+          {selectedCategory === "For You" ? (
+            <View style={styles.cardsGrid}>
+              {forYouExercises.map((exercise) => (
+                <ExerciseButton
+                  key={exercise.name}
+                  title={exercise.name}
+                  image={
+                    <Image
+                      source={exercise.mascot}
+                      style={styles.exerciseImage}
+                      resizeMode="contain"
+                    />
+                  }
+                  xp={exercise.xp}
+                  onPress={() => handleExercisePress(exercise.name)}
+                />
+              ))}
+            </View>
+          ) : selectedCategory === "See All" ? (
+            <View style={styles.cardsGrid}>
+              {allExercises.map((exercise) => (
+                <ExerciseButton
+                  key={exercise.name}
+                  title={exercise.name}
+                  image={
+                    <Image
+                      source={exercise.mascot}
+                      style={styles.exerciseImage}
+                      resizeMode="contain"
+                    />
+                  }
+                  xp={exercise.xp}
+                  onPress={() => handleExercisePress(exercise.name)}
+                />
+              ))}
+            </View>
+          ) : null}
+        </View>
 
         <View style={styles.bottomSpacing} />
 
@@ -186,10 +187,10 @@ const PhysicalHomePage = () => {
 export default PhysicalHomePage;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background, // EXACT SAME AS MENTAL PAGE
-  },
+  container: {
+    flex: 1,
+    backgroundColor: Colors.light.background,
+  },
   scrollView: {
     flex: 1,
   },
@@ -200,13 +201,13 @@ const styles = StyleSheet.create({
   headerSection: {
     marginBottom: 20,
   },
-  greeting: {
-    fontSize: 28,
-    fontWeight: "600",
-    color: Colors.textPrimary,
-    textAlign: "center",
-    marginTop: screenHeight * 0.015,
-  },
+  greeting: {
+    fontSize: 28,
+    fontWeight: "600",
+    color: Colors.light.text,
+    textAlign: "center",
+    marginTop: screenHeight * 0.015,
+  },
   progressContainer: {
     marginTop: 10,
   },
