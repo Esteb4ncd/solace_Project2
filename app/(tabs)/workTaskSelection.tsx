@@ -1,8 +1,9 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import BackButton from '../../components/ui/BackButton';
 import LargeButton from '../../components/ui/LargeButton';
+import FloatingAIAssist from '../../components/ui/FloatingAIAssist';
 import ProgressIndicator from '../../components/ui/ProgressIndicator';
 import SelectableCard from '../../components/ui/SelectableCard';
 import { Globals } from '../../constants/globals';
@@ -49,6 +50,8 @@ const workTasks: WorkTask[] = [
 export default function WorkTaskSelectionScreen() {
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
 
+  const isNextDisabled = selectedTasks.size === 0;
+
   const handleTaskPress = (taskId: string) => {
     setSelectedTasks((prev) => {
       const newSet = new Set(prev);
@@ -62,6 +65,10 @@ export default function WorkTaskSelectionScreen() {
   };
 
   const handleNext = () => {
+    if (selectedTasks.size === 0) {
+      return;
+    }
+
     // Convert selected tasks to array and map to AI service format
     const selectedTasksArray = Array.from(selectedTasks);
     const mappedTasks = selectedTasksArray.map(taskId => {
@@ -104,34 +111,39 @@ export default function WorkTaskSelectionScreen() {
       </View>
 
       {/* Content */}
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Title */}
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>What tasks do you do most?</Text>
-          <Text style={styles.subtitle}>(Select all that apply)</Text>
-        </View>
+      <View style={styles.content}>
+        <View>
+          {/* Title */}
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>What tasks do you do most?</Text>
+            <Text style={styles.subtitle}>(Select all that apply)</Text>
+          </View>
 
-        {/* Cards Grid */}
-        <View style={styles.cardsContainer}>
-          {workTasks.map((task) => (
-            <SelectableCard
-              key={task.id}
-              label={task.label}
-              icon={task.icon}
-              isSelected={selectedTasks.has(task.id)}
-              onPress={() => handleTaskPress(task.id)}
-            />
-          ))}
+          {/* Cards Grid */}
+          <View style={styles.cardsContainer}>
+            {workTasks.map((task) => (
+              <SelectableCard
+                key={task.id}
+                label={task.label}
+                icon={task.icon}
+                isSelected={selectedTasks.has(task.id)}
+                onPress={() => handleTaskPress(task.id)}
+              />
+            ))}
+          </View>
         </View>
-      </ScrollView>
+      </View>
 
       {/* Next Button */}
       <View style={styles.buttonContainer}>
-        <LargeButton label="Next" onPress={handleNext} />
+        <LargeButton label="Next" onPress={handleNext} disabled={isNextDisabled} />
       </View>
+
+      <FloatingAIAssist
+        onPress={() => {
+          router.push('/(tabs)/aiQuestion1');
+        }}
+      />
     </View>
   );
 }
@@ -164,8 +176,10 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   content: {
+    flex: 1,
     paddingHorizontal: 30,
-    paddingBottom: Globals.spacing.large,
+    justifyContent: 'center',
+    width: '100%',
   },
   titleContainer: {
     marginBottom: Globals.spacing.large,
@@ -187,6 +201,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     width: 332, // 2 cards (158px each) + 1 gap (16px) = 332px
     alignSelf: 'center',
+    marginTop: 8,
   },
   buttonContainer: {
     paddingHorizontal: 30,

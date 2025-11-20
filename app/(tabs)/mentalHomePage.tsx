@@ -1,3 +1,4 @@
+import BottomNavigation from '@/components/ui/BottomNavigation';
 import { Globals } from "@/constants/globals";
 import { Colors } from "@/constants/theme";
 import { router } from "expo-router";
@@ -21,6 +22,25 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 const MentalHomePage = () => {
   const [userName] = useState("Sarah");
   const [selectedCategory, setSelectedCategory] = useState("breathing");
+
+  const handleNavPress = (itemId: string) => {
+    switch (itemId) {
+      case 'home':
+        router.push('/(tabs)/homePage');
+        break;
+      case 'physical':
+        router.push('/(tabs)/physicalHomePage');
+        break;
+      case 'mental':
+        // already on mental page
+        break;
+      case 'account':
+        router.push('/(tabs)/accountSettingsPage');
+        break;
+      default:
+        console.log(`Navigating to ${itemId}`);
+    }
+  };
 
   const handleExercisePress = (exerciseName: string) => {
     console.log(`Starting exercise: ${exerciseName}`);
@@ -155,7 +175,10 @@ const MentalHomePage = () => {
             />
           </View>
         )}
+        <View style={styles.bottomSpacing} />
       </ScrollView>
+
+      <BottomNavigation onItemPress={handleNavPress} />
     </View>
   );
 };

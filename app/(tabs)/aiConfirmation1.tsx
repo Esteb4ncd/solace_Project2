@@ -101,6 +101,31 @@ export default function AIConfirmation1Screen() {
     outputRange: [0.5, 1],
   });
 
+  const extractTasksFromText = (text: string): string[] => {
+    const lowerAnswer = text.toLowerCase();
+    const extractedTasks: string[] = [];
+    
+    if (lowerAnswer.includes('lift') || lowerAnswer.includes('heavy') || lowerAnswer.includes('weight')) {
+      extractedTasks.push('heavy lifting');
+    }
+    if (lowerAnswer.includes('overhead') || lowerAnswer.includes('above') || lowerAnswer.includes('reach')) {
+      extractedTasks.push('overhead work');
+    }
+    if (lowerAnswer.includes('tool') || lowerAnswer.includes('repetitive') || lowerAnswer.includes('hammer') || lowerAnswer.includes('drill')) {
+      extractedTasks.push('repetitive tool use');
+    }
+    if (lowerAnswer.includes('kneel') || lowerAnswer.includes('crouch') || lowerAnswer.includes('squat')) {
+      extractedTasks.push('kneeling');
+    }
+    if (lowerAnswer.includes('stand') || lowerAnswer.includes('long hours')) {
+      extractedTasks.push('standing long hours');
+    }
+    if (lowerAnswer.includes('awkward') || lowerAnswer.includes('twist')) {
+      extractedTasks.push('awkward postures');
+    }
+    return extractedTasks;
+  };
+
   const handleYesPress = async () => {
     // Save question 1 recording to JSON file before navigating
     try {
@@ -121,10 +146,24 @@ export default function AIConfirmation1Screen() {
       console.error('Error saving question 1 recording:', error);
     }
     
-    // Navigate to question 2
+    const context = aiService.getCurrentContext();
+    let tasks = [...context.workTasks];
+
+    if (tasks.length === 0 && typeof answer === 'string') {
+      tasks = extractTasksFromText(answer);
+    }
+
+    if (tasks.length === 0) {
+      console.warn('⚠️ AI confirmation could not determine tasks; returning to manual selection.');
+      router.push('/(tabs)/workTaskSelection');
+      return;
+    }
+
     router.push({
-      pathname: '/(tabs)/aiQuestion2',
-      params: { firstAnswer: answer as string }
+      pathname: '/(tabs)/painAreaSelection',
+      params: {
+        selectedWorkTasks: JSON.stringify(tasks),
+      },
     });
   };
 

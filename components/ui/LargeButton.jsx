@@ -4,10 +4,10 @@ import React from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
 import { Globals } from '../../constants/globals'; // adjust path if needed
 
-const LargeButton = ({ label, onPress, style }) => {
+const LargeButton = ({ label, onPress, style, disabled = false }) => {
   const state = useToggleState({});
   const { buttonProps } = useButton(
-    { onPress, isDisabled: false },
+    { onPress, isDisabled: disabled },
     state
   );
 
@@ -17,11 +17,12 @@ const LargeButton = ({ label, onPress, style }) => {
       style={({ pressed }) => [
         styles.button, 
         { backgroundColor: Globals.colors.primaryButton },
-        pressed && styles.buttonPressed,
+        pressed && !disabled && styles.buttonPressed,
+        disabled && styles.buttonDisabled,
         style // Allow style override
       ]}
     >
-      <Text style={styles.text}>{label}</Text>
+      <Text style={[styles.text, disabled && styles.textDisabled]}>{label}</Text>
     </Pressable>
   );
 };
@@ -44,9 +45,16 @@ const styles = StyleSheet.create({
   buttonPressed: {
     borderBottomWidth: 0,
   },
+  buttonDisabled: {
+    opacity: 0.4,
+    borderBottomWidth: 0,
+  },
   text: {
     ...Globals.fonts.styles.header2Bold,
     textAlign: 'center',
+  },
+  textDisabled: {
+    color: '#FFFFFF',
   },
 });
 

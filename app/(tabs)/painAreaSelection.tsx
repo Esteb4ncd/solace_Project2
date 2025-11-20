@@ -1,8 +1,9 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
-import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import BackButton from '../../components/ui/BackButton';
 import LargeButton from '../../components/ui/LargeButton';
+import FloatingAIAssist from '../../components/ui/FloatingAIAssist';
 import ProgressIndicator from '../../components/ui/ProgressIndicator';
 import SelectableCard from '../../components/ui/SelectableCard';
 import { Globals } from '../../constants/globals';
@@ -49,6 +50,7 @@ const painAreas: PainArea[] = [
 export default function PainAreaSelectionScreen() {
   const { selectedWorkTasks } = useLocalSearchParams();
   const [selectedAreas, setSelectedAreas] = useState<Set<string>>(new Set());
+  const isNextDisabled = selectedAreas.size === 0;
 
   const handleAreaPress = (areaId: string) => {
     setSelectedAreas((prev) => {
@@ -63,6 +65,10 @@ export default function PainAreaSelectionScreen() {
   };
 
   const handleNext = () => {
+    if (selectedAreas.size === 0) {
+      return;
+    }
+
     // Convert selected areas to array and map to AI service format
     const selectedAreasArray = Array.from(selectedAreas);
     const mappedAreas = selectedAreasArray.map(areaId => {
@@ -106,36 +112,54 @@ export default function PainAreaSelectionScreen() {
       </View>
 
       {/* Content */}
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Title */}
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>
-            Where do you usually feel pain or discomfort?
-          </Text>
-          <Text style={styles.subtitle}>(Select all that apply)</Text>
-        </View>
+      <View style={styles.content}>
+        <View>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>
+              Where do you usually feel pain or discomfort?
+            </Text>
+            <Text style={styles.subtitle}>(Select all that apply)</Text>
+          </View>
 
-        {/* Cards Grid */}
-        <View style={styles.cardsContainer}>
-          {painAreas.map((area) => (
-            <SelectableCard
-              key={area.id}
-              label={area.label}
-              icon={area.icon}
-              isSelected={selectedAreas.has(area.id)}
-              onPress={() => handleAreaPress(area.id)}
-            />
-          ))}
+          <View style={styles.cardsContainer}>
+            {painAreas.map((area) => (
+              <SelectableCard
+                key={area.id}
+                label={area.label}
+                icon={area.icon}
+                isSelected={selectedAreas.has(area.id)}
+                onPress={() => handleAreaPress(area.id)}
+              />
+            ))}
+          </View>
         </View>
-      </ScrollView>
+      </View>
 
       {/* Next Button */}
       <View style={styles.buttonContainer}>
-        <LargeButton label="Next" onPress={handleNext} />
+        <LargeButton label="Next" onPress={handleNext} disabled={isNextDisabled} />
       </View>
+
+      <FloatingAIAssist
+        onPress={() => {
+          let firstAnswerParam = '';
+          if (typeof selectedWorkTasks === 'string') {
+            try {
+              const parsed = JSON.parse(selectedWorkTasks);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                firstAnswerParam = parsed.join(', ');
+              }
+            } catch (error) {
+              console.warn('Failed to parse selectedWorkTasks for AI assist:', error);
+            }
+          }
+          
+          router.push({
+            pathname: '/(tabs)/aiQuestion2',
+            params: firstAnswerParam ? { firstAnswer: firstAnswerParam } : {},
+          });
+        }}
+      />
     </View>
   );
 }
@@ -168,11 +192,13 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   content: {
+    flex: 1,
     paddingHorizontal: 30,
-    paddingBottom: Globals.spacing.large,
+    justifyContent: 'center',
+    width: '100%',
   },
   titleContainer: {
-    marginBottom: Globals.spacing.small,
+    marginBottom: Globals.spacing.large,
   },
   title: {
     ...Globals.fonts.styles.header2Bold,
@@ -191,6 +217,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     width: 332, // 2 cards (158px each) + 1 gap (16px) = 332px
     alignSelf: 'center',
+    marginTop: 8,
   },
   buttonContainer: {
     paddingHorizontal: 30,
