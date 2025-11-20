@@ -1,317 +1,3 @@
-// import BottomNavigation from '@/components/ui/BottomNavigation';
-// import CategoryCard from '@/components/ui/CategoryCard';
-// import ExerciseButton from "../../components/ui/ExerciseButton";
-
-// import StatusBar from '@/components/ui/StatusBar';
-// import XPBar from '@/components/ui/XPBar';
-// import { Globals } from '@/constants/globals';
-// import { Colors } from '@/constants/theme';
-// import { router } from 'expo-router';
-// import React, { useState } from 'react';
-// import { Dimensions, ScrollView, Image,  StyleSheet, Text, View } from 'react-native';
-
-// const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-
-// const PhysicalHomePage = () => {
-//   const [userName] = useState("Sarah");
-  
-//   const handleNavPress = (itemId: string) => {
-//     switch (itemId) {
-//       case 'home':
-//         router.push('/(tabs)/homePage');
-//         break;
-//       case 'physical':
-//         // Already on physical page
-//         break;
-//       case 'mental':
-//         router.push('/(tabs)/mentalHomePage');
-//         break;
-//       case 'account':
-//         router.push('/(tabs)/accountSettingsPage');
-//         break;
-//       default:
-//         console.log(`Navigating to ${itemId}`);
-//     }
-//   };
-
-//   const handleExercisePress = (exerciseName: string) => {
-//     console.log(`Starting exercise: ${exerciseName}`);
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <StatusBar />
-      
-//       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-//         <View style={styles.contentContainer}>
-//           {/* Header with Progress Bar and Greeting */}
-//           <View style={styles.headerSection}>
-//             <View style={styles.progressContainer}>
-//               <XPBar 
-//                 totalProgress={50}
-//                 level={1}
-//               />
-//             </View>
-//             <Text style={styles.greeting}>Hey, {userName}</Text>
-//           </View>
-
-//           {/* For you Section */}
-//           <View style={styles.section}>
-//             <View style={styles.sectionHeader}>
-//               <Text style={styles.sectionTitle}>For you</Text>
-//               <Text style={styles.xpText}>10xp</Text>
-//             </View>
-            
-//             <CategoryCard 
-//               title="Back"
-//               xpAmount={10}
-//               onPress={() => handleExercisePress("Back")}
-//             />
-//                             <ExerciseButton
-//                   title="Deep Breathing"
-//                   image={
-//                     <Image
-//                       source={require("../../assets/images/Breathing03.png")}
-//                       style={styles.exerciseImage}
-//                       resizeMode="contain"
-//                     />
-//                   }
-//                   xp={3}
-//                   onPress={() => handleExercisePress("Deep Breathing")}
-//                 />
-//             <CategoryCard 
-//               title="Shoulder"
-//               xpAmount={10}
-//               onPress={() => handleExercisePress("Shoulder")}
-//             />
-//             <CategoryCard 
-//               title="Wrists"
-//               xpAmount={10}
-//               onPress={() => handleExercisePress("Wrists")}
-//             />
-//           </View>
-
-//           {/* See all Section */}
-//           <View style={styles.section}>
-//             <View style={styles.sectionHeader}>
-//               <Text style={styles.sectionTitle}>See all</Text>
-//               <Text style={styles.xpText}>5xp</Text>
-//             </View>
-            
-//             <CategoryCard 
-//               title="Explore Areas"
-//               xpAmount={5}
-//               onPress={() => handleExercisePress("Explore Areas")}
-//             />
-//           </View>
-
-//           {/* Bottom spacing for navigation */}
-//           <View style={styles.bottomSpacing} />
-//         </View>
-//       </ScrollView>
-
-//       <BottomNavigation onItemPress={handleNavPress} />
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: Colors.light.background,
-//     width: screenWidth,
-//     height: screenHeight,
-//   },
-//   scrollView: {
-//     flex: 1,
-//   },
-//   contentContainer: {
-//     paddingHorizontal: screenWidth * 0.04, // 4% of screen width
-//   },
-//   headerSection: {
-//     paddingTop: screenHeight * 0.025, // 2.5% of screen height
-//     paddingBottom: screenHeight * 0.03, // 3% of screen height
-//   },
-//   progressContainer: {
-//     marginBottom: screenHeight * 0.02, // 2% of screen height
-//   },
-//   greeting: {
-//     ...Globals.fonts.styles.header1,
-//   },
-//   section: {
-//     marginBottom: screenHeight * 0.04, // 4% of screen height
-//   },
-//   sectionHeader: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     marginBottom: screenHeight * 0.015, // 1.5% of screen height
-//   },
-//   sectionTitle: {
-//     ...Globals.fonts.styles.header2Bold,
-//   },
-//   xpText: {
-//     ...Globals.fonts.styles.header2Bold,
-//     color: '#7267D9',
-//   },
-//   bottomSpacing: {
-//     height: screenHeight * 0.12, // 12% of screen height
-//   },
-// });
-
-// export default PhysicalHomePage;
-
-
-
-// import BottomNavigation from '@/components/ui/BottomNavigation';
-// import { Globals } from "@/constants/globals";
-// import { Colors } from "@/constants/theme";
-// import { router } from "expo-router";
-// import React, { useState } from "react";
-// import {
-//   Dimensions,
-//   ScrollView,
-//   StyleSheet,
-//   Text,
-//   View,
-// } from "react-native";
-
-// import ExerciseChip from "../../components/ui/ExerciseChip";
-// import XPBar from "../../components/ui/XPBar";
-// import GeneralTaskCard from "../../components/taskCards/generalTaskCard";
-// import ExerciseButton from "../../components/ui/ExerciseButton";
-// import StatusBar from "../../components/ui/StatusBar";
-
-// const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
-
-// const PhysicalHomePage = () => {
-//   const [userName] = useState("Sarah");
-//   const [selectedCategory, setSelectedCategory] = useState("foryou");
-
-//   const handleNavPress = (itemId: string) => {
-//     switch (itemId) {
-//       case 'home':
-//         router.push('/(tabs)/homePage');
-//         break;
-//       case 'physical':
-//         // already here
-//         break;
-//       case 'mental':
-//         router.push('/(tabs)/mentalHomePage');
-//         break;
-//       case 'account':
-//         router.push('/(tabs)/accountSettingsPage');
-//         break;
-//     }
-//   };
-
-//   const handleExercisePress = (exerciseName: string) => {
-//     router.push({
-//       pathname: "/(tabs)/physicalExercisePage",
-//       params: { exerciseType: exerciseName },
-//     });
-//   };
-
-//   const allExercises = [
-//     "Back",
-//     "Shoulder",
-//     "Chest",
-//     "Hand",
-//     "Hip",
-//     "Legs",
-//   ];
-
-//   return (
-//     <View style={styles.container}>
-//       <StatusBar />
-
-//       <ScrollView
-//         style={styles.scrollView}
-//         showsVerticalScrollIndicator={false}
-//       >
-//         <View style={styles.contentContainer}>
-
-//           {/* Header */}
-//           <View style={styles.headerSection}>
-//             <Text style={styles.greeting}>Hey, {userName}</Text>
-//             <View style={styles.progressContainer}>
-//               <XPBar totalProgress={50} level={1} />
-//             </View>
-//           </View>
-
-//           {/* Category Tabs */}
-//           <View style={styles.exerciseChipContainer}>
-//             <ExerciseChip
-//               categories={["For You", "See All"]}
-//               onSelectionChange={(index: number, category: string) => {
-//                 setSelectedCategory(category.toLowerCase().replace(" ", ""));
-//               }}
-//             />
-//           </View>
-
-//           {/* Content for "For You" */}
-//           {selectedCategory === "foryou" && (
-//             <View style={{ marginTop: 20 }}>
-//               <GeneralTaskCard
-//                 title="Recommended for Today"
-//                 description="A curated stretch to help you feel better."
-//                 onPress={() => handleExercisePress("Back")}
-//               />
-//             </View>
-//           )}
-
-//           {/* Content for "See All" */}
-//           {selectedCategory === "seeall" && (
-//             <View style={{ marginTop: 20 }}>
-//               {allExercises.map((exercise) => (
-//                 <ExerciseButton
-//                   key={exercise}
-//                   title={exercise}
-//                   onPress={() => handleExercisePress(exercise)}
-//                 />
-//               ))}
-//             </View>
-//           )}
-//         </View>
-//       </ScrollView>
-
-//       <BottomNavigation onPress={handleNavPress} />
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: Colors.background, // SAME AS MENTAL PAGE
-//   },
-//   scrollView: {
-//     flex: 1,
-//   },
-//   contentContainer: {
-//     paddingHorizontal: Globals.horizontalPadding,
-//     paddingBottom: 100,
-//   },
-//   headerSection: {
-//     marginTop: 20,
-//     marginBottom: 10,
-//   },
-//   greeting: {
-//     fontSize: 28,
-//     fontWeight: "600",
-//     color: Colors.textPrimary,
-//   },
-//   progressContainer: {
-//     marginTop: 12,
-//   },
-//   exerciseChipContainer: {
-//     marginTop: 20,
-//   },
-// });
-
-// export default PhysicalHomePage;
-
-
 import BottomNavigation from '@/components/ui/BottomNavigation';
 import { Globals } from "@/constants/globals";
 import { Colors } from "@/constants/theme";
@@ -325,6 +11,7 @@ import {
   Text,
   View,
 } from "react-native";
+
 import ExerciseChip from "../..//components/ui/ExerciseChip";
 import XPBar from "../..//components/ui/XPBar";
 import GeneralTaskCard from "../../components/taskCards/generalTaskCard";
@@ -333,7 +20,7 @@ import StatusBar from "../../components/ui/StatusBar";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
-const MentalHomePage = () => {
+const PhysicalHomePage = () => {
   const [userName] = useState("Sarah");
   const [selectedCategory, setSelectedCategory] = useState("For You");
 
@@ -343,10 +30,10 @@ const MentalHomePage = () => {
         router.push('/(tabs)/homePage');
         break;
       case 'physical':
-        router.push('/(tabs)/physicalHomePage');
+        // already here
         break;
       case 'mental':
-        // already on mental page
+        router.push('/(tabs)/mentalHomePage');
         break;
       case 'account':
         router.push('/(tabs)/accountSettingsPage');
@@ -357,28 +44,21 @@ const MentalHomePage = () => {
   };
 
   const handleExercisePress = (exerciseName: string) => {
-    console.log(`Starting exercise: ${exerciseName}`);
-    if (
-      exerciseName === "Breathing Exercise" ||
-      exerciseName === "4-7-8 Breathing" ||
-      exerciseName === "Box Breathing" ||
-      exerciseName === "Deep Breathing"
-    ) {
-      router.push({
-        pathname: "/(tabs)/breathingExercisePage",
-        params: { exerciseType: exerciseName },
-      });
-    } else if (
-      exerciseName === "Rain Sounds" ||
-      exerciseName === "Soft Piano" ||
-      exerciseName === "Sea Waves"
-    ) {
-      router.push({
-        pathname: "/(tabs)/whiteNoise" as unknown as any,
-        params: { soundType: exerciseName },
-      });
-    }
+    console.log(`Starting physical exercise: ${exerciseName}`);
+    router.push({
+      pathname: "/(tabs)/physicalExercisePage",
+      params: { exerciseType: exerciseName },
+    });
   };
+
+  const allExercises = [
+    "Back",
+    "Shoulder",
+    "Chest",
+    "Hand",
+    "Hip",
+    "Legs",
+  ];
 
   return (
     <View style={styles.container}>
@@ -397,191 +77,81 @@ const MentalHomePage = () => {
             </View>
           </View>
         </View>
+
         {/* Categories Section */}
         <View style={styles.exerciseChipContainer}>
           <ExerciseChip
             categories={["For You", "See All"]}
             onSelectionChange={(index: number, category: string) => {
-              console.log(`Selected category: ${category} (index: ${index})`);
-              // Update the selected category state based on the category name
-              const normalizedCategory = category
-                .toLowerCase()
-                .replace(" ", "");
-              if (normalizedCategory === "for you") {
-                setSelectedCategory("for you");
-              } else if (normalizedCategory === "see all") {
-                setSelectedCategory("see all");
-              }
+              console.log(`Selected category: ${category}`);
+              setSelectedCategory(category);
             }}
           />
         </View>
-        {/* Show 3 ExerciseButtons when breathing category is selected */}
-        {selectedCategory === "For You" && (
-          <View style={styles.multipleButtonsContainer}>
-            <View style={styles.buttonRow}>
-              <View style={styles.buttonColumn}>
+
+        {/* Exercise Buttons */}
+        <View style={styles.exerciseButtonsContainer}>
+          {selectedCategory === "For You" && (
+            <>
+              <GeneralTaskCard
+                title="Recommended Stretch"
+                description="Try this routine to reduce muscle stiffness."
+              />
+            </>
+          )}
+
+          {selectedCategory === "See All" && (
+            <>
+              {allExercises.map((exercise) => (
                 <ExerciseButton
-                  title="4-7-8 Breathing"
-                  image={
-                    <Image
-                      source={require("../../assets/images/Breathing01.png")}
-                      style={styles.exerciseImage}
-                      resizeMode="contain"
-                    />
-                  }
-                  xp={5}
-                  onPress={() => handleExercisePress("4-7-8 Breathing")}
+                  key={exercise}
+                  label={exercise}
+                  onPress={() => handleExercisePress(exercise)}
                 />
-              </View>
-              <View style={styles.buttonColumn}>
-                <ExerciseButton
-                  title="Box Breathing"
-                  image={
-                    <Image
-                      source={require("../../assets/images/Breathing02.png")}
-                      style={styles.exerciseImage}
-                      resizeMode="contain"
-                    />
-                  }
-                  xp={4}
-                  onPress={() => handleExercisePress("Box Breathing")}
-                />
-              </View>
-            </View>
-            <View style={styles.buttonRow}>
-              <View style={styles.buttonColumn}>
-                <ExerciseButton
-                  title="Deep Breathing"
-                  image={
-                    <Image
-                      source={require("../../assets/images/Breathing03.png")}
-                      style={styles.exerciseImage}
-                      resizeMode="contain"
-                    />
-                  }
-                  xp={3}
-                  onPress={() => handleExercisePress("Deep Breathing")}
-                />
-              </View>
-              <View style={styles.buttonColumn}>
-                {/* Empty column for symmetry */}
-              </View>
-            </View>
-          </View>
-        )}
-        {/* Show white noise task cards when white noise category is selected */}
-        {selectedCategory === "noise" && (
-          <View style={styles.whiteNoiseContainer}>
-            <GeneralTaskCard
-              task="Rain Sounds"
-              xp={1}
-              onPress={() => handleExercisePress("Rain Sounds")}
-            />
-            <GeneralTaskCard
-              task="Soft Piano"
-              xp={1}
-              onPress={() => handleExercisePress("Soft Piano")}
-            />
-            <GeneralTaskCard
-              task="Sea Waves"
-              xp={1}
-              onPress={() => handleExercisePress("Sea Waves")}
-            />
-          </View>
-        )}
-        <View style={styles.bottomSpacing} />
+              ))}
+            </>
+          )}
+        </View>
+
       </ScrollView>
 
-      <BottomNavigation onItemPress={handleNavPress} />
+      <BottomNavigation onPress={handleNavPress} activeTab="physical" />
     </View>
   );
 };
 
+export default PhysicalHomePage;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
-    width: screenWidth,
-    height: screenHeight,
+    backgroundColor: Colors.background, // EXACT SAME AS MENTAL PAGE
   },
   scrollView: {
     flex: 1,
   },
   contentContainer: {
-    paddingHorizontal: screenWidth * 0.04, // 4% of screen width
+    paddingHorizontal: Globals.horizontalPadding,
+    paddingTop: 10,
   },
   headerSection: {
-    paddingTop: screenHeight * 0.025, // 2.5% of screen height
-    paddingBottom: screenHeight * 0.03, // 3% of screen height
-  },
-  progressContainer: {
-    marginBottom: screenHeight * 0.02, // 2% of screen height
+    marginBottom: 20,
   },
   greeting: {
-    textAlign: "center",
-    ...Globals.fonts.styles.header1,
-    marginTop: screenHeight * 0.015, // 1.5% of screen height
+    fontSize: 28,
+    fontWeight: "600",
+    color: Colors.textPrimary,
   },
-  section: {
-    marginBottom: screenHeight * 0.04, // 4% of screen height
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: screenHeight * 0.015, // 1.5% of screen height
-  },
-  sectionTitle: {
-    ...Globals.fonts.styles.header2Bold,
-  },
-  xpText: {
-    ...Globals.fonts.styles.header2Bold,
-    color: "#7267D9",
+  progressContainer: {
+    marginTop: 10,
   },
   exerciseChipContainer: {
-    marginBottom: screenHeight * 0.03, // 3% of screen height
-    alignSelf: "center",
+    paddingHorizontal: Globals.horizontalPadding,
+    marginBottom: 20,
   },
-  categoryTextContainer: {
-    alignItems: "center",
-    marginBottom: screenHeight * 0.02, // 2% of screen height
-  },
-  categoryDisplayText: {
-    ...Globals.fonts.styles.header2Bold,
-    color: "#7267D9",
-    textAlign: "center",
-  },
-  exerciseButtonContainer: {
-    alignItems: "center",
-    marginTop: screenHeight * 0.02, // 2% of screen height
-    marginBottom: screenHeight * 0.03, // 3% of screen height
-    paddingHorizontal: screenWidth * 0.04, // 4% of screen width
-  },
-  multipleButtonsContainer: {
-    paddingHorizontal: screenWidth * 0.04, // 4% of screen width
-    gap: screenHeight * 0.02, // 2% gap between rows
-  },
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: screenHeight * 0.015, // 1.5% margin between rows
-  },
-  buttonColumn: {
-    flex: 1,
-    alignItems: "center",
-    paddingHorizontal: screenWidth * 0.02, // 2% padding on each side
-  },
-  exerciseImage: {
-    width: 75,
-    height: 75,
-  },
-  bottomSpacing: {
-    height: screenHeight * 0.12, // 12% of screen height
-  },
-  whiteNoiseContainer: {
-    alignItems: "center",
-    paddingHorizontal: screenWidth * 0.04, // 4% of screen width
+  exerciseButtonsContainer: {
+    gap: 15,
+    paddingHorizontal: Globals.horizontalPadding,
+    paddingBottom: 100,
   },
 });
-
-export default MentalHomePage;
