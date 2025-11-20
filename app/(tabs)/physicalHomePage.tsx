@@ -2,7 +2,7 @@ import BottomNavigation from '@/components/ui/BottomNavigation';
 import { Globals } from "@/constants/globals";
 import { Colors } from "@/constants/theme";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 
+import { useExerciseContext } from '@/contexts/ExerciseContext';
 import ExerciseButton from "../../components/ui/ExerciseButton";
 import ExerciseChip from "../../components/ui/ExerciseChip";
 import StatusBar from "../../components/ui/StatusBar";
@@ -19,11 +20,67 @@ import XPBar from "../../components/ui/XPBar";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
+// Map target areas to body part names and mascot images
+const targetAreaToBodyPart: Record<string, { name: string; mascot: any; xp: number }> = {
+  'back': { name: 'Back', mascot: require('../../assets/SollyStates/backpain.png'), xp: 10 },
+  'lower back': { name: 'Back', mascot: require('../../assets/SollyStates/backpain.png'), xp: 10 },
+  'upper back': { name: 'Back', mascot: require('../../assets/SollyStates/backpain.png'), xp: 10 },
+  'spine': { name: 'Back', mascot: require('../../assets/SollyStates/backpain.png'), xp: 10 },
+  'shoulder': { name: 'Shoulder', mascot: require('../../assets/SollyStates/shoulderpain.png'), xp: 10 },
+  'chest': { name: 'Chest', mascot: require('../../assets/SollyStates/chestpain.png'), xp: 10 },
+  'hand': { name: 'Hand', mascot: require('../../assets/SollyStates/handpain.png'), xp: 10 },
+  'wrist': { name: 'Hand', mascot: require('../../assets/SollyStates/handpain.png'), xp: 10 },
+  'forearm': { name: 'Hand', mascot: require('../../assets/SollyStates/handpain.png'), xp: 10 },
+  'hip': { name: 'Hip', mascot: require('../../assets/SollyStates/hippain.png'), xp: 10 },
+  'leg': { name: 'Legs', mascot: require('../../assets/SollyStates/legpain.png'), xp: 10 },
+  'knee': { name: 'Legs', mascot: require('../../assets/SollyStates/legpain.png'), xp: 10 },
+  'hamstring': { name: 'Legs', mascot: require('../../assets/SollyStates/legpain.png'), xp: 10 },
+};
+
 const PhysicalHomePage = () => {
   const [userName] = useState<string>("Sarah");
   const [selectedCategory, setSelectedCategory] = useState<string>("For You");
+  const { recommendedExercises } = useExerciseContext();
 
-  const handleNavPress = (itemId: string) => {
+  // Get unique body parts from recommended exercises
+  const forYouExercises = useMemo(() => {
+    if (!recommendedExercises || recommendedExercises.length === 0) {
+      // Fallback to default exercises if no recommendations
+      return [
+        { name: "Back", mascot: require("../../assets/SollyStates/backpain.png"), xp: 10 },
+        { name: "Shoulder", mascot: require("../../assets/SollyStates/shoulderpain.png"), xp: 10 },
+        { name: "Chest", mascot: require("../../assets/SollyStates/chestpain.png"), xp: 10 },
+      ];
+    }
+
+    // Extract unique body parts from recommended exercises
+    const bodyPartsSet = new Set<string>();
+    const bodyPartsMap = new Map<string, { name: string; mascot: any; xp: number }>();
+
+    recommendedExercises.forEach((recEx) => {
+      // Get the first target area from each recommended exercise
+      const firstTargetArea = recEx.exercise.targetAreas[0]?.toLowerCase();
+      if (firstTargetArea) {
+        // Find matching body part
+        const bodyPartKey = Object.keys(targetAreaToBodyPart).find(key => 
+          firstTargetArea.includes(key.toLowerCase()) || key.toLowerCase().includes(firstTargetArea)
+        );
+        
+        if (bodyPartKey) {
+          const bodyPart = targetAreaToBodyPart[bodyPartKey];
+          if (!bodyPartsSet.has(bodyPart.name)) {
+            bodyPartsSet.add(bodyPart.name);
+            bodyPartsMap.set(bodyPart.name, bodyPart);
+          }
+        }
+      }
+    });
+
+    // Convert to array and limit to 3 for display
+    return Array.from(bodyPartsMap.values()).slice(0, 3);
+  }, [recommendedExercises]);
+
+  const handleNavPress = (itemId: string) => {
     switch (itemId) {
       case 'home':
         router.push('/(tabs)/homePage');
@@ -53,24 +110,6 @@ const PhysicalHomePage = () => {
     });
   };
 
-  // Exercise data with mascot images
-  const forYouExercises = [
-    {
-      name: "Back",
-      mascot: require("../../assets/SollyStates/backpain.png"),
-      xp: 10,
-    },
-    {
-      name: "Shoulder",
-      mascot: require("../../assets/SollyStates/shoulderpain.png"),
-      xp: 10,
-    },
-    {
-      name: "Chest",
-      mascot: require("../../assets/SollyStates/chestpain.png"),
-      xp: 10,
-    },
-  ];
 
   const allExercises = [
     {
