@@ -2,7 +2,7 @@ import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import IonIcon from "react-native-vector-icons/Ionicons";
 
-function SettingsToggle({ icon, label, onToggle, initialValue }) {
+function SettingsToggle({ icon, label, onToggle, initialValue, containerStyle }) {
   const [isEnabled, setIsEnabled] = useState(initialValue);
 
   const handleToggle = () => {
@@ -14,7 +14,7 @@ function SettingsToggle({ icon, label, onToggle, initialValue }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]}>
       <IonIcon
         name={icon}
         size={24}

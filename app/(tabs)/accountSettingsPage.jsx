@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Image, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Platform, StyleSheet, Text, View, ScrollView} from "react-native";
 import BackButton from "../../components/ui/BackButton";
 import BottomNavigation from "../../components/ui/BottomNavigation";
 import SettingsButton from "../../components/ui/SettingsButton";
@@ -16,7 +16,7 @@ function AccountSettingsPage() {
   const [username, setUsername] = useState("User123");
   const [email, setEmail] = useState("user123@example.com");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(Globals.userSettings?.darkMode ?? false);
   const [showContent, setShowContent] = useState(true);
   const [activeSection, setActiveSection] = useState(null);
 
@@ -64,7 +64,15 @@ function AccountSettingsPage() {
       case "General":
         return <GeneralSettingsContent />;
       case "Accessibility":
-        return <AccessibilitySettingsContent />;
+        return (
+          <AccessibilitySettingsContent
+            darkMode={darkMode}
+            onDarkModeChange={(val) => {
+              setDarkMode(val);
+              Globals.userSettings = { ...(Globals.userSettings || {}), darkMode: val };
+            }}
+          />
+        );
       case "Notifications":
         return <NotificationSettingsContent />;
       case "Account":
@@ -79,10 +87,10 @@ function AccountSettingsPage() {
   return (
     <View style={styles.container}>
       {!showContent && (
-        <View style={styles.backButtonContainer}>
+        <View style={[styles.backButtonContainer, darkMode && styles.containerDark]}>
           <View style={styles.headerRow}>
             <BackButton onPress={handleBackPress} style={styles.backButton} />
-            <Text style={styles.activeSectionText}>{activeSection}</Text>
+            <Text style={[styles.activeSectionText, darkMode && { color: "#FFFFFF" }]}>{activeSection}</Text>
           </View>
           <ScrollView
             style={styles.scrollView}
@@ -95,63 +103,57 @@ function AccountSettingsPage() {
       )}
 
       {showContent && (
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.contentContainer}>
-            <View style={styles.mascotAndProgress}>
-              <Image
-                source={require("../../assets/images/Mascot-standing.png")}
-                style={{
-                  width: 77,
-                  height: 155,
-                  alignSelf: "center",
-                  marginBottom: 5,
-                  marginTop: 10,
-                }}
-              />
-              <XPBar progress={0.5} />
-            </View>
-            <View style={styles.titleContainer}>
-              <Image
-                source={require("../../assets/images/Setting_fill.png")}
-                style={{ width: 33, height: 33 }}
-              />
-              <Text style={styles.title}>Settings</Text>
-            </View>
-            <View style={styles.buttonContainer}>
-              <SettingsButton
-                title="Account"
-                onPress={() => handleSectionPress("Account")}
-              />
-              <SettingsButton
-                title="General"
-                onPress={() => handleSectionPress("General")}
-              />
-              <SettingsButton
-                title="Accessibility"
-                onPress={() => handleSectionPress("Accessibility")}
-              />
-              <SettingsButton
-                title="Notifications"
-                onPress={() => handleSectionPress("Notifications")}
-              />
-              <SettingsButton
-                title="About"
-                onPress={() => handleSectionPress("About")}
-              />
-              <SettingsButton
-                title="Logout"
-                onPress={() => {
-                  // Navigate to login page
-                  router.push("/(tabs)/signInPage");
-                }}
-              />
-            </View>
+        <View style={styles.contentContainer}>
+          <View style={styles.mascotAndProgress}>
+            <Image
+              source={require("../../assets/images/Mascot-standing.png")}
+              style={{
+                width: 77,
+                height: 155,
+                alignSelf: "center",
+                marginBottom: 5,
+                marginTop: 10,
+              }}
+            />
+            <XPBar progress={0.5} />
           </View>
-        </ScrollView>
+          <View style={styles.titleContainer}>
+            <Image
+              source={require("../../assets/images/Setting_fill.png")}
+              style={{ width: 33, height: 33 }}
+            />
+            <Text style={styles.title}>Settings</Text>
+          </View>
+          <View style={styles.buttonContainer}>
+            <SettingsButton
+              title="Account"
+              onPress={() => handleSectionPress("Account")}
+            />
+            <SettingsButton
+              title="General"
+              onPress={() => handleSectionPress("General")}
+            />
+            <SettingsButton
+              title="Accessibility"
+              onPress={() => handleSectionPress("Accessibility")}
+            />
+            <SettingsButton
+              title="Notifications"
+              onPress={() => handleSectionPress("Notifications")}
+            />
+            <SettingsButton
+              title="About"
+              onPress={() => handleSectionPress("About")}
+            />
+            <SettingsButton
+              title="Logout"
+              onPress={() => {
+                // Navigate to login page
+                router.push("/(tabs)/signInPage");
+              }}
+            />
+          </View>
+        </View>
       )}
 
       <View>
@@ -206,10 +208,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backButton: {
-    position: "absolute",
-    top: Platform.OS === 'web' ? 30 : 60,
-    left: 20,
-    zIndex: 10,
+    // keep default positioning so the button sits in the header flow
+    marginRight: 12,
   },
   headerRow: {
     flexDirection: "row",
@@ -231,6 +231,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     justifyContent: "center",
+  },
+  containerDark: {
+    backgroundColor: "#1D1E1D",
   },
 });
 
