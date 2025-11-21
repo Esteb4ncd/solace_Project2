@@ -1,21 +1,22 @@
 import TaskCard from '@/components/taskCards/TaskCard';
+import { ThemedText } from '@/components/themed-text';
 import BottomNavigation from '@/components/ui/BottomNavigation';
 import Header from '@/components/ui/Header';
+import LargeButton from '@/components/ui/LargeButton';
+import SpeechBubble from '@/components/ui/SpeechBubble';
 import StatusBar from '@/components/ui/StatusBar';
 import TabBar from '@/components/ui/TabBar';
+import TextAndVoiceInput from '@/components/ui/TextAndVoiceInput';
 import XPBar from '@/components/ui/XPBar';
+import { getExerciseXpReward, recommendExercises } from '@/constants/exercises';
 import { Colors } from '@/constants/theme';
 import { useExerciseContext } from '@/contexts/ExerciseContext';
-import { ThemedText } from '@/components/themed-text';
+import { aiService } from '@/services/aiService';
+import { speechService } from '@/services/speechService';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Image, Keyboard, Modal, Pressable, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
-import TextAndVoiceInput from '@/components/ui/TextAndVoiceInput';
-import LargeButton from '@/components/ui/LargeButton';
-import { aiService } from '@/services/aiService';
-import { speechService } from '@/services/speechService';
-import { recommendExercises, getExerciseXpReward } from '@/constants/exercises';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -39,11 +40,62 @@ const HomePage = () => {
   
   const { completedExercises, getStreakCount, dailyTasks, setRecommendedExercises, updateDailyTasks } = useExerciseContext();
   const streakCount = getStreakCount();
+  const [sollyMessage, setSollyMessage] = useState<string>('');
   
   // Debug: Log when dailyTasks changes
   useEffect(() => {
     console.log('📋 Daily tasks updated in homepage:', dailyTasks);
   }, [dailyTasks]);
+
+  // Generate AI message for Solly based on exercise completion state
+  useEffect(() => {
+    const generateSollyMessage = async () => {
+      try {
+        const completedCount = completedExercises.length;
+        const dailyCompletedCount = dailyTasks.filter(task => task.isCompleted).length;
+        const totalDailyTasks = dailyTasks.length;
+        const hasStreak = streakCount > 0;
+
+        // Create context for AI
+        const context = {
+          completedExercises: completedCount,
+          dailyCompleted: dailyCompletedCount,
+          totalDaily: totalDailyTasks,
+          streakDays: streakCount,
+          hasStreak: hasStreak,
+        };
+
+        // Generate short, contextual message
+        let message = '';
+        
+        if (dailyCompletedCount === totalDailyTasks && totalDailyTasks > 0) {
+          message = hasStreak 
+            ? `Amazing! ${streakCount} day streak! 🎉`
+            : 'All done today! Great work! ✨';
+        } else if (dailyCompletedCount > 0) {
+          const remaining = totalDailyTasks - dailyCompletedCount;
+          message = `Keep going! ${remaining} more to go 💪`;
+        } else if (completedCount > 0) {
+          message = 'Ready for your daily exercises? 🏃';
+        } else if (hasStreak) {
+          message = `Don't break your ${streakCount} day streak! 🔥`;
+        } else {
+          message = 'Let\'s start your exercises! 🌟';
+        }
+
+        setSollyMessage(message);
+      } catch (error) {
+        console.error('Error generating Solly message:', error);
+        setSollyMessage('Ready to exercise? 💪');
+      }
+    };
+
+    generateSollyMessage();
+    
+    // Update message periodically or when state changes
+    const interval = setInterval(generateSollyMessage, 30000); // Update every 30 seconds
+    return () => clearInterval(interval);
+  }, [completedExercises, dailyTasks, streakCount]);
 
   const additionalTasks = [
     { id: '4', title: 'Stress Relief', xpAmount: 5, xpColor: '#7267D9', isCompleted: false },
@@ -346,6 +398,10 @@ const HomePage = () => {
               source={require('@/assets/hompageAssets/SollySitting.png')} 
               style={styles.avatar}
             />
+            <SpeechBubble 
+              message={sollyMessage} 
+              position="left"
+            />
           </View>
 
           <View style={styles.xpBarContainer}>
@@ -557,6 +613,7 @@ const styles = StyleSheet.create({
   avatarSection: {
     alignItems: 'center',
     paddingVertical: screenHeight * 0.01, // 1% of screen height
+    marginLeft: 60, // Move Solly even more to the right to avoid overlap
   },
   avatar: {
     width: screenWidth * 0.38, // 38% of screen width

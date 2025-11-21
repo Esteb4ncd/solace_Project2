@@ -15,7 +15,7 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    ```
 
 2. **Download videos:**
-   - Download all video files from: https://drive.google.com/drive/folders/1UbOq1VWOajTtmeWCDY17bTFX7dFJ5f_c?usp=sharing
+   - Download all video files from: https://drive.google.com/drive/folders/1MQ909vS36aygZ7UnjantJyNxcinw3isq?usp=sharing
    - Place them in `assets/videos/` folder
    - Required videos: HandWarmUp.mov, BumperStretch.mov, HamstringStretch.mov, HipFlexorStretch.mov, ChestStretch.mov, LowerBackMuscleRelease.mov, ResetSpineStretch.mov, WarmUpSpineStretch.mov, ShoulderWarmUp.mov, UpperBackStretch.mov
 
@@ -111,44 +111,20 @@ To learn more about developing your project with Expo, look at the following res
 
 ## 📹 Video Configuration
 
-**Videos are served from a local Express server.**
+**How Exercise Videos Work:**
+- Videos are served by a local Express server running on `http://localhost:3001`
+- Server streams videos from `assets/videos/` directory when users select exercises
+- App requests videos via URLs like `http://localhost:3001/videos/HandWarmUp.mov`
+- Server supports range requests for smooth playback and scrubbing
+- Videos are not bundled with the app—they're streamed on-demand
 
-### Setup Instructions
-
-1. **Download Videos:**
-   - Go to: https://drive.google.com/drive/folders/1UbOq1VWOajTtmeWCDY17bTFX7dFJ5f_c?usp=sharing
-   - Download all `.mov` video files
-   - Place them in `assets/videos/` directory
-
-2. **Start the Server:**
-   ```bash
-   npm run server
-   ```
-   Or use `npm run dev` to start both server and app together.
-
-3. **Verify Videos:**
-   - Server will validate videos on startup
-   - Check console for missing videos
-   - Videos must be in `assets/videos/` folder
-
-### Required Video Files
-- HandWarmUp.mov
-- BumperStretch.mov
-- HamstringStretch.mov
-- HipFlexorStretch.mov
-- ChestStretch.mov
-- LowerBackMuscleRelease.mov
-- ResetSpineStretch.mov
-- WarmUpSpineStretch.mov
-- ShoulderWarmUp.mov
-- UpperBackStretch.mov
-
-### Server Endpoints
-- `GET /health` - Health check (public)
-- `GET /videos` - List all videos (requires auth in production)
-- `GET /videos/:filename` - Stream video file (requires auth in production)
-
-**Note:** Authentication is disabled in development mode for easier testing.
+**Downloading Videos for Development:**
+- Go to: https://drive.google.com/drive/folders/1UbOq1VWOajTtmeWCDY17bTFX7dFJ5f_c?usp=sharing
+- Download all 10 `.mov` video files from the folder
+- Place them in `assets/videos/` directory (create folder if needed)
+- Run `npm run dev` to start server and app
+- Server validates videos on startup and shows count in console
+- Videos are excluded from Git (too large), so each developer downloads separately
 
 ## Join the community
 
