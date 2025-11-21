@@ -124,7 +124,7 @@ export default function StreakSplashScreen({ visible, streakCount, onClose }: St
 
           {/* Celebration Text */}
           <Text style={styles.celebrationText}>
-            {streakCount} Day Streak! 🔥
+            Day Streak!
           </Text>
         </Animated.View>
       </View>
