@@ -15,8 +15,8 @@ import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { aiService } from '@/services/aiService';
 import { speechService } from '@/services/speechService';
 import { router } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Image, Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, Image, Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -42,50 +42,165 @@ const HomePage = () => {
   const { completedExercises, getStreakCount, dailyTasks, setRecommendedExercises, updateDailyTasks, isExerciseComplete } = useExerciseContext();
   const streakCount = getStreakCount();
   const [sollyMessage, setSollyMessage] = useState<string>('');
+  const sollyScaleAnim = useRef(new Animated.Value(1)).current;
+  const sollyBounceAnim = useRef(new Animated.Value(0)).current;
+  const [showExerciseCompleteMessage, setShowExerciseCompleteMessage] = useState(false);
+  const prevCompletedCount = useRef(0);
+  
+  // Determine which Solly image to show based on exercise completion
+  const getSollyImage = () => {
+    const dailyCompletedCount = dailyTasks.filter(task => task.isCompleted).length;
+    const totalDailyTasks = dailyTasks.length;
+    
+    // All exercises complete
+    if (dailyCompletedCount === totalDailyTasks && totalDailyTasks > 0) {
+      return require('@/assets/SollyStates/happysolly.png');
+    }
+    // 2 exercises done
+    else if (dailyCompletedCount >= 2) {
+      return require('@/assets/SollyStates/SollyHurt1.png');
+    }
+    // 1 exercise done
+    else if (dailyCompletedCount >= 1) {
+      return require('@/assets/SollyStates/SollyHurt2.png');
+    }
+    // 0 exercises done
+    else {
+      return require('@/assets/SollyStates/SollyHurt3.png');
+    }
+  };
   
   // Debug: Log when dailyTasks changes
   useEffect(() => {
     console.log('📋 Daily tasks updated in homepage:', dailyTasks);
   }, [dailyTasks]);
 
-  // Generate AI-powered personalized message for Solly
+  // Check if an exercise was just completed
   useEffect(() => {
-    const generateSollyMessage = async () => {
-      try {
-        const completedCount = completedExercises.length;
-        const dailyCompletedCount = dailyTasks.filter(task => task.isCompleted).length;
-        const totalDailyTasks = dailyTasks.length;
-        const hasStreak = streakCount > 0;
+    const currentCompletedCount = completedExercises.length;
+    
+    // If completed count increased, show "Oh that's a bit better!"
+    if (currentCompletedCount > prevCompletedCount.current) {
+      setShowExerciseCompleteMessage(true);
+      setSollyMessage("Oh that's a bit better!");
+    }
+    
+    prevCompletedCount.current = currentCompletedCount;
+  }, [completedExercises]);
 
-        // Get user context from AI service (work tasks and pain areas)
-        const aiContext = aiService.getCurrentContext();
+  // Generate AI-powered personalized message for Solly
+  const generateSollyMessage = useCallback(async () => {
+    // If we should show the exercise complete message, don't generate a new one
+    if (showExerciseCompleteMessage) {
+      return;
+    }
+    
+    try {
+      const completedCount = completedExercises.length;
+      const dailyCompletedCount = dailyTasks.filter(task => task.isCompleted).length;
+      const totalDailyTasks = dailyTasks.length;
+      const currentStreak = getStreakCount();
+      const hasStreak = currentStreak > 0;
 
-        // Create comprehensive context for AI
-        const context = {
-          completedExercises: completedCount,
-          dailyCompleted: dailyCompletedCount,
-          totalDaily: totalDailyTasks,
-          streakDays: streakCount,
-          hasStreak: hasStreak,
-          painAreas: aiContext.painAreas,
-          workTasks: aiContext.workTasks,
-        };
+      // Get user context from AI service (work tasks and pain areas)
+      const aiContext = aiService.getCurrentContext();
 
-        // Generate personalized AI message
-        const message = await aiService.generateSpeechBubbleMessage(context);
-        setSollyMessage(message);
-      } catch (error) {
-        console.error('Error generating Solly message:', error);
-        setSollyMessage('Ready to exercise? 💪');
-      }
-    };
+      // Create comprehensive context for AI
+      const context = {
+        completedExercises: completedCount,
+        dailyCompleted: dailyCompletedCount,
+        totalDaily: totalDailyTasks,
+        streakDays: currentStreak,
+        hasStreak: hasStreak,
+        painAreas: aiContext.painAreas,
+        workTasks: aiContext.workTasks,
+      };
 
-    generateSollyMessage();
+      console.log('Generating new Solly message with context:', context);
+
+      // Generate personalized AI message
+      const message = await aiService.generateSpeechBubbleMessage(context);
+      console.log('New Solly message generated:', message);
+      setSollyMessage(message);
+    } catch (error) {
+      console.error('Error generating Solly message:', error);
+      setSollyMessage('Ready to exercise?');
+    }
+  }, [completedExercises, dailyTasks, getStreakCount, showExerciseCompleteMessage]);
+
+  // Initial load and periodic updates
+  useEffect(() => {
+    // Only generate message if we're not showing the exercise complete message
+    if (!showExerciseCompleteMessage) {
+      generateSollyMessage();
+    }
     
     // Update message periodically or when state changes (every 45 seconds for variety)
-    const interval = setInterval(generateSollyMessage, 45000);
+    // But only if we're not showing the exercise complete message
+    const interval = setInterval(() => {
+      if (!showExerciseCompleteMessage) {
+        generateSollyMessage();
+      }
+    }, 45000);
     return () => clearInterval(interval);
-  }, [completedExercises, dailyTasks, streakCount]);
+  }, [completedExercises, dailyTasks, streakCount, showExerciseCompleteMessage, generateSollyMessage]);
+
+  // Animation on load
+  useEffect(() => {
+    // Bounce animation on initial load
+    Animated.sequence([
+      Animated.timing(sollyBounceAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(sollyBounceAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  // Handle Solly click - refresh message and animate
+  const handleSollyPress = useCallback(() => {
+    console.log('👆 Solly clicked - refreshing message');
+    
+    // Clear the exercise complete message flag so we can generate normal messages
+    setShowExerciseCompleteMessage(false);
+    
+    // Trigger bounce animation
+    sollyBounceAnim.setValue(0);
+    Animated.sequence([
+      Animated.timing(sollyBounceAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(sollyBounceAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Force a refresh by temporarily clearing the message, then generating a new one
+    setSollyMessage('');
+    
+    // Small delay to ensure state update, then generate new message
+    setTimeout(() => {
+      generateSollyMessage().catch(error => {
+        console.error('Error refreshing Solly message:', error);
+        setSollyMessage('Ready to exercise?');
+      });
+    }, 50);
+  }, [generateSollyMessage]);
+
+  // Interpolate bounce animation
+  const bounceScale = sollyBounceAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.1],
+  });
 
   const additionalTasks = [
     { id: '4', title: 'Stress Relief', xpAmount: 5, xpColor: '#7267D9', isCompleted: false },
@@ -193,7 +308,7 @@ const HomePage = () => {
         
         // Check if we have enough context to generate recommendations
         const context = aiService.getCurrentContext();
-        console.log('📊 AI Context after message:', context);
+        console.log('AI Context after message:', context);
         
         // Get context from AI service, with fallback extraction from message
         let painAreas = [...context.painAreas];
@@ -261,8 +376,8 @@ const HomePage = () => {
             
             // Update daily tasks - this should trigger a re-render
             updateDailyTasks(dailyTasks);
-            console.log('✅ Updated daily checklist with recommendations:', dailyTasks);
-            console.log('📝 Daily tasks after update:', dailyTasks);
+            console.log('Updated daily checklist with recommendations:', dailyTasks);
+            console.log('Daily tasks after update:', dailyTasks);
             
             // Force a small delay to ensure state update propagates
             setTimeout(() => {
@@ -271,7 +386,7 @@ const HomePage = () => {
               setAiInputValue('');
             }, 100);
           } else {
-            console.warn('⚠️ No exercises found for context:', { painAreas, workTasks });
+            console.warn('No exercises found for context:', { painAreas, workTasks });
             // Keep modal open if no exercises found
             setAiInputValue('');
           }
@@ -384,11 +499,27 @@ const HomePage = () => {
 
           {/* Avatar Section */}
           <View style={styles.avatarSection}>
-            <Image 
-              source={require('@/assets/hompageAssets/SollySitting.png')} 
-              style={styles.avatar}
-            />
+            <TouchableOpacity 
+              onPress={handleSollyPress}
+              activeOpacity={0.8}
+              style={styles.sollyTouchable}
+            >
+              <Animated.View
+                style={[
+                  styles.sollyContainer,
+                  {
+                    transform: [{ scale: bounceScale }],
+                  },
+                ]}
+              >
+                <Image 
+                  source={getSollyImage()} 
+                  style={styles.avatar}
+                />
+              </Animated.View>
+            </TouchableOpacity>
             <SpeechBubble 
+              key={sollyMessage} 
               message={sollyMessage} 
               position="left"
             />
@@ -619,6 +750,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: screenHeight * 0.01, // 1% of screen height
     marginLeft: 60, // Move Solly even more to the right to avoid overlap
+  },
+  sollyTouchable: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sollyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   avatar: {
     width: screenWidth * 0.38, // 38% of screen width

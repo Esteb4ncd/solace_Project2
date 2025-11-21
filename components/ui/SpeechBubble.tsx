@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 
 interface SpeechBubbleProps {
@@ -7,15 +7,22 @@ interface SpeechBubbleProps {
 }
 
 export default function SpeechBubble({ message, position = 'right' }: SpeechBubbleProps) {
-  const [fadeAnim] = useState(new Animated.Value(0));
+  const fadeAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // Fade in animation
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
+    // Fade out then fade in when message changes
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
   }, [message]);
 
   if (!message) return null;
@@ -54,7 +61,7 @@ const styles = StyleSheet.create({
     top: 20,
   },
   leftPosition: {
-    right: 200,
+    right: 225,
     top: 20,
   },
   topPosition: {
