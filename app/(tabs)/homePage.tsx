@@ -542,12 +542,36 @@ const HomePage = () => {
           {activeTab === 'stretch' && (
             <>
               {dailyTasks.length > 0 ? (
-                /* Daily Checklist Section - filter out completed exercises */
-                <TaskCard 
-                  tasks={dailyTasks.filter(task => !isExerciseComplete(task.id))}
-                  exerciseType="physical"
-                  isDaily={true}
-                />
+                <>
+                  {(() => {
+                    const uncompletedTasks = dailyTasks.filter(task => !isExerciseComplete(task.id));
+                    const allCompleted = uncompletedTasks.length === 0 && dailyTasks.length > 0;
+                    
+                    if (allCompleted) {
+                      // All exercises completed - show "Find more exercises" button
+                      return (
+                        <View style={styles.allCompletedContainer}>
+                          <ThemedText style={styles.allCompletedText}>
+                            All exercises completed! Great work!
+                          </ThemedText>
+                          <LargeButton 
+                            label="Find more exercises"
+                            onPress={() => router.push('/(tabs)/physicalHomePage')}
+                          />
+                        </View>
+                      );
+                    } else {
+                      // Show remaining exercises
+                      return (
+                        <TaskCard 
+                          tasks={uncompletedTasks}
+                          exerciseType="physical"
+                          isDaily={true}
+                        />
+                      );
+                    }
+                  })()}
+                </>
               ) : (
                 /* Empty State - Prompt to take quiz */
                 <View style={styles.emptyStateContainer}>
@@ -791,6 +815,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyStateText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 26,
+  },
+  allCompletedContainer: {
+    paddingVertical: 60,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  allCompletedText: {
     fontSize: 18,
     fontWeight: '600',
     color: '#666',

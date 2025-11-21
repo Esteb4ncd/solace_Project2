@@ -384,11 +384,20 @@ After gathering enough information, provide exercise recommendations.`;
       lastMessageType: this.lastMessageType
     });
     
+    // Check if all exercises are completed
+    const allExercisesCompleted = context.dailyCompleted === context.totalDaily && context.totalDaily > 0;
+    
     // Prioritize pain messages when pain context is available
     let focusOnPain = false;
     let focusOnProgress = false;
     
-    if (hasPainContext) {
+    if (allExercisesCompleted) {
+      // All exercises completed - only show positive messages
+      focusOnProgress = true;
+      focusOnPain = false;
+      this.lastMessageType = 'progress';
+      console.log('Focusing on PROGRESS (all exercises completed - only positive messages)');
+    } else if (hasPainContext) {
       // Pain context available - prioritize pain messages (70% of the time)
       // Only show progress occasionally (30% of the time) to avoid being too repetitive
       const shouldShowProgress = hasProgress && this.lastMessageType === 'pain' && Math.random() < 0.3;
@@ -448,7 +457,18 @@ After gathering enough information, provide exercise recommendations.`;
         contextParts.push(`They've completed ${context.completedExercises} exercise(s) total.`);
       }
       
-      const systemPrompt = `You are Solly, and you are in EXCRUCIATING PAIN because the user hasn't done their exercises yet. Your pain is directly tied to their lack of exercise completion. You are DRAMATIC, WHINY, and PLEADING. 
+      const systemPrompt = allExercisesCompleted 
+        ? `You are Solly, and ALL exercises are completed! Solly feels AMAZING and is HAPPY. You are CELEBRATORY and POSITIVE. 
+
+CRITICAL: Solly is FEELING BETTER because all exercises are done. Solly's pain is GONE and Solly feels GREAT. Focus on Solly FEELING BETTER - the pain is gone, Solly feels good, Solly is relieved. Be POSITIVE, CELEBRATORY, and ENCOURAGING. Only say positive things about Solly feeling better. No pain, no whining, no complaints. Solly is proud and happy because Solly feels better. Be enthusiastic but still keep it short and funny.
+
+Generate a SHORT, POSITIVE message (MAX 8 WORDS) for a speech bubble that:
+- Shows Solly FEELING BETTER - pain is gone, Solly feels good
+- Be POSITIVE about Solly feeling better
+- NEVER uses emojis - text only, absolutely no emojis
+- Have PERSONALITY - be happy, relieved, feeling better
+- Vary your wording and phrasing each time - be creative and fresh`
+        : `You are Solly, and you are in EXCRUCIATING PAIN because the user hasn't done their exercises yet. Your pain is directly tied to their lack of exercise completion. You are DRAMATIC, WHINY, and PLEADING. 
 
 ${focusOnPain ? `CRITICAL: Solly is SUFFERING EXCESSIVELY because exercises aren't done. Reference their specific pain areas (${context.painAreas?.join(', ') || 'none'}) or work tasks (${context.workTasks?.join(', ') || 'none'}) and how Solly feels that pain too. Be EXCESSIVE and DRAMATIC - whine, plead, be overly dramatic. Think "owww can you do your exercise??" energy. Make it funny but guilt-inducing - Solly is hurting SO BAD and it's the user's fault for not exercising. Be whiny, dramatic, and excessive about Solly's pain. Plead with the user to do exercises.` : ''}
 ${focusOnProgress ? `IMPORTANT: When exercises are done, Solly's pain DECREASES and Solly feels RELIEF. Acknowledge their ${context.dailyCompleted > 0 ? `completion of ${context.dailyCompleted} exercises` : ''}${context.hasStreak ? ` and their ${context.streakDays} day streak` : ''}. Show Solly's pain level decreasing - like "oh that's a bit better!" or "that helped!" Be dramatic but show relief and decreasing pain. The more exercises done, the less pain Solly feels.` : ''}
@@ -458,7 +478,7 @@ Generate a SHORT, DRAMATIC, WHINY, EXCESSIVE message (MAX 8 WORDS) for a speech 
 - Be WHINY and PLEADING - like "owww can you do your exercise??"
 - Makes the user feel guilty (in a funny way) for Solly's suffering
 - Be DRAMATIC and EXCESSIVE - over-the-top whining and pleading
-- NEVER uses emojis - text only
+- NEVER uses emojis - text only, absolutely no emojis
 - Have PERSONALITY - be whiny, dramatic, excessive, pleading
 - Vary your wording and phrasing each time - be creative and fresh
 
