@@ -10,7 +10,7 @@ const XPGainScreen = () => {
     exerciseName: string;
   }>();
   
-  const { markExerciseComplete } = useExerciseContext();
+  const { markExerciseComplete, updateDailyTasks, dailyTasks } = useExerciseContext();
 
   const handleBackToHome = () => {
     console.log('Back to Home button pressed');
@@ -18,6 +18,14 @@ const XPGainScreen = () => {
     // Mark exercise as complete
     if (exerciseId && exerciseName) {
       markExerciseComplete(exerciseId, exerciseName, parseInt(xpAmount || '10'));
+      
+      // Update dailyTasks to mark this exercise as completed
+      const updatedTasks = dailyTasks.map(task => 
+        task.id === exerciseId 
+          ? { ...task, isCompleted: true }
+          : task
+      );
+      updateDailyTasks(updatedTasks);
     }
     
     router.push('/(tabs)/homePage');

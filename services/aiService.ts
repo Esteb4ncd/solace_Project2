@@ -1,7 +1,7 @@
 // Real AI service for handling conversations and voice processing
 
+import { getSecondaryExercises, RecommendedExercise, recommendExercises } from '@/constants/exercises';
 import Constants from 'expo-constants';
-import { Exercise, RecommendedExercise, recommendExercises, getSecondaryExercises } from '@/constants/exercises';
 
 export interface ChatMessage {
   id: string;
@@ -351,6 +351,158 @@ After gathering enough information, provide exercise recommendations.`;
       workTasks: [],
       userPreferences: []
     };
+  }
+
+  // Generate personalized speech bubble message
+  async generateSpeechBubbleMessage(context: {
+    completedExercises: number;
+    dailyCompleted: number;
+    totalDaily: number;
+    streakDays: number;
+    hasStreak: boolean;
+    painAreas?: string[];
+    workTasks?: string[];
+  }): Promise<string> {
+    try {
+      const apiKey = this.getOpenAIApiKey();
+      
+      // Build context string for AI
+      const contextParts: string[] = [];
+      
+      if (context.painAreas && context.painAreas.length > 0) {
+        contextParts.push(`The user experiences pain in their ${context.painAreas.join(' and ')}.`);
+      }
+      
+      if (context.workTasks && context.workTasks.length > 0) {
+        contextParts.push(`Their work involves ${context.workTasks.join(' and ')}.`);
+      }
+      
+      if (context.dailyCompleted === context.totalDaily && context.totalDaily > 0) {
+        contextParts.push(`They've completed all ${context.totalDaily} daily exercises today.`);
+      } else if (context.dailyCompleted > 0) {
+        const remaining = context.totalDaily - context.dailyCompleted;
+        contextParts.push(`They've completed ${context.dailyCompleted} of ${context.totalDaily} daily exercises, with ${remaining} remaining.`);
+      } else {
+        contextParts.push(`They haven't started their daily exercises yet.`);
+      }
+      
+      if (context.hasStreak && context.streakDays > 0) {
+        contextParts.push(`They have a ${context.streakDays} day streak going.`);
+      }
+      
+      if (context.completedExercises > 0) {
+        contextParts.push(`They've completed ${context.completedExercises} exercise(s) total.`);
+      }
+
+      const systemPrompt = `You are Solly, a friendly and encouraging AI assistant. Generate a SHORT, PERSONALIZED message (max 15 words) for a speech bubble that:
+- Shows you know about the user's work life and pain points
+- Is encouraging and motivational
+- References their specific situation naturally
+- Is conversational and friendly
+- Uses emojis sparingly (1-2 max)
+- Never mentions "I" or "you" directly - be more subtle
+
+Context: ${contextParts.join(' ')}
+
+Generate ONLY the message text, nothing else.`;
+
+      if (!apiKey || apiKey === 'your-api-key-here') {
+        // Fallback to rule-based message
+        return this.generateFallbackSpeechMessage(context);
+      }
+
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: 'Generate a personalized speech bubble message based on the context.' }
+      ];
+
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: messages,
+          temperature: 0.9, // Higher temperature for more variety
+          max_tokens: 50, // Short messages only
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const message = data.choices[0]?.message?.content?.trim() || this.generateFallbackSpeechMessage(context);
+      
+      // Ensure message is short (truncate if needed)
+      const maxLength = 80;
+      return message.length > maxLength ? message.substring(0, maxLength) + '...' : message;
+    } catch (error) {
+      console.error('Error generating AI speech bubble message:', error);
+      return this.generateFallbackSpeechMessage(context);
+    }
+  }
+
+  private generateFallbackSpeechMessage(context: {
+    completedExercises: number;
+    dailyCompleted: number;
+    totalDaily: number;
+    streakDays: number;
+    hasStreak: boolean;
+    painAreas?: string[];
+    workTasks?: string[];
+  }): string {
+    const messages: string[] = [];
+    
+    // Work/pain context messages
+    if (context.workTasks && context.workTasks.length > 0) {
+      if (context.workTasks.includes('heavy lifting')) {
+        messages.push('Those heavy lifts can be tough on your back 💪');
+      }
+      if (context.workTasks.includes('overhead work')) {
+        messages.push('Overhead work can strain those shoulders 🏗️');
+      }
+      if (context.workTasks.includes('repetitive tool use')) {
+        messages.push('Repetitive motions need regular breaks 🔧');
+      }
+      if (context.workTasks.includes('kneeling')) {
+        messages.push('Kneeling all day? Let\'s help those knees 🦵');
+      }
+    }
+    
+    if (context.painAreas && context.painAreas.length > 0) {
+      if (context.painAreas.includes('back')) {
+        messages.push('Back pain from work? Time for some stretches 🧘');
+      }
+      if (context.painAreas.includes('shoulder')) {
+        messages.push('Shoulder tension? Let\'s work it out 💆');
+      }
+      if (context.painAreas.includes('wrist')) {
+        messages.push('Wrist pain? These exercises will help ✋');
+      }
+    }
+    
+    // Progress messages
+    if (context.dailyCompleted === context.totalDaily && context.totalDaily > 0) {
+      if (context.hasStreak) {
+        messages.push(`${context.streakDays} day streak! Keep it going`);
+      } else {
+        messages.push('All done today! Great work!');
+      }
+    } else if (context.dailyCompleted > 0) {
+      const remaining = context.totalDaily - context.dailyCompleted;
+      messages.push(`${remaining} more to go! You've got this!`);
+    } else if (context.hasStreak) {
+      messages.push(`Don't break that ${context.streakDays} day streak!`);
+    } else {
+      messages.push('Ready to start your exercises?');
+    }
+    
+    // Return a random message from the list
+    return messages[Math.floor(Math.random() * messages.length)] || 'Ready to exercise? 💪';
   }
 }
 

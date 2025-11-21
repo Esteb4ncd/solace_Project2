@@ -1,6 +1,7 @@
 import TaskCard from '@/components/taskCards/TaskCard';
 import { ThemedText } from '@/components/themed-text';
 import BottomNavigation from '@/components/ui/BottomNavigation';
+import CompletedTask from '@/components/ui/CompletedTask';
 import Header from '@/components/ui/Header';
 import LargeButton from '@/components/ui/LargeButton';
 import SpeechBubble from '@/components/ui/SpeechBubble';
@@ -15,7 +16,7 @@ import { aiService } from '@/services/aiService';
 import { speechService } from '@/services/speechService';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Image, Keyboard, Modal, Pressable, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { Animated, Dimensions, Image, Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -38,7 +39,7 @@ const HomePage = () => {
   const dot2Anim = useRef(new Animated.Value(0)).current;
   const dot3Anim = useRef(new Animated.Value(0)).current;
   
-  const { completedExercises, getStreakCount, dailyTasks, setRecommendedExercises, updateDailyTasks } = useExerciseContext();
+  const { completedExercises, getStreakCount, dailyTasks, setRecommendedExercises, updateDailyTasks, isExerciseComplete } = useExerciseContext();
   const streakCount = getStreakCount();
   const [sollyMessage, setSollyMessage] = useState<string>('');
   
@@ -47,7 +48,7 @@ const HomePage = () => {
     console.log('📋 Daily tasks updated in homepage:', dailyTasks);
   }, [dailyTasks]);
 
-  // Generate AI message for Solly based on exercise completion state
+  // Generate AI-powered personalized message for Solly
   useEffect(() => {
     const generateSollyMessage = async () => {
       try {
@@ -56,33 +57,22 @@ const HomePage = () => {
         const totalDailyTasks = dailyTasks.length;
         const hasStreak = streakCount > 0;
 
-        // Create context for AI
+        // Get user context from AI service (work tasks and pain areas)
+        const aiContext = aiService.getCurrentContext();
+
+        // Create comprehensive context for AI
         const context = {
           completedExercises: completedCount,
           dailyCompleted: dailyCompletedCount,
           totalDaily: totalDailyTasks,
           streakDays: streakCount,
           hasStreak: hasStreak,
+          painAreas: aiContext.painAreas,
+          workTasks: aiContext.workTasks,
         };
 
-        // Generate short, contextual message
-        let message = '';
-        
-        if (dailyCompletedCount === totalDailyTasks && totalDailyTasks > 0) {
-          message = hasStreak 
-            ? `Amazing! ${streakCount} day streak! 🎉`
-            : 'All done today! Great work! ✨';
-        } else if (dailyCompletedCount > 0) {
-          const remaining = totalDailyTasks - dailyCompletedCount;
-          message = `Keep going! ${remaining} more to go 💪`;
-        } else if (completedCount > 0) {
-          message = 'Ready for your daily exercises? 🏃';
-        } else if (hasStreak) {
-          message = `Don't break your ${streakCount} day streak! 🔥`;
-        } else {
-          message = 'Let\'s start your exercises! 🌟';
-        }
-
+        // Generate personalized AI message
+        const message = await aiService.generateSpeechBubbleMessage(context);
         setSollyMessage(message);
       } catch (error) {
         console.error('Error generating Solly message:', error);
@@ -92,8 +82,8 @@ const HomePage = () => {
 
     generateSollyMessage();
     
-    // Update message periodically or when state changes
-    const interval = setInterval(generateSollyMessage, 30000); // Update every 30 seconds
+    // Update message periodically or when state changes (every 45 seconds for variety)
+    const interval = setInterval(generateSollyMessage, 45000);
     return () => clearInterval(interval);
   }, [completedExercises, dailyTasks, streakCount]);
 
@@ -421,9 +411,9 @@ const HomePage = () => {
           {activeTab === 'stretch' && (
             <>
               {dailyTasks.length > 0 ? (
-                /* Daily Checklist Section */
+                /* Daily Checklist Section - filter out completed exercises */
                 <TaskCard 
-                  tasks={dailyTasks}
+                  tasks={dailyTasks.filter(task => !isExerciseComplete(task.id))}
                   exerciseType="physical"
                   isDaily={true}
                 />
@@ -446,9 +436,9 @@ const HomePage = () => {
 
           {activeTab === 'relax' && (
             <>
-              {/* Additional XP Section */}
+              {/* Additional XP Section - filter out completed exercises */}
               <TaskCard 
-                tasks={additionalTasks}
+                tasks={additionalTasks.filter(task => !isExerciseComplete(task.id))}
                 exerciseType="mental"
                 isDaily={false}
               />
@@ -456,8 +446,23 @@ const HomePage = () => {
           )}
 
           {activeTab === 'complete' && (
-            <View style={styles.emptyState}>
-              {/* Complete content will go here */}
+            <View style={styles.completeSection}>
+              <Text style={styles.completeSectionTitle}>Completed Exercises</Text>
+              {completedExercises.length > 0 ? (
+                completedExercises.map((exercise) => (
+                  <CompletedTask
+                    key={exercise.id}
+                    taskName={exercise.name}
+                    xpGained={exercise.xpGained}
+                  />
+                ))
+              ) : (
+                <View style={styles.emptyState}>
+                  <ThemedText style={styles.emptyStateText}>
+                    No exercises completed yet. Complete exercises to see them here!
+                  </ThemedText>
+                </View>
+              )}
             </View>
           )}
 
@@ -630,6 +635,15 @@ const styles = StyleSheet.create({
   emptyState: {
     paddingVertical: 40,
     alignItems: 'center',
+  },
+  completeSection: {
+    paddingVertical: 16,
+  },
+  completeSectionTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 16,
   },
   emptyStateContainer: {
     paddingVertical: 60,
