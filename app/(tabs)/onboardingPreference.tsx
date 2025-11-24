@@ -66,6 +66,22 @@ export default function OnboardingPreferenceScreen() {
 
 const PersonalizeIllustration = () => (
   <Svg width={160} height={240} viewBox="0 0 133 244" fill="none">
+    <Defs>
+      <LinearGradient id="paint0" x1="67.0678" y1="158.554" x2="69.4407" y2="251.54" gradientUnits="userSpaceOnUse">
+        <Stop stopColor="#443E82" />
+        <Stop offset="0.25" stopColor="#7065D6" />
+        <Stop offset="0.51" stopColor="#7267D9" />
+        <Stop offset="0.92" stopColor="#453F84" />
+      </LinearGradient>
+      <LinearGradient id="paint1" x1="-12.6549" y1="79.2904" x2="147.358" y2="79.2904" gradientUnits="userSpaceOnUse">
+        <Stop offset="0.1" stopColor="#443E83" />
+        <Stop offset="0.5" stopColor="#7267D9" />
+        <Stop offset="0.89" stopColor="#443E82" />
+      </LinearGradient>
+      <ClipPath id="clip0">
+        <Rect width="133" height="244" fill="white" />
+      </ClipPath>
+    </Defs>
     <Path
       d="M107.044 0C121.924 0 133.606 13.0842 132.328 28.3095L122.867 140.81C121.897 150.02 114.356 156.997 105.374 156.997H29.0509C20.0683 156.997 12.5271 150.02 11.5575 140.81L2.09656 28.3095C0.812395 13.0842 12.5009 0 27.3737 0H107.044Z"
       fill="#7267D9"
@@ -120,22 +136,6 @@ const PersonalizeIllustration = () => (
       d="M48.4629 157.32C55.4079 156.279 62.3856 156.035 69.383 156.002C76.3804 156.029 83.3516 156.272 90.3031 157.32C83.3581 158.367 76.3804 158.611 69.383 158.637C62.3856 158.605 55.4144 158.361 48.4629 157.32Z"
       fill="#443E82"
     />
-    <Defs>
-      <LinearGradient id="paint0" x1="67.0678" y1="158.554" x2="69.4407" y2="251.54" gradientUnits="userSpaceOnUse">
-        <Stop stopColor="#443E82" />
-        <Stop offset="0.25" stopColor="#7065D6" />
-        <Stop offset="0.51" stopColor="#7267D9" />
-        <Stop offset="0.92" stopColor="#453F84" />
-      </LinearGradient>
-      <LinearGradient id="paint1" x1="-12.6549" y1="79.2904" x2="147.358" y2="79.2904" gradientUnits="userSpaceOnUse">
-        <Stop offset="0.1" stopColor="#443E83" />
-        <Stop offset="0.5" stopColor="#7267D9" />
-        <Stop offset="0.89" stopColor="#443E82" />
-      </LinearGradient>
-      <ClipPath id="clip0">
-        <Rect width="133" height="244" fill="white" />
-      </ClipPath>
-    </Defs>
   </Svg>
 );
 
