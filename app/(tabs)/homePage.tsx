@@ -9,7 +9,16 @@ import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { ThemedText } from '@/components/themed-text';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Dimensions, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { 
+  Dimensions, 
+  Image, 
+  Keyboard, 
+  Pressable, 
+  ScrollView, 
+  StyleSheet, 
+  TouchableWithoutFeedback, 
+  View 
+} from 'react-native';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 

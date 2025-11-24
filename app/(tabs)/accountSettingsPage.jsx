@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Image, Platform, StyleSheet, Text, View } from "react-native";
+import { Image, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import BackButton from "../../components/ui/BackButton";
 import BottomNavigation from "../../components/ui/BottomNavigation";
 import SettingsButton from "../../components/ui/SettingsButton";
@@ -90,73 +90,79 @@ function AccountSettingsPage() {
         <View style={[styles.backButtonContainer, darkMode && styles.containerDark]}>
           <View style={styles.headerRow}>
             <BackButton onPress={handleBackPress} style={styles.backButton} />
-            <Text style={[styles.activeSectionText, darkMode && { color: "#FFFFFF" }]}>{activeSection}</Text>
+            <Text style={[styles.activeSectionText, darkMode && { color: "#FFFFFF" }]}>{activeSection || ''}</Text>
           </View>
           <ScrollView
             style={styles.scrollView}
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
-            {renderSectionContent()}
+            {renderSectionContent() || null}
           </ScrollView>
         </View>
       )}
 
       {showContent && (
-        <View style={styles.contentContainer}>
-          <View style={styles.mascotAndProgress}>
-            <Image
-              source={require("../../assets/images/Mascot-standing.png")}
-              style={{
-                width: 77,
-                height: 155,
-                alignSelf: "center",
-                marginBottom: 5,
-                marginTop: 10,
-              }}
-            />
-            <XPBar progress={0.5} />
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.contentContainer}>
+            <View style={styles.mascotAndProgress}>
+              <Image
+                source={require("../../assets/images/Mascot-standing.png")}
+                style={{
+                  width: 77,
+                  height: 155,
+                  alignSelf: "center",
+                  marginBottom: 5,
+                  marginTop: 10,
+                }}
+              />
+              <XPBar progress={0.5} />
+            </View>
+            <View style={styles.titleContainer}>
+              <Image
+                source={require("../../assets/images/Setting_fill.png")}
+                style={{ width: 33, height: 33 }}
+              />
+              <Text style={styles.title}>Settings</Text>
+            </View>
+            <View style={styles.buttonContainer}>
+              <SettingsButton
+                title="Account"
+                onPress={() => handleSectionPress("Account")}
+              />
+              <SettingsButton
+                title="General"
+                onPress={() => handleSectionPress("General")}
+              />
+              <SettingsButton
+                title="Accessibility"
+                onPress={() => handleSectionPress("Accessibility")}
+              />
+              <SettingsButton
+                title="Notifications"
+                onPress={() => handleSectionPress("Notifications")}
+              />
+              <SettingsButton
+                title="About"
+                onPress={() => handleSectionPress("About")}
+              />
+              <SettingsButton
+                title="Logout"
+                onPress={() => {
+                  // Navigate to login page
+                  router.push("/(tabs)/signInPage");
+                }}
+              />
+            </View>
           </View>
-          <View style={styles.titleContainer}>
-            <Image
-              source={require("../../assets/images/Setting_fill.png")}
-              style={{ width: 33, height: 33 }}
-            />
-            <Text style={styles.title}>Settings</Text>
-          </View>
-          <View style={styles.buttonContainer}>
-            <SettingsButton
-              title="Account"
-              onPress={() => handleSectionPress("Account")}
-            />
-            <SettingsButton
-              title="General"
-              onPress={() => handleSectionPress("General")}
-            />
-            <SettingsButton
-              title="Accessibility"
-              onPress={() => handleSectionPress("Accessibility")}
-            />
-            <SettingsButton
-              title="Notifications"
-              onPress={() => handleSectionPress("Notifications")}
-            />
-            <SettingsButton
-              title="About"
-              onPress={() => handleSectionPress("About")}
-            />
-            <SettingsButton
-              title="Logout"
-              onPress={() => {
-                // Navigate to login page
-                router.push("/(tabs)/signInPage");
-              }}
-            />
-          </View>
-        </View>
+        </ScrollView>
       )}
 
-      <View>
+      <View style={styles.navigationBar}>
         <BottomNavigation onItemPress={handleNavPress} />
       </View>
     </View>
@@ -174,6 +180,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 100, // Space for bottom navigation
+    flexGrow: 1,
   },
   contentContainer: {
     padding: 17,

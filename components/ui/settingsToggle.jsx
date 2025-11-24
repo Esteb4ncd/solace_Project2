@@ -21,7 +21,7 @@ function SettingsToggle({ icon, label, onToggle, initialValue, containerStyle })
         color="#443E82"
         style={{ marginRight: 12 }}
       />
-      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.label}>{label || ''}</Text>
       <TouchableOpacity
         onPress={handleToggle}
         style={[
