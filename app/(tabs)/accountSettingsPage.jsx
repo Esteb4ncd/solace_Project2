@@ -88,8 +88,8 @@ function AccountSettingsPage() {
     <View style={styles.container}>
       {!showContent && (
         <View style={[styles.backButtonContainer, darkMode && styles.containerDark]}>
+          <BackButton onPress={handleBackPress} style={styles.backButton} />
           <View style={styles.headerRow}>
-            <BackButton onPress={handleBackPress} style={styles.backButton} />
             <Text style={[styles.activeSectionText, darkMode && { color: "#FFFFFF" }]}>{activeSection || ''}</Text>
           </View>
           <ScrollView
@@ -133,10 +133,6 @@ function AccountSettingsPage() {
               <SettingsButton
                 title="Account"
                 onPress={() => handleSectionPress("Account")}
-              />
-              <SettingsButton
-                title="General"
-                onPress={() => handleSectionPress("General")}
               />
               <SettingsButton
                 title="Accessibility"
@@ -215,15 +211,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backButton: {
-    // keep default positioning so the button sits in the header flow
-    marginRight: 12,
+    position: "absolute",
+    top: 60,
+    left: 20,
+    zIndex: 10,
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
-    position: "relative",
     marginTop: 20,
   },
   activeSectionText: {
@@ -231,7 +228,6 @@ const styles = StyleSheet.create({
     fontFamily: Globals.fonts.weights.bold,
     color: "#000",
     textAlign: "center",
-    flex: 1,
   },
   navigationBar: {
     bottom: 0,

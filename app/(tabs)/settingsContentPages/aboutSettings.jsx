@@ -18,7 +18,7 @@ export default function AboutSettingsContent() {
         stigma-free, helping workers build lasting, healthy habits.
       </Text>
 
-      <View style={styles.infoSection}>
+      <View style={[styles.infoSection, styles.firstInfoSection]}>
         <Text style={styles.infoLabel}>Version:</Text>
         <Text style={styles.infoValue}>1.0.0</Text>
       </View>
@@ -61,15 +61,18 @@ const styles = StyleSheet.create({
     fontFamily: Globals.fonts.weights.regular,
     color: "#666",
     lineHeight: 24,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   infoSection: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 12,
-    paddingVertical: 8,
+    marginBottom: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
+  },
+  firstInfoSection: {
+    marginTop: 8,
   },
   infoLabel: {
     fontSize: 16,
@@ -82,8 +85,7 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   bottomSection: {
-    flex: 1,
-    justifyContent: "flex-end",
-    marginTop: 80,
+    marginTop: 32,
+    alignItems: "center",
   },
 });
