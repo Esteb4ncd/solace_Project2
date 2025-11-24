@@ -2,7 +2,7 @@ import BottomNavigation from '@/components/ui/BottomNavigation';
 import { Globals } from "@/constants/globals";
 import { Colors } from "@/constants/theme";
 import { router } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -11,6 +11,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { getUsername } from '@/services/userStorage';
 
 import { useExerciseContext } from '@/contexts/ExerciseContext';
 import ExerciseButton from "../../components/ui/ExerciseButton";
@@ -38,9 +39,19 @@ const targetAreaToBodyPart: Record<string, { name: string; mascot: any; xp: numb
 };
 
 const PhysicalHomePage = () => {
-  const [userName] = useState<string>("Sarah");
+  const [userName, setUserName] = useState<string>("David");
   const [selectedCategory, setSelectedCategory] = useState<string>("For You");
   const { recommendedExercises } = useExerciseContext();
+
+  useEffect(() => {
+    const loadUsername = async () => {
+      const storedUsername = await getUsername();
+      if (storedUsername) {
+        setUserName(storedUsername);
+      }
+    };
+    loadUsername();
+  }, []);
 
   // Get unique body parts from recommended exercises
   const forYouExercises = useMemo(() => {

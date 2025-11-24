@@ -2,7 +2,7 @@ import BottomNavigation from '@/components/ui/BottomNavigation';
 import { Globals } from "@/constants/globals";
 import { Colors } from "@/constants/theme";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -16,11 +16,22 @@ import XPBar from "../..//components/ui/XPBar";
 import GeneralTaskCard from "../../components/taskCards/generalTaskCard";
 import ExerciseButton from "../../components/ui/ExerciseButton";
 import StatusBar from "../../components/ui/StatusBar";
+import { getUsername } from "@/services/userStorage";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 const MentalHomePage = () => {
-  const [userName] = useState("Sarah");
+  const [userName, setUserName] = useState("David");
+  
+  useEffect(() => {
+    const loadUsername = async () => {
+      const storedUsername = await getUsername();
+      if (storedUsername) {
+        setUserName(storedUsername);
+      }
+    };
+    loadUsername();
+  }, []);
   const [selectedCategory, setSelectedCategory] = useState("breathing");
 
   const handleNavPress = (itemId: string) => {

@@ -4,7 +4,7 @@ import { useToggleState } from '@react-stately/toggle';
 import { useEffect } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-const BackButton = ({onPress, style}) => {
+const BackButton = ({onPress, style, highContrast = false}) => {
   const state = useToggleState({});
   const pathname = usePathname();
   
@@ -57,9 +57,18 @@ const BackButton = ({onPress, style}) => {
   return (
     <Pressable
       {...buttonProps}
-      style={[styles.button, style]}
+      style={[
+        styles.button,
+        highContrast && styles.buttonHighContrast,
+        style,
+      ]}
     >
-      <View style={styles.LeftArrow}></View>
+      <View
+        style={[
+          styles.LeftArrow,
+          highContrast && styles.leftArrowHighContrast,
+        ]}
+      ></View>
     </Pressable>
   );
 };
@@ -90,6 +99,14 @@ const styles = StyleSheet.create({
     borderColor: "#FFFFFF",
     borderLeft: "4.77px solid white",
     borderBottom: "4.77px solid white",
+  },
+  buttonHighContrast: {
+    backgroundColor: '#000000',
+    borderWidth: 2,
+    borderColor: '#000000',
+  },
+  leftArrowHighContrast: {
+    borderColor: '#FFFFFF',
   },
 });
 

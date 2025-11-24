@@ -1,12 +1,15 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import IonIcons from "react-native-vector-icons/Ionicons";
 import SettingsToggle from "../../../components/ui/settingsToggle.jsx";
 import { Globals } from "../../../constants/globals";
+const HIGH_CONTRAST_STORAGE_KEY = "accessibility_high_contrast";
 
 export default function AccessibilitySettingsContent({
   darkMode: parentDarkMode,
   onDarkModeChange,
+  onHighContrastChange,
 }) {
   const [darkMode, setDarkMode] = useState(
     parentDarkMode ?? Globals.userSettings?.darkMode ?? false
@@ -17,9 +20,34 @@ export default function AccessibilitySettingsContent({
       setDarkMode(parentDarkMode);
     }
   }, [parentDarkMode]);
+
   const [fontSizeIndex, setFontSizeIndex] = useState(1); // 0: Small, 1: Medium, 2: Large
+  const [highContrast, setHighContrast] = useState(false);
   const fontSizes = ["Small", "Medium", "Large"];
   const fontValues = [14, 16, 20];
+
+  useEffect(() => {
+    const loadHighContrastPreference = async () => {
+      try {
+        const storedValue = await AsyncStorage.getItem(
+          HIGH_CONTRAST_STORAGE_KEY
+        );
+        if (storedValue !== null) {
+          setHighContrast(storedValue === "true");
+        }
+      } catch (error) {
+        console.warn("Failed to load high contrast preference", error);
+      }
+    };
+
+    loadHighContrastPreference();
+  }, []);
+
+  useEffect(() => {
+    if (onHighContrastChange) {
+      onHighContrastChange(highContrast);
+    }
+  }, [highContrast, onHighContrastChange]);
 
   const decreaseFontSize = () => {
     if (fontSizeIndex > 0) {
@@ -33,8 +61,71 @@ export default function AccessibilitySettingsContent({
     }
   };
 
+  const handleHighContrastToggle = async (value) => {
+    setHighContrast(value);
+    try {
+      await AsyncStorage.setItem(
+        HIGH_CONTRAST_STORAGE_KEY,
+        value ? "true" : "false"
+      );
+    } catch (error) {
+      console.warn("Failed to save high contrast preference", error);
+    }
+  };
+
+  const containerStyle = [
+    styles.container,
+    highContrast && styles.highContrastContainer,
+  ];
+  const descriptionStyle = [
+    styles.description,
+    highContrast && styles.highContrastDescription,
+    darkMode && styles.descriptionDark,
+  ];
+  const fontSizeContainerStyle = [
+    styles.fontSizeContainer,
+    highContrast && styles.highContrastFontSizeContainer,
+    darkMode && styles.fontSizeContainerDark,
+  ];
+  const fontSizeLabelStyle = [
+    styles.fontSizeLabel,
+    highContrast && styles.highContrastFontSizeLabel,
+    darkMode && styles.fontSizeLabelDark,
+  ];
+  const fontSizeValueStyle = [
+    styles.fontSizeValue,
+    highContrast && styles.highContrastFontSizeValue,
+    darkMode && styles.fontSizeValueDark,
+  ];
+  const fontPreviewStyle = [
+    styles.fontPreview,
+    highContrast && styles.highContrastFontPreview,
+    darkMode && styles.fontPreviewDark,
+  ];
+  const fontButtonStyle = [
+    styles.fontButton,
+    highContrast && styles.highContrastFontButton,
+  ];
+  const disabledFontButtonStyle = [
+    styles.fontButton,
+    styles.disabledButton,
+    highContrast && styles.highContrastDisabledButton,
+  ];
+  const fontButtonTextStyle = [
+    styles.fontButtonText,
+    highContrast && styles.highContrastFontButtonText,
+  ];
+  const disabledFontButtonTextStyle = [
+    styles.fontButtonText,
+    highContrast ? styles.highContrastFontButtonTextDisabled : styles.fontButtonText,
+  ];
+  const iconColor = highContrast ? "#000000" : darkMode ? "#FFFFFF" : "#443E82";
+
   return (
-    <View style={[styles.container, darkMode && styles.containerDark]}>
+    <View style={[containerStyle, darkMode && styles.containerDark]} accessibilityRole="main">
+      <Text style={descriptionStyle}>
+        Customize accessibility features to improve your app experience.
+      </Text>
 
       {/* Add more accessibility settings content here */}
       <SettingsToggle
@@ -49,51 +140,60 @@ export default function AccessibilitySettingsContent({
           };
         }}
         initialValue={darkMode}
-        containerStyle={darkMode ? { backgroundColor: "#EAE8F9" } : undefined}
+        highContrast={highContrast}
+        darkMode={darkMode}
       />
       <SettingsToggle
         icon="half-circle"
         label="High Contrast"
-        onToggle={() => {}}
-        initialValue={true}
-        containerStyle={darkMode ? { backgroundColor: "#EAE8F9" } : undefined}
+        onToggle={handleHighContrastToggle}
+        initialValue={highContrast}
+        value={highContrast}
+        highContrast={highContrast}
+        darkMode={darkMode}
+        accessibilityLabel="High contrast toggle"
       />
       <SettingsToggle
         icon="moon"
         label="Colourblind"
         onToggle={() => {}}
         initialValue={true}
-        containerStyle={darkMode ? { backgroundColor: "#EAE8F9" } : undefined}
+        highContrast={highContrast}
+        darkMode={darkMode}
       />
 
-      <View
-        style={[
-          styles.fontSizeContainer,
-          darkMode && { backgroundColor: "#EAE8F9" },
-        ]}
-      >
+      <View style={fontSizeContainerStyle}>
         <View style={styles.fontHeader}>
-          <IonIcons name="text" size={24} color="#443E82" />
-          <Text style={styles.fontSizeLabel}>Font Size</Text>
+          <IonIcons name="text" size={24} color={iconColor} />
+          <Text style={fontSizeLabelStyle}>Font Size</Text>
         </View>
         <View style={styles.fontControls}>
           <TouchableOpacity
             style={[
-              styles.fontButton,
-              fontSizeIndex === 0 && styles.disabledButton,
-              { backgroundColor: darkMode ? "#7267D9" : "#B0A9F8" },
+              fontSizeIndex === 0 ? disabledFontButtonStyle : fontButtonStyle,
             ]}
             onPress={decreaseFontSize}
             disabled={fontSizeIndex === 0}
+            accessibilityRole="button"
+            accessibilityLabel="Decrease font size"
           >
-            <Text style={[styles.fontButtonText, styles.smallA]}>A-</Text>
+            <Text
+              style={[
+                fontSizeIndex === 0
+                  ? disabledFontButtonTextStyle
+                  : fontButtonTextStyle,
+                styles.smallA,
+              ]}
+            >
+              A-
+            </Text>
           </TouchableOpacity>
 
           <View style={styles.fontSizeDisplay}>
-            <Text style={styles.fontSizeValue}>{fontSizes[fontSizeIndex]}</Text>
+            <Text style={fontSizeValueStyle}>{fontSizes[fontSizeIndex]}</Text>
             <Text
               style={[
-                styles.fontPreview,
+                fontPreviewStyle,
                 { fontSize: fontValues[fontSizeIndex] },
               ]}
             >
@@ -103,14 +203,25 @@ export default function AccessibilitySettingsContent({
 
           <TouchableOpacity
             style={[
-              styles.fontButton,
-              fontSizeIndex === fontSizes.length - 1 && styles.disabledButton,
-              { backgroundColor: darkMode ? "#7267D9" : "#B0A9F8" },
+              fontSizeIndex === fontSizes.length - 1
+                ? disabledFontButtonStyle
+                : fontButtonStyle,
             ]}
             onPress={increaseFontSize}
             disabled={fontSizeIndex === fontSizes.length - 1}
+            accessibilityRole="button"
+            accessibilityLabel="Increase font size"
           >
-            <Text style={[styles.fontButtonText, styles.largeA]}>A+</Text>
+            <Text
+              style={[
+                fontSizeIndex === fontSizes.length - 1
+                  ? disabledFontButtonTextStyle
+                  : fontButtonTextStyle,
+                styles.largeA,
+              ]}
+            >
+              A+
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -199,5 +310,61 @@ const styles = StyleSheet.create({
     fontFamily: Globals.fonts.weights.regular,
     color: "#666",
     textAlign: "center",
+  },
+  highContrastContainer: {
+    backgroundColor: "#FFFFFF",
+  },
+  highContrastDescription: {
+    color: "#000000",
+    fontWeight: "600",
+  },
+  highContrastFontSizeContainer: {
+    borderWidth: 2,
+    borderColor: "#000000",
+    backgroundColor: "#FFFFFF",
+  },
+  highContrastFontSizeLabel: {
+    fontFamily: Globals.fonts.weights.semiBold,
+    color: "#000000",
+  },
+  highContrastFontButton: {
+    backgroundColor: "#000000",
+    borderWidth: 2,
+    borderColor: "#000000",
+  },
+  highContrastDisabledButton: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 2,
+    borderColor: "#000000",
+  },
+  highContrastFontButtonText: {
+    color: "#FFFFFF",
+  },
+  highContrastFontButtonTextDisabled: {
+    color: "#000000",
+  },
+  highContrastFontSizeValue: {
+    color: "#000000",
+    fontFamily: Globals.fonts.weights.semiBold,
+  },
+  highContrastFontPreview: {
+    color: "#000000",
+    fontWeight: "600",
+  },
+  descriptionDark: {
+    color: "#FFFFFF",
+  },
+  fontSizeContainerDark: {
+    borderColor: "#7267D9",
+    backgroundColor: "#2A2A2A",
+  },
+  fontSizeLabelDark: {
+    color: "#FFFFFF",
+  },
+  fontSizeValueDark: {
+    color: "#FFFFFF",
+  },
+  fontPreviewDark: {
+    color: "#FFFFFF",
   },
 });

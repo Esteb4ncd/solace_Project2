@@ -17,6 +17,8 @@ function AccountSettingsPage() {
   const [email, setEmail] = useState("user123@example.com");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [darkMode, setDarkMode] = useState(Globals.userSettings?.darkMode ?? false);
+  const [accessibilityHighContrast, setAccessibilityHighContrast] =
+    useState(false);
   const [showContent, setShowContent] = useState(true);
   const [activeSection, setActiveSection] = useState(null);
 
@@ -71,6 +73,7 @@ function AccountSettingsPage() {
               setDarkMode(val);
               Globals.userSettings = { ...(Globals.userSettings || {}), darkMode: val };
             }}
+            onHighContrastChange={setAccessibilityHighContrast}
           />
         );
       case "Notifications":
@@ -88,7 +91,13 @@ function AccountSettingsPage() {
     <View style={styles.container}>
       {!showContent && (
         <View style={[styles.backButtonContainer, darkMode && styles.containerDark]}>
-          <BackButton onPress={handleBackPress} style={styles.backButton} />
+          <BackButton 
+            onPress={handleBackPress} 
+            style={styles.backButton}
+            highContrast={
+              activeSection === "Accessibility" && accessibilityHighContrast
+            }
+          />
           <View style={styles.headerRow}>
             <Text style={[styles.activeSectionText, darkMode && { color: "#FFFFFF" }]}>{activeSection || ''}</Text>
           </View>
