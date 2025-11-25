@@ -1,6 +1,5 @@
 import CompletedTask from '@/components/ui/CompletedTask';
 import { getExerciseById, getExerciseXpReward } from '@/constants/exercises';
-import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -20,8 +19,6 @@ interface TaskCardProps {
 }
 
 const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDaily = false }) => {
-  const { isExerciseComplete } = useExerciseContext();
-
   const handleTaskPress = (taskId: string) => {
     console.log('Task pressed:', taskId, 'isDaily:', isDaily, 'exerciseType:', exerciseType);
     
@@ -92,9 +89,7 @@ const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDai
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{getSectionTitle()}</Text>
       {tasks.map((task) => {
-        const isCompleted = isExerciseComplete(task.id);
-        
-        if (isCompleted) {
+        if (task.isCompleted) {
           return (
             <CompletedTask
               key={task.id}

@@ -39,7 +39,7 @@ const HomePage = () => {
   const dot2Anim = useRef(new Animated.Value(0)).current;
   const dot3Anim = useRef(new Animated.Value(0)).current;
   
-  const { completedExercises, getStreakCount, dailyTasks, setRecommendedExercises, updateDailyTasks, isExerciseComplete } = useExerciseContext();
+  const { completedExercises, getStreakCount, dailyTasks, setRecommendedExercises, updateDailyTasks } = useExerciseContext();
   const streakCount = getStreakCount();
   const [sollyMessage, setSollyMessage] = useState<string>('');
   const sollyScaleAnim = useRef(new Animated.Value(1)).current;
@@ -208,6 +208,52 @@ const HomePage = () => {
     { id: '6', title: 'Anxiety Release', xpAmount: 5, xpColor: '#7267D9', isCompleted: false },
   ];
 
+  const extractPainAreasFromText = useCallback((answer: string): string[] => {
+    const extractedAreas: string[] = [];
+    const lowerAnswer = answer.toLowerCase();
+    
+    if (lowerAnswer.includes('shoulder') || lowerAnswer.includes('arm')) {
+      extractedAreas.push('shoulder');
+    }
+    if (lowerAnswer.includes('knee') || lowerAnswer.includes('leg') || lowerAnswer.includes('squat')) {
+      extractedAreas.push('knee');
+    }
+    if (lowerAnswer.includes('back') || lowerAnswer.includes('spine') || lowerAnswer.includes('lower back')) {
+      extractedAreas.push('back');
+    }
+    if (lowerAnswer.includes('neck') || lowerAnswer.includes('cervical')) {
+      extractedAreas.push('neck');
+    }
+    if (lowerAnswer.includes('wrist') || lowerAnswer.includes('hand') || lowerAnswer.includes('forearm')) {
+      extractedAreas.push('wrist');
+    }
+    if (lowerAnswer.includes('hip')) {
+      extractedAreas.push('hip');
+    }
+
+    return extractedAreas;
+  }, []);
+
+  const extractWorkTasksFromText = useCallback((answer: string): string[] => {
+    const extractedTasks: string[] = [];
+    const lowerAnswer = answer.toLowerCase();
+    
+    if (lowerAnswer.includes('lift') || lowerAnswer.includes('heavy') || lowerAnswer.includes('carry')) {
+      extractedTasks.push('heavy lifting');
+    }
+    if (lowerAnswer.includes('overhead') || lowerAnswer.includes('above') || lowerAnswer.includes('reach')) {
+      extractedTasks.push('overhead work');
+    }
+    if (lowerAnswer.includes('tool') || lowerAnswer.includes('drill') || lowerAnswer.includes('hammer') || lowerAnswer.includes('repetitive')) {
+      extractedTasks.push('repetitive tool use');
+    }
+    if (lowerAnswer.includes('kneel') || lowerAnswer.includes('crouch') || lowerAnswer.includes('squat')) {
+      extractedTasks.push('kneeling');
+    }
+
+    return extractedTasks;
+  }, []);
+
   const handleNavPress = (itemId: string) => {
     switch (itemId) {
       case 'home':
@@ -251,8 +297,9 @@ const HomePage = () => {
 
   // AI Modal handlers
   const handleAIIconPress = () => {
-    // Don't reset conversation - allow context to accumulate
-    // This allows users to build context over multiple messages
+    // Always start fresh for single-question flow
+    setAiInputValue('');
+    setAiContextFeedback('');
     setShowAIModal(true);
   };
 
@@ -278,11 +325,7 @@ const HomePage = () => {
   };
 
   const handleAIVoicePress = async () => {
-    if (isAIKeyboardVisible) {
-      handleAISend();
-    } else {
-      await handleAIStartRecording();
-    }
+    await handleAIStartRecording();
   };
 
   const handleAISend = async () => {
@@ -302,106 +345,70 @@ const HomePage = () => {
     }
     
     // Process with AI service
-    if (finalText) {
-      try {
-        await aiService.sendMessage(finalText, isAIRecording);
-        
-        // Check if we have enough context to generate recommendations
-        const context = aiService.getCurrentContext();
-        console.log('AI Context after message:', context);
-        
-        // Get context from AI service, with fallback extraction from message
-        let painAreas = [...context.painAreas];
-        let workTasks = [...context.workTasks];
-        
-        // Fallback: try to extract from the message if context extraction didn't work
-        if (painAreas.length === 0) {
-          const lowerText = finalText.toLowerCase();
-          if (lowerText.includes('shoulder') || lowerText.includes('arm')) painAreas.push('shoulder');
-          if (lowerText.includes('knee') || lowerText.includes('leg')) painAreas.push('knee');
-          if (lowerText.includes('back')) painAreas.push('back');
-          if (lowerText.includes('neck')) painAreas.push('neck');
-          if (lowerText.includes('wrist') || lowerText.includes('hand')) painAreas.push('wrist');
-        }
-        
-        if (workTasks.length === 0) {
-          const lowerText = finalText.toLowerCase();
-          if (lowerText.includes('lift') || lowerText.includes('heavy') || lowerText.includes('weight')) {
-            workTasks.push('heavy lifting');
-          }
-          if (lowerText.includes('overhead') || lowerText.includes('above') || lowerText.includes('reach')) {
-            workTasks.push('overhead work');
-          }
-          if (lowerText.includes('tool') || lowerText.includes('repetitive') || lowerText.includes('hammer') || lowerText.includes('drill')) {
-            workTasks.push('repetitive tool use');
-          }
-          if (lowerText.includes('kneel') || lowerText.includes('crouch') || lowerText.includes('squat')) {
-            workTasks.push('kneeling');
-          }
-        }
-        
-        // Update feedback message
-        if (painAreas.length > 0 && workTasks.length > 0) {
-          setAiContextFeedback(`Got it! I found ${painAreas.join(', ')} pain areas and ${workTasks.join(', ')} work tasks. Generating your personalized exercises...`);
-        } else if (painAreas.length > 0) {
-          setAiContextFeedback(`I found ${painAreas.join(', ')} pain areas. Can you tell me about your work activities?`);
-        } else if (workTasks.length > 0) {
-          setAiContextFeedback(`I found ${workTasks.join(', ')} work tasks. Where do you feel pain or discomfort?`);
-        } else {
-          setAiContextFeedback('Tell me about your pain areas and work activities so I can create your exercise plan.');
-        }
-        
-        // Generate recommendations if we have both pain areas and work tasks
-        if (painAreas.length > 0 && workTasks.length > 0) {
-          console.log('📋 Generating recommendations with context:', { painAreas, workTasks });
-          
-          const recommendedExercises = recommendExercises(
-            painAreas,
-            workTasks,
-            [],
-            3 // Get top 3 recommendations for daily checklist
-          );
-          
-          if (recommendedExercises.length > 0) {
-            setRecommendedExercises(recommendedExercises);
-            
-            // Convert to daily tasks format
-            const dailyTasks = recommendedExercises.map((recEx) => ({
-              id: recEx.exercise.id,
-              title: recEx.exercise.name,
-              xpAmount: getExerciseXpReward(recEx.exercise, recEx.isRecommended),
-              xpColor: '#7267D9',
-              isCompleted: false,
-            }));
-            
-            // Update daily tasks - this should trigger a re-render
-            updateDailyTasks(dailyTasks);
-            console.log('Updated daily checklist with recommendations:', dailyTasks);
-            console.log('Daily tasks after update:', dailyTasks);
-            
-            // Force a small delay to ensure state update propagates
-            setTimeout(() => {
-              // Close modal only after successfully generating recommendations
-              setShowAIModal(false);
-              setAiInputValue('');
-            }, 100);
-          } else {
-            console.warn('No exercises found for context:', { painAreas, workTasks });
-            // Keep modal open if no exercises found
-            setAiInputValue('');
-          }
-        } else {
-          console.log('⏳ Waiting for more context. Current:', { 
-            painAreas: painAreas.length, 
-            workTasks: workTasks.length 
-          });
-          // Keep modal open to gather more context
-          // Clear input so user can type again
-          setAiInputValue('');
-        }
-      } catch (error) {
-        console.error('Error processing with AI in modal:', error);
+    if (!finalText) {
+      return;
+    }
+
+    try {
+      await aiService.sendMessage(finalText, isAIRecording);
+    } catch (error) {
+      console.error('Error sending message to AI:', error);
+    }
+
+    const context = aiService.getCurrentContext();
+    let painAreas = [...context.painAreas];
+    let workTasks = [...context.workTasks];
+
+    if (painAreas.length === 0) {
+      painAreas = extractPainAreasFromText(finalText);
+    }
+    if (workTasks.length === 0) {
+      workTasks = extractWorkTasksFromText(finalText);
+    }
+
+    if (painAreas.length === 0) {
+      painAreas = ['back'];
+    }
+    if (workTasks.length === 0) {
+      workTasks = ['heavy lifting'];
+    }
+
+    setAiContextFeedback(`Creating your checklist with focus on ${painAreas.join(', ')} and ${workTasks.join(', ')}...`);
+
+    try {
+      const recommendedExercises = recommendExercises(
+        painAreas,
+        workTasks,
+        [],
+        3
+      );
+
+      if (recommendedExercises.length === 0) {
+        console.warn('No exercises found for context:', { painAreas, workTasks });
+        setAiContextFeedback('I could not find matching exercises. Please try describing your work tasks and pain areas differently.');
+        return;
       }
+
+      setRecommendedExercises(recommendedExercises);
+      const updatedTasks = recommendedExercises.map((recEx) => ({
+        id: recEx.exercise.id,
+        title: recEx.exercise.name,
+        xpAmount: getExerciseXpReward(recEx.exercise, recEx.isRecommended),
+        xpColor: '#7267D9',
+        isCompleted: false,
+      }));
+
+      updateDailyTasks(updatedTasks);
+      console.log('✅ Checklist updated from AI modal:', updatedTasks);
+
+      setAiInputValue('');
+      setShowAIModal(false);
+      setAiContextFeedback('');
+      setShowExerciseCompleteMessage(false);
+      generateSollyMessage().catch(console.error);
+    } catch (error) {
+      console.error('Error generating recommendations:', error);
+      setAiContextFeedback('Something went wrong while updating your checklist. Please try again.');
     }
   };
 
@@ -544,7 +551,7 @@ const HomePage = () => {
               {dailyTasks.length > 0 ? (
                 <>
                   {(() => {
-                    const uncompletedTasks = dailyTasks.filter(task => !isExerciseComplete(task.id));
+                     const uncompletedTasks = dailyTasks.filter(task => !task.isCompleted);
                     const allCompleted = uncompletedTasks.length === 0 && dailyTasks.length > 0;
                     
                     if (allCompleted) {
@@ -554,10 +561,11 @@ const HomePage = () => {
                           <ThemedText style={styles.allCompletedText}>
                             All exercises completed! Great work!
                           </ThemedText>
-                          <LargeButton 
-                            label="Find more exercises"
-                            onPress={() => router.push('/(tabs)/physicalHomePage')}
-                          />
+                           <LargeButton 
+                             label="Find more exercises"
+                             onPress={() => router.push('/(tabs)/physicalHomePage')}
+                             style={styles.allCompletedButton}
+                           />
                         </View>
                       );
                     } else {
@@ -593,7 +601,7 @@ const HomePage = () => {
             <>
               {/* Additional XP Section - filter out completed exercises */}
               <TaskCard 
-                tasks={additionalTasks.filter(task => !isExerciseComplete(task.id))}
+                tasks={additionalTasks.filter(task => !task.isCompleted)}
                 exerciseType="mental"
                 isDaily={false}
               />
@@ -835,6 +843,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
     lineHeight: 26,
+  },
+  allCompletedButton: {
+    width: '100%',
+    maxWidth: 360,
   },
   takeQuizButton: {
     backgroundColor: '#7267D9',

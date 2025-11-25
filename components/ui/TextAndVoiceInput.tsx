@@ -36,17 +36,22 @@ const TextAndVoiceInput: React.FC<TextAndVoiceInputProps> = ({
 
   const handleVoicePress = () => {
     if (isKeyboardVisible) {
-      // When keyboard is visible, call the original onVoicePress (for send functionality)
-      onVoicePress?.();
-    } else {
-      // When keyboard is not visible, start recording
-      if (onStartRecording) {
-        // Parent handles recording view
-        onStartRecording();
-      } else {
-        // Fallback to internal recording
-        setIsRecording(true);
+      // When keyboard is visible, prioritize sending the message if handler exists
+      if (onSend) {
+        onSend();
+        return;
       }
+      // Fallback to legacy behaviour
+      onVoicePress?.();
+      return;
+    }
+
+    // When keyboard is not visible, start recording (voice mode)
+    if (onStartRecording) {
+      onStartRecording();
+    } else {
+      // Fallback to internal recording visual
+      setIsRecording(true);
     }
   };
 
