@@ -1,5 +1,8 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { getExerciseXpReward, recommendExercises } from '@/constants/exercises';
+import { useExerciseContext } from '@/contexts/ExerciseContext';
+import { aiService } from '@/services/aiService';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
@@ -9,9 +12,9 @@ import VoiceConversationView from '../../components/ui/VoiceConversationView';
 import { Globals } from '../../constants/globals';
 import { recordingStorage } from '../../services/recordingStorage';
 import { speechService } from '../../services/speechService';
-import { aiService } from '@/services/aiService';
 
 export default function AIQuestion1Screen() {
+  const { setRecommendedExercises, updateDailyTasks } = useExerciseContext();
   const [inputValue, setInputValue] = useState('');
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -105,7 +108,6 @@ export default function AIQuestion1Screen() {
           nextAction: aiResponse.nextAction
         });
         // AI response is processed and context is extracted
-        // The response will be used in the confirmation page
       } catch (error) {
         console.error('❌ Error processing with AI:', error);
         // Continue with flow even if AI fails - context extraction might still work
@@ -114,7 +116,7 @@ export default function AIQuestion1Screen() {
       console.warn('⚠️ No text to process with AI');
     }
     
-    // Navigate to next page (always navigate, even if AI processing failed)
+    // Process answer and update checklist directly (always process, even if AI processing failed)
     handleNext();
   };
 
@@ -144,6 +146,59 @@ export default function AIQuestion1Screen() {
     handleNext();
   };
 
+  const extractTasksFromText = (text: string): string[] => {
+    const lowerAnswer = text.toLowerCase();
+    const extractedTasks: string[] = [];
+    
+    if (lowerAnswer.includes('lift') || lowerAnswer.includes('heavy') || lowerAnswer.includes('weight')) {
+      extractedTasks.push('heavy lifting');
+    }
+    if (lowerAnswer.includes('overhead') || lowerAnswer.includes('above') || lowerAnswer.includes('reach')) {
+      extractedTasks.push('overhead work');
+    }
+    if (lowerAnswer.includes('tool') || lowerAnswer.includes('repetitive') || lowerAnswer.includes('hammer') || lowerAnswer.includes('drill')) {
+      extractedTasks.push('repetitive tool use');
+    }
+    if (lowerAnswer.includes('kneel') || lowerAnswer.includes('crouch') || lowerAnswer.includes('squat')) {
+      extractedTasks.push('kneeling');
+    }
+    if (lowerAnswer.includes('stand') || lowerAnswer.includes('long hours')) {
+      extractedTasks.push('standing long hours');
+    }
+    if (lowerAnswer.includes('awkward') || lowerAnswer.includes('twist')) {
+      extractedTasks.push('awkward postures');
+    }
+    return extractedTasks;
+  };
+
+  const extractPainAreasFromText = (text: string): string[] => {
+    const lowerAnswer = text.toLowerCase();
+    const extractedAreas: string[] = [];
+    
+    if (lowerAnswer.includes('shoulder') || lowerAnswer.includes('arm')) {
+      extractedAreas.push('shoulder');
+    }
+    if (lowerAnswer.includes('knee') || lowerAnswer.includes('leg')) {
+      extractedAreas.push('knee');
+    }
+    if (lowerAnswer.includes('back') || lowerAnswer.includes('spine')) {
+      extractedAreas.push('back');
+    }
+    if (lowerAnswer.includes('neck')) {
+      extractedAreas.push('neck');
+    }
+    if (lowerAnswer.includes('wrist') || lowerAnswer.includes('hand')) {
+      extractedAreas.push('wrist');
+    }
+    if (lowerAnswer.includes('hip')) {
+      extractedAreas.push('hip');
+    }
+    if (lowerAnswer.includes('chest')) {
+      extractedAreas.push('chest');
+    }
+    return extractedAreas;
+  };
+
   const handleNext = () => {
     // Use a default answer or input value
     const answer = inputValue.trim() || transcribedText || '';
@@ -151,16 +206,73 @@ export default function AIQuestion1Screen() {
     // If we have text input but no recording was made, store it
     if (answer && !transcribedText && !isRecording) {
       recordingStorage.storeQuestion1(
-        'What iron work tasks do you typically do?',
+        'What iron work tasks do you typically do, and where do you usually feel pain or discomfort?',
         answer,
         null // No audio URI for text input
       );
     }
     
-    router.push({
-      pathname: '/(tabs)/aiConfirmation1',
-      params: { answer }
-    });
+    // Get context from AI service
+    const context = aiService.getCurrentContext();
+    let workTasks = [...context.workTasks];
+    let painAreas = [...context.painAreas];
+
+    // Extract from answer if context is empty
+    if (workTasks.length === 0 && answer) {
+      workTasks = extractTasksFromText(answer);
+    }
+    
+    if (painAreas.length === 0 && answer) {
+      painAreas = extractPainAreasFromText(answer);
+    }
+
+    // Use defaults if still empty
+    if (workTasks.length === 0) {
+      workTasks = ['heavy lifting'];
+      console.log('⚠️ No work tasks extracted, using default: heavy lifting');
+    }
+    
+    if (painAreas.length === 0) {
+      painAreas = ['back'];
+      console.log('⚠️ No pain areas extracted, using default: back');
+    }
+
+    console.log('📋 Final context for recommendations:', { painAreas, workTasks });
+    
+    // Generate recommendations and update checklist directly
+    try {
+      const recommendedExercises = recommendExercises(
+        painAreas,
+        workTasks,
+        [],
+        3 // Get top 3 recommendations for daily checklist
+      );
+      
+      if (recommendedExercises.length > 0) {
+        setRecommendedExercises(recommendedExercises);
+        
+        // Convert to daily tasks format
+        const dailyTasks = recommendedExercises.map((recEx) => ({
+          id: recEx.exercise.id,
+          title: recEx.exercise.name,
+          xpAmount: getExerciseXpReward(recEx.exercise, recEx.isRecommended),
+          xpColor: '#7267D9',
+          isCompleted: false,
+        }));
+        
+        updateDailyTasks(dailyTasks);
+        console.log('✅ Generated recommendations and updated checklist:', dailyTasks);
+      } else {
+        console.warn('⚠️ No exercises found for context:', { painAreas, workTasks });
+      }
+      
+      // Navigate back to homepage
+      router.push('/(tabs)/homePage');
+    } catch (error) {
+      console.error('Error generating recommendations:', error);
+      // Still navigate back even if there's an error
+      router.push('/(tabs)/homePage');
+    }
   };
 
   const dismissKeyboard = () => {
@@ -183,7 +295,7 @@ export default function AIQuestion1Screen() {
 
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
           <VoiceConversationView
-            question="What iron work tasks do you typically do?"
+            question="What iron work tasks do you typically do, and where do you usually feel pain or discomfort?"
             transcribedText={transcribedText}
             isRecording={isRecording}
             onSend={handleSend}
@@ -216,7 +328,7 @@ export default function AIQuestion1Screen() {
               />
               <View style={styles.speechBubble}>
                 <ThemedText style={styles.speechBubbleText}>
-                  What iron work tasks do you typically do?
+                  What iron work tasks do you typically do, and where do you usually feel pain or discomfort?
                 </ThemedText>
                 <View style={styles.speechBubbleTailBorder} />
                 <View style={styles.speechBubbleTail} />
@@ -227,7 +339,7 @@ export default function AIQuestion1Screen() {
               {/* Question - centered horizontally */}
               <View style={styles.questionContainer}>
                 <ThemedText style={styles.questionText}>
-                  What iron work tasks do you typically do?
+                  What iron work tasks do you typically do, and where do you usually feel pain or discomfort?
                 </ThemedText>
               </View>
 

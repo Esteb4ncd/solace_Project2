@@ -13,12 +13,14 @@ import {
   Dimensions, 
   Image, 
   Keyboard, 
+  Modal,
   Pressable, 
   ScrollView, 
   StyleSheet, 
   TouchableWithoutFeedback, 
   View 
 } from 'react-native';
+import AIModal from '@/components/ui/AIModal';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -27,6 +29,7 @@ const HomePage = () => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempUserName, setTempUserName] = useState("Solly");
   const [activeTab, setActiveTab] = useState<'stretch' | 'relax' | 'complete'>('stretch');
+  const [showAIModal, setShowAIModal] = useState(false);
   
   const { completedExercises, getStreakCount, dailyTasks } = useExerciseContext();
   const streakCount = getStreakCount();
@@ -110,6 +113,7 @@ const HomePage = () => {
               onUserNameChange={setTempUserName}
               onSaveName={handleSaveName}
               onCancelEdit={handleCancelEdit}
+              onAIIconPress={() => setShowAIModal(true)}
             />
 
           {/* Avatar Section */}
@@ -191,6 +195,11 @@ const HomePage = () => {
       </ScrollView>
 
       <BottomNavigation onItemPress={handleNavPress} />
+
+      <AIModal
+        visible={showAIModal}
+        onClose={() => setShowAIModal(false)}
+      />
     </View>
     </TouchableWithoutFeedback>
   );

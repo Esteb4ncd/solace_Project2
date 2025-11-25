@@ -17,6 +17,7 @@ const BUTTON_WIDTH = 352;
 
 export default function AIConfirmation1Screen() {
   const { answer } = useLocalSearchParams();
+  const { setRecommendedExercises, updateDailyTasks } = useExerciseContext();
   const [showModal, setShowModal] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [isModalRecording, setIsModalRecording] = useState(false);
@@ -126,6 +127,34 @@ export default function AIConfirmation1Screen() {
     return extractedTasks;
   };
 
+  const extractPainAreasFromText = (text: string): string[] => {
+    const lowerAnswer = text.toLowerCase();
+    const extractedAreas: string[] = [];
+    
+    if (lowerAnswer.includes('shoulder') || lowerAnswer.includes('arm')) {
+      extractedAreas.push('shoulder');
+    }
+    if (lowerAnswer.includes('knee') || lowerAnswer.includes('leg')) {
+      extractedAreas.push('knee');
+    }
+    if (lowerAnswer.includes('back') || lowerAnswer.includes('spine')) {
+      extractedAreas.push('back');
+    }
+    if (lowerAnswer.includes('neck')) {
+      extractedAreas.push('neck');
+    }
+    if (lowerAnswer.includes('wrist') || lowerAnswer.includes('hand')) {
+      extractedAreas.push('wrist');
+    }
+    if (lowerAnswer.includes('hip')) {
+      extractedAreas.push('hip');
+    }
+    if (lowerAnswer.includes('chest')) {
+      extractedAreas.push('chest');
+    }
+    return extractedAreas;
+  };
+
   const handleYesPress = async () => {
     // Save question 1 recording to JSON file before navigating
     try {
@@ -134,7 +163,7 @@ export default function AIConfirmation1Screen() {
       if (!storedData && answer) {
         console.log('📝 Storing question 1 data from answer parameter...');
         recordingStorage.storeQuestion1(
-          'What iron work tasks do you typically do?',
+          'What iron work tasks do you typically do, and where do you usually feel pain or discomfort?',
           answer as string,
           null
         );
@@ -146,25 +175,67 @@ export default function AIConfirmation1Screen() {
       console.error('Error saving question 1 recording:', error);
     }
     
+    // Get context from AI service
     const context = aiService.getCurrentContext();
-    let tasks = [...context.workTasks];
+    let workTasks = [...context.workTasks];
+    let painAreas = [...context.painAreas];
 
-    if (tasks.length === 0 && typeof answer === 'string') {
-      tasks = extractTasksFromText(answer);
+    // Extract from answer if context is empty
+    if (workTasks.length === 0 && typeof answer === 'string') {
+      workTasks = extractTasksFromText(answer);
+    }
+    
+    if (painAreas.length === 0 && typeof answer === 'string') {
+      painAreas = extractPainAreasFromText(answer);
     }
 
-    if (tasks.length === 0) {
-      console.warn('⚠️ AI confirmation could not determine tasks; returning to manual selection.');
-      router.push('/(tabs)/workTaskSelection');
-      return;
+    // Use defaults if still empty
+    if (workTasks.length === 0) {
+      workTasks = ['heavy lifting'];
+      console.log('⚠️ No work tasks extracted, using default: heavy lifting');
+    }
+    
+    if (painAreas.length === 0) {
+      painAreas = ['back'];
+      console.log('⚠️ No pain areas extracted, using default: back');
     }
 
-    router.push({
-      pathname: '/(tabs)/painAreaSelection',
-      params: {
-        selectedWorkTasks: JSON.stringify(tasks),
-      },
-    });
+    console.log('📋 Final context for recommendations:', { painAreas, workTasks });
+    
+    // Generate recommendations and update checklist
+    try {
+      const recommendedExercises = recommendExercises(
+        painAreas,
+        workTasks,
+        [],
+        3 // Get top 3 recommendations for daily checklist
+      );
+      
+      if (recommendedExercises.length > 0) {
+        setRecommendedExercises(recommendedExercises);
+        
+        // Convert to daily tasks format
+        const dailyTasks = recommendedExercises.map((recEx) => ({
+          id: recEx.exercise.id,
+          title: recEx.exercise.name,
+          xpAmount: getExerciseXpReward(recEx.exercise, recEx.isRecommended),
+          xpColor: '#7267D9',
+          isCompleted: false,
+        }));
+        
+        updateDailyTasks(dailyTasks);
+        console.log('✅ Generated recommendations and updated checklist:', dailyTasks);
+      } else {
+        console.warn('⚠️ No exercises found for context:', { painAreas, workTasks });
+      }
+      
+      // Navigate to onboarding complete
+      router.push('/(tabs)/onboardingComplete');
+    } catch (error) {
+      console.error('Error generating recommendations:', error);
+      // Still navigate even if there's an error
+      router.push('/(tabs)/onboardingComplete');
+    }
   };
 
   const handleNoPress = () => {
@@ -248,35 +319,33 @@ export default function AIConfirmation1Screen() {
     const context = aiService.getCurrentContext();
     console.log('📊 AI Context in confirmation 1:', context);
     
+    const parts: string[] = [];
+    
+    // Add work tasks
     if (context.workTasks.length > 0) {
-      const tasks = context.workTasks.join(', ');
-      return `${tasks}.`;
-    }
-    
-    // Fallback: if no context extracted, try to extract from answer parameter
-    if (answer && context.workTasks.length === 0) {
-      const lowerAnswer = (answer as string).toLowerCase();
-      const extractedTasks: string[] = [];
-      
-      if (lowerAnswer.includes('lift') || lowerAnswer.includes('heavy') || lowerAnswer.includes('weight')) {
-        extractedTasks.push('heavy lifting');
-      }
-      if (lowerAnswer.includes('overhead') || lowerAnswer.includes('above') || lowerAnswer.includes('reach')) {
-        extractedTasks.push('overhead work');
-      }
-      if (lowerAnswer.includes('tool') || lowerAnswer.includes('repetitive') || lowerAnswer.includes('hammer') || lowerAnswer.includes('drill')) {
-        extractedTasks.push('repetitive tool use');
-      }
-      if (lowerAnswer.includes('kneel') || lowerAnswer.includes('crouch') || lowerAnswer.includes('squat')) {
-        extractedTasks.push('kneeling');
-      }
-      
-      if (extractedTasks.length > 0) {
-        return `${extractedTasks.join(', ')}.`;
+      parts.push(`tasks like ${context.workTasks.join(', ')}`);
+    } else if (answer) {
+      const tasks = extractTasksFromText(answer as string);
+      if (tasks.length > 0) {
+        parts.push(`tasks like ${tasks.join(', ')}`);
       }
     }
     
-    return 'your work tasks.';
+    // Add pain areas
+    if (context.painAreas.length > 0) {
+      parts.push(`pain in your ${context.painAreas.join(', ')}`);
+    } else if (answer) {
+      const areas = extractPainAreasFromText(answer as string);
+      if (areas.length > 0) {
+        parts.push(`pain in your ${areas.join(', ')}`);
+      }
+    }
+    
+    if (parts.length > 0) {
+      return parts.join(' and ');
+    }
+    
+    return 'your work tasks and pain areas.';
   };
 
   const aiSummary = getAISummary();
@@ -306,7 +375,7 @@ export default function AIConfirmation1Screen() {
       {/* Confirmation Message */}
       <View style={styles.confirmationContainer}>
         <ThemedText style={styles.confirmationLabel}>
-          Your tasks involve {aiSummary || answerText}
+          You mentioned {aiSummary || answerText}
         </ThemedText>
         {aiSummary && (
           <ThemedText style={styles.summarySubtext}>
