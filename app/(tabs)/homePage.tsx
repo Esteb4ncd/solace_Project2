@@ -1,4 +1,5 @@
 import TaskCard from '@/components/taskCards/TaskCard';
+import { ThemedText } from '@/components/themed-text';
 import BottomNavigation from '@/components/ui/BottomNavigation';
 import Header from '@/components/ui/Header';
 import StatusBar from '@/components/ui/StatusBar';
@@ -6,18 +7,18 @@ import TabBar from '@/components/ui/TabBar';
 import XPBar from '@/components/ui/XPBar';
 import { Colors } from '@/constants/theme';
 import { useExerciseContext } from '@/contexts/ExerciseContext';
-import { ThemedText } from '@/components/themed-text';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { 
-  Dimensions, 
-  Image, 
-  Keyboard, 
-  Pressable, 
-  ScrollView, 
-  StyleSheet, 
-  TouchableWithoutFeedback, 
-  View 
+import {
+  Dimensions,
+  Image,
+  Keyboard,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  View
 } from 'react-native';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
@@ -27,6 +28,7 @@ const HomePage = () => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempUserName, setTempUserName] = useState("Solly");
   const [activeTab, setActiveTab] = useState<'stretch' | 'relax' | 'complete'>('stretch');
+  const [showAIModal, setShowAIModal] = useState(false);
   
   const { completedExercises, getStreakCount, dailyTasks } = useExerciseContext();
   const streakCount = getStreakCount();
@@ -55,7 +57,7 @@ const HomePage = () => {
 		},
 	];
 
-	const handleNavPress = (itemId) => {
+	const handleNavPress = (itemId: string) => {
 		switch (itemId) {
 			case "home":
 				break;
@@ -110,6 +112,7 @@ const HomePage = () => {
               onUserNameChange={setTempUserName}
               onSaveName={handleSaveName}
               onCancelEdit={handleCancelEdit}
+              onAIIconPress={() => setShowAIModal(true)}
             />
 
           {/* Avatar Section */}
@@ -191,6 +194,36 @@ const HomePage = () => {
       </ScrollView>
 
       <BottomNavigation onItemPress={handleNavPress} />
+
+      {/* AI Modal */}
+      <Modal
+        visible={showAIModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowAIModal(false)}
+      >
+        <Pressable 
+          style={styles.modalOverlay} 
+          onPress={() => setShowAIModal(false)}
+        >
+          <Pressable 
+            style={styles.modalContent}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <Pressable 
+              style={styles.closeButton}
+              onPress={() => setShowAIModal(false)}
+            >
+              <ThemedText style={styles.closeButtonText}>×</ThemedText>
+            </Pressable>
+            
+            <ThemedText style={styles.modalTitle}>AI Assistant</ThemedText>
+            <ThemedText style={styles.modalText}>
+              AI Assistant functionality coming soon!
+            </ThemedText>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
     </TouchableWithoutFeedback>
   );
@@ -258,6 +291,65 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    margin: 0,
+    padding: 0,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    padding: 24,
+    width: screenWidth * 0.9,
+    maxWidth: 400,
+    maxHeight: screenHeight * 0.75,
+    minHeight: 200,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 5,
+    position: 'relative',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  closeButtonText: {
+    fontSize: 24,
+    color: '#000',
+    fontWeight: '300',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 16,
+    marginTop: 8,
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#666',
+    lineHeight: 24,
   },
 });
 
