@@ -1,5 +1,7 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { aiService } from '@/services/aiService';
+import { speechService } from '@/services/speechService';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Image, Keyboard, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
@@ -9,8 +11,6 @@ import LargeButton from '../../components/ui/LargeButton';
 import TextAndVoiceInput from '../../components/ui/TextAndVoiceInput';
 import { Globals } from '../../constants/globals';
 import { recordingStorage } from '../../services/recordingStorage';
-import { aiService } from '@/services/aiService';
-import { speechService } from '@/services/speechService';
 
 const { width: screenWidth } = Dimensions.get('window');
 const BUTTON_WIDTH = 352;

@@ -265,7 +265,7 @@ export default function AIModal({ visible, onClose }: AIModalProps) {
                     <ThemedText style={styles.closeButtonText}>×</ThemedText>
                   </Pressable>
                   
-                  <View style={styles.voiceButtonContainer}>
+                  <View style={styles.voiceHeaderContainer}>
                     <Pressable style={styles.voiceButton}>
                       <ThemedText style={styles.voiceButtonText}>Voice</ThemedText>
                     </Pressable>
@@ -393,16 +393,21 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#fff',
     borderRadius: 24,
-    padding: 20,
+    paddingTop: 8,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
     width: screenWidth * 0.9,
     maxWidth: 400,
-    maxHeight: screenHeight * 0.75,
-    minHeight: 400,
+    height: 500,
+    minHeight: 500,
+    maxHeight: 500,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
     elevation: 5,
+    overflow: 'hidden',
+    justifyContent: 'space-between',
   },
   closeButton: {
     position: 'absolute',
@@ -424,7 +429,7 @@ const styles = StyleSheet.create({
   },
   questionContainer: {
     marginTop: 16,
-    marginBottom: 20,
+    marginBottom: 16,
     alignItems: 'center',
     paddingHorizontal: 16,
     zIndex: 2,
@@ -438,14 +443,15 @@ const styles = StyleSheet.create({
     width: 150,
     height: 180,
     alignSelf: 'center',
-    marginBottom: 16,
+    marginTop: 20,
+    marginBottom: 20,
     zIndex: 0,
   },
   keyboardQuestionContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginTop: 16,
-    marginBottom: 16,
+    marginTop: -8,
+    marginBottom: 8,
     paddingHorizontal: 16,
     zIndex: 2,
   },
@@ -510,7 +516,8 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   inputSection: {
-    marginTop: 16,
+    marginTop: 'auto',
+    marginBottom: 0,
     zIndex: 2,
   },
   scrollView: {
@@ -522,18 +529,16 @@ const styles = StyleSheet.create({
   },
   voiceContentContainer: {
     width: '100%',
-    marginTop: 60,
+    marginTop: 16,
     paddingBottom: 20,
-    height: screenHeight * 0.5,
-    maxHeight: screenHeight * 0.5,
+    height: 400,
+    maxHeight: 400,
   },
-  voiceButtonContainer: {
-    position: 'absolute',
-    top: 16,
-    left: 0,
-    right: 0,
+  voiceHeaderContainer: {
+    width: '100%',
     alignItems: 'center',
-    zIndex: 10,
+    marginTop: 8,
+    marginBottom: 16,
   },
   voiceButton: {
     backgroundColor: '#D3D0F3',
