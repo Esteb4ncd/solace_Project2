@@ -256,7 +256,12 @@ export default function AIConfirmation2Screen() {
     // Process with AI service
     if (finalText) {
       try {
-        await aiService.sendMessage(finalText, isModalRecording);
+        const aiResponse = await aiService.sendMessage(finalText, isModalRecording);
+        console.log('✅ AI Response received:', {
+          message: aiResponse.message?.substring(0, 100) + '...',
+          hasRecommendations: !!aiResponse.recommendations,
+          nextAction: aiResponse.nextAction
+        });
         // Close modal and navigate to confirmation page
         setShowModal(false);
         router.push({
@@ -267,7 +272,16 @@ export default function AIConfirmation2Screen() {
           }
         });
       } catch (error) {
-        console.error('Error processing with AI in modal:', error);
+        console.error('❌ Error processing with AI in modal:', error);
+        // Continue with navigation even if AI fails - context extraction might still work
+        setShowModal(false);
+        router.push({
+          pathname: '/(tabs)/aiConfirmation2',
+          params: { 
+            firstAnswer: firstAnswer as string,
+            secondAnswer: finalText 
+          }
+        });
       }
     }
   };

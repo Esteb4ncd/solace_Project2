@@ -1,5 +1,7 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { getExerciseXpReward, RecommendedExercise, recommendExercises } from '@/constants/exercises';
+import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { aiService } from '@/services/aiService';
 import { speechService } from '@/services/speechService';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -215,7 +217,7 @@ export default function AIConfirmation1Screen() {
         setRecommendedExercises(recommendedExercises);
         
         // Convert to daily tasks format
-        const dailyTasks = recommendedExercises.map((recEx) => ({
+        const dailyTasks = recommendedExercises.map((recEx: RecommendedExercise) => ({
           id: recEx.exercise.id,
           title: recEx.exercise.name,
           xpAmount: getExerciseXpReward(recEx.exercise, recEx.isRecommended),
@@ -292,7 +294,12 @@ export default function AIConfirmation1Screen() {
     // Process with AI service
     if (finalText) {
       try {
-        await aiService.sendMessage(finalText, isModalRecording);
+        const aiResponse = await aiService.sendMessage(finalText, isModalRecording);
+        console.log('✅ AI Response received:', {
+          message: aiResponse.message?.substring(0, 100) + '...',
+          hasRecommendations: !!aiResponse.recommendations,
+          nextAction: aiResponse.nextAction
+        });
         // Close modal and navigate to confirmation page
         setShowModal(false);
         router.push({
@@ -300,7 +307,13 @@ export default function AIConfirmation1Screen() {
           params: { answer: finalText }
         });
       } catch (error) {
-        console.error('Error processing with AI in modal:', error);
+        console.error('❌ Error processing with AI in modal:', error);
+        // Continue with navigation even if AI fails - context extraction might still work
+        setShowModal(false);
+        router.push({
+          pathname: '/(tabs)/aiConfirmation1',
+          params: { answer: finalText }
+        });
       }
     }
   };

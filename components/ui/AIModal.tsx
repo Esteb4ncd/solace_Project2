@@ -145,13 +145,19 @@ export default function AIModal({ visible, onClose }: AIModalProps) {
     // Process with AI service
     if (finalText) {
       try {
-        await aiService.sendMessage(finalText, isRecording);
+        const aiResponse = await aiService.sendMessage(finalText, isRecording);
+        console.log('✅ AI Response received:', {
+          message: aiResponse.message?.substring(0, 100) + '...',
+          hasRecommendations: !!aiResponse.recommendations,
+          nextAction: aiResponse.nextAction
+        });
       } catch (error) {
         console.error('❌ Error processing with AI:', error);
+        // Continue with context extraction even if API call fails
       }
     }
     
-    // Process answer and update checklist
+    // Process answer and update checklist (uses context extracted by AI service)
     processAnswerAndUpdateChecklist(finalText);
   };
 
