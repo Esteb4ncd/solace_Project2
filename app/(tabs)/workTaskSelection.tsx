@@ -2,8 +2,8 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import BackButton from '../../components/ui/BackButton';
-import LargeButton from '../../components/ui/LargeButton';
 import FloatingAIAssist from '../../components/ui/FloatingAIAssist';
+import LargeButton from '../../components/ui/LargeButton';
 import ProgressIndicator from '../../components/ui/ProgressIndicator';
 import SelectableCard from '../../components/ui/SelectableCard';
 import { Globals } from '../../constants/globals';
@@ -141,7 +141,7 @@ export default function WorkTaskSelectionScreen() {
 
       {/* Next Button */}
       <View style={styles.buttonContainer}>
-        <LargeButton label="Next" onPress={handleNext} disabled={isNextDisabled} />
+        <LargeButton label="Next" onPress={handleNext} disabled={isNextDisabled} style={undefined} />
       </View>
 
       <FloatingAIAssist
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: Platform.OS === 'web' ? 30 : 60,
+    top: Platform.OS === 'web' ? 20 : 50,
     left: 20,
     zIndex: 10,
   },

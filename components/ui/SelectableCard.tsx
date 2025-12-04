@@ -64,12 +64,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    borderWidth: 1,
-    borderColor: '#E5E7EB', // Light gray border for unselected
+    borderWidth: 8,
+    borderColor: 'transparent', // Transparent border to maintain consistent layout
   },
   cardSelected: {
-    borderWidth: 8,
-    borderColor: '#7267D9', // Purple stroke - 8px when selected
+    borderColor: '#7267D9', // Purple stroke - same 8px width when selected
   },
   cardPressed: {
     opacity: 0.8,
