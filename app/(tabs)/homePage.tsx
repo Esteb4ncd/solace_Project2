@@ -9,7 +9,7 @@ import StatusBar from '@/components/ui/StatusBar';
 import TabBar from '@/components/ui/TabBar';
 import TextAndVoiceInput from '@/components/ui/TextAndVoiceInput';
 import XPBar from '@/components/ui/XPBar';
-import { getExerciseXpReward, recommendExercises } from '@/constants/exercises';
+import { getExerciseById, getExerciseXpReward, recommendExercises } from '@/constants/exercises';
 import { Colors } from '@/constants/theme';
 import { useExerciseContext } from '@/contexts/ExerciseContext';
 import { aiService } from '@/services/aiService';
@@ -330,6 +330,7 @@ const HomePage = () => {
 
   const handleAISend = async () => {
     let finalText = aiInputValue.trim();
+    const wasUsingVoice = isAIRecording; // Track if voice tool was used
     
     if (isAIRecording) {
       try {
@@ -350,7 +351,7 @@ const HomePage = () => {
     }
 
     try {
-      await aiService.sendMessage(finalText, isAIRecording);
+      await aiService.sendMessage(finalText, wasUsingVoice);
     } catch (error) {
       console.error('Error sending message to AI:', error);
     }
@@ -376,12 +377,28 @@ const HomePage = () => {
     setAiContextFeedback(`Creating your checklist with focus on ${painAreas.join(', ')} and ${workTasks.join(', ')}...`);
 
     try {
-      const recommendedExercises = recommendExercises(
+      let recommendedExercises = recommendExercises(
         painAreas,
         workTasks,
         [],
         3
       );
+
+      // Always include "Hand Warm Up" at the top when using voice tool
+      if (wasUsingVoice) {
+        const handWarmUpExercise = getExerciseById('1'); // Hand Warm Up has id "1"
+        if (handWarmUpExercise) {
+          // Remove Hand Warm Up if it's already in the list
+          recommendedExercises = recommendedExercises.filter(
+            recEx => recEx.exercise.id !== '1'
+          );
+          // Add Hand Warm Up at the beginning with isRecommended: true
+          recommendedExercises = [
+            { exercise: handWarmUpExercise, isRecommended: true },
+            ...recommendedExercises
+          ];
+        }
+      }
 
       if (recommendedExercises.length === 0) {
         console.warn('No exercises found for context:', { painAreas, workTasks });
