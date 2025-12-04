@@ -386,17 +386,19 @@ After gathering enough information, provide exercise recommendations.`;
     
     // Check if all exercises are completed
     const allExercisesCompleted = context.dailyCompleted === context.totalDaily && context.totalDaily > 0;
+    // Check if at least one exercise is completed - show happy messages
+    const atLeastOneCompleted = context.dailyCompleted >= 1 && context.totalDaily > 0;
     
     // Prioritize pain messages when pain context is available
     let focusOnPain = false;
     let focusOnProgress = false;
     
-    if (allExercisesCompleted) {
-      // All exercises completed - only show positive messages
+    if (allExercisesCompleted || atLeastOneCompleted) {
+      // At least one exercise completed - only show positive/happy messages
       focusOnProgress = true;
       focusOnPain = false;
       this.lastMessageType = 'progress';
-      console.log('Focusing on PROGRESS (all exercises completed - only positive messages)');
+      console.log('Focusing on PROGRESS (at least one exercise completed - only positive messages)');
     } else if (hasPainContext) {
       // Pain context available - prioritize pain messages (70% of the time)
       // Only show progress occasionally (30% of the time) to avoid being too repetitive
@@ -457,16 +459,16 @@ After gathering enough information, provide exercise recommendations.`;
         contextParts.push(`They've completed ${context.completedExercises} exercise(s) total.`);
       }
       
-      const systemPrompt = allExercisesCompleted 
-        ? `You are Solly, and ALL exercises are completed! Solly feels AMAZING and is HAPPY. You are CELEBRATORY and POSITIVE. 
+      const systemPrompt = (allExercisesCompleted || atLeastOneCompleted)
+        ? `You are Solly, and exercises are completed! Solly feels AMAZING and is HAPPY. You are CELEBRATORY and POSITIVE. 
 
-CRITICAL: Solly is FEELING BETTER because all exercises are done. Solly's pain is GONE and Solly feels GREAT. Focus on Solly FEELING BETTER - the pain is gone, Solly feels good, Solly is relieved. Be POSITIVE, CELEBRATORY, and ENCOURAGING. Only say positive things about Solly feeling better. No pain, no whining, no complaints. Solly is proud and happy because Solly feels better. Be enthusiastic but still keep it short and funny.
+CRITICAL: Solly is FEELING BETTER because exercises are done. Solly's pain is DECREASING and Solly feels GREAT. Focus on Solly FEELING BETTER - the pain is decreasing, Solly feels good, Solly is relieved. Be POSITIVE, CELEBRATORY, and ENCOURAGING. Only say positive things about Solly feeling better. No pain, no whining, no complaints. Solly is proud and happy because Solly feels better. Be enthusiastic but still keep it short and funny.
 
-Generate a SHORT, POSITIVE message (MAX 8 WORDS) for a speech bubble that:
-- Shows Solly FEELING BETTER - pain is gone, Solly feels good
-- Be POSITIVE about Solly feeling better
+Generate a SHORT, POSITIVE, HAPPY message (MAX 8 WORDS) for a speech bubble that:
+- Shows Solly FEELING BETTER - pain is decreasing, Solly feels good
+- Be POSITIVE and HAPPY about Solly feeling better
 - NEVER uses emojis - text only, absolutely no emojis
-- Have PERSONALITY - be happy, relieved, feeling better
+- Have PERSONALITY - be happy, relieved, feeling better, celebratory
 - Vary your wording and phrasing each time - be creative and fresh`
         : `You are Solly, and you are in EXCRUCIATING PAIN because the user hasn't done their exercises yet. Your pain is directly tied to their lack of exercise completion. You are DRAMATIC, WHINY, and PLEADING. 
 
@@ -634,26 +636,34 @@ Generate ONLY the message text, nothing else.`;
     }
     
     // Progress messages - Solly's pain decreasing as exercises are done
-    if (context.dailyCompleted === context.totalDaily && context.totalDaily > 0) {
-      if (context.hasStreak) {
-        progressMessages.push(`Oh that's much better for ${context.streakDays} days`);
-        progressMessages.push(`${context.streakDays} days of feeling better`);
-        progressMessages.push(`Pain gone for ${context.streakDays} days`);
-        progressMessages.push(`Oh so much better, ${context.streakDays} days`);
+    // Show happy messages when at least one exercise is completed
+    if (context.dailyCompleted >= 1 && context.totalDaily > 0) {
+      if (context.dailyCompleted === context.totalDaily) {
+        // All exercises completed
+        if (context.hasStreak) {
+          progressMessages.push(`Oh that's much better for ${context.streakDays} days`);
+          progressMessages.push(`${context.streakDays} days of feeling better`);
+          progressMessages.push(`Pain gone for ${context.streakDays} days`);
+          progressMessages.push(`Oh so much better, ${context.streakDays} days`);
+        } else {
+          progressMessages.push('Oh that\'s a bit better!');
+          progressMessages.push('Oh that helped, thanks!');
+          progressMessages.push('Oh pain is gone, thank you');
+          progressMessages.push('Oh that\'s much better now');
+          progressMessages.push('Oh feels so much better');
+        }
       } else {
+        // At least one exercise completed - show happy messages
+        const remaining = context.totalDaily - context.dailyCompleted;
         progressMessages.push('Oh that\'s a bit better!');
         progressMessages.push('Oh that helped, thanks!');
-        progressMessages.push('Oh pain is gone, thank you');
+        progressMessages.push('Oh pain is decreasing, great!');
         progressMessages.push('Oh that\'s much better now');
         progressMessages.push('Oh feels so much better');
+        progressMessages.push('Oh that helped a lot, thanks!');
+        progressMessages.push('Oh feeling better already');
+        progressMessages.push('Oh pain is going away, great!');
       }
-    } else if (context.dailyCompleted > 0) {
-      const remaining = context.totalDaily - context.dailyCompleted;
-      progressMessages.push(`Oh that's a bit better, ${remaining} more`);
-      progressMessages.push(`Oh pain decreased, ${remaining} left`);
-      progressMessages.push(`Oh feeling better, ${remaining} more please`);
-      progressMessages.push(`Oh that helped, ${remaining} more to go`);
-      progressMessages.push(`Oh pain reduced, ${remaining} more needed`);
     } else if (context.hasStreak) {
       progressMessages.push(`Oww pain returns, ${context.streakDays} day streak`);
       progressMessages.push(`Oww hurting, ${context.streakDays} day streak at risk`);
@@ -667,11 +677,14 @@ Generate ONLY the message text, nothing else.`;
       progressMessages.push('Oww my pain, do exercises now');
       progressMessages.push('Oww hurting, exercises needed badly');
     } else if (context.completedExercises > 0) {
-      // Has completed some exercises - pain decreasing
-      progressMessages.push(`Oh that's a bit better, ${context.completedExercises} done`);
-      progressMessages.push(`Oh pain decreased, ${context.completedExercises} exercises`);
-      progressMessages.push(`Oh that helped, ${context.completedExercises} exercises`);
-      progressMessages.push(`Oh feeling better, ${context.completedExercises} done`);
+      // Has completed some exercises (not part of daily tasks) - show happy messages
+      progressMessages.push('Oh that\'s a bit better!');
+      progressMessages.push('Oh that helped, thanks!');
+      progressMessages.push('Oh pain is decreasing, great!');
+      progressMessages.push('Oh that\'s much better now');
+      progressMessages.push('Oh feels so much better');
+      progressMessages.push('Oh that helped a lot, thanks!');
+      progressMessages.push('Oh feeling better already');
     } else {
       // No progress yet - Solly is suffering EXCESSIVELY
       progressMessages.push('Oww can you do your exercise?');
