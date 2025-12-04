@@ -50,21 +50,12 @@ const HomePage = () => {
   // Determine which Solly image to show based on exercise completion
   const getSollyImage = () => {
     const dailyCompletedCount = dailyTasks.filter(task => task.isCompleted).length;
-    const totalDailyTasks = dailyTasks.length;
     
-    // All exercises complete
-    if (dailyCompletedCount === totalDailyTasks && totalDailyTasks > 0) {
+    // If at least 1 exercise is completed, show happy Solly
+    if (dailyCompletedCount >= 1) {
       return require('@/assets/SollyStates/happysolly.png');
     }
-    // 2 exercises done
-    else if (dailyCompletedCount >= 2) {
-      return require('@/assets/SollyStates/SollyHurt1.png');
-    }
-    // 1 exercise done
-    else if (dailyCompletedCount >= 1) {
-      return require('@/assets/SollyStates/SollyHurt2.png');
-    }
-    // 0 exercises done
+    // 0 exercises done - show hurt Solly
     else {
       return require('@/assets/SollyStates/SollyHurt3.png');
     }

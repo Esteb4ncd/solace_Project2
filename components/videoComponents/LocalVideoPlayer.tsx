@@ -1,14 +1,14 @@
 import { ResizeMode, Video } from 'expo-av';
 import { useEffect, useRef, useState } from "react";
 import {
-  Dimensions,
-  Image,
+    Dimensions,
+    Image,
   PanResponder,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
 import BackButton from '../ui/BackButton';
 import LargeButton from '../ui/LargeButton';
@@ -94,7 +94,7 @@ export default function LocalVideoPlayer({
     if (status.isLoaded) {
       // Only update current time if not seeking (to avoid conflicts)
       if (!isSeeking) {
-        setCurrentTime(status.positionMillis / 1000);
+      setCurrentTime(status.positionMillis / 1000);
       }
       setDuration(status.durationMillis / 1000);
       setIsLoading(false);

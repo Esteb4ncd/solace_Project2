@@ -68,14 +68,14 @@ const XPGainScreen = () => {
 
   return (
     <>
-      <ExercisePage
-        title="Congrats!"
-        characterImage={require('@/assets/SollyStates/SollyXPGain.png')}
-        bottomText={`You've gained ${xpAmount || '10'} xp`}
-        buttonLabel="Back to Home"
-        onButtonPress={handleBackToHome}
-        showBackButton={false}
-      />
+    <ExercisePage
+      title="Congrats!"
+      characterImage={require('@/assets/SollyStates/SollyXPGain.png')}
+      bottomText={`You've gained ${xpAmount || '10'} xp`}
+      buttonLabel="Back to Home"
+      onButtonPress={handleBackToHome}
+      showBackButton={false}
+    />
       <StreakSplashScreen
         visible={showStreakSplash}
         streakCount={streakCount}
