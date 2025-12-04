@@ -67,6 +67,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({
         <LargeButton 
           label={buttonLabel} 
           onPress={onButtonPress}
+          style={undefined}
         />
       </View>
     </View>
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "black",
     textAlign: "center",
-    marginTop: 130,
+    marginTop: 180,
     marginBottom: 40,
   },
   subtitle: {

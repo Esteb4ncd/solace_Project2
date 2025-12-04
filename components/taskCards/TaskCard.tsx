@@ -29,10 +29,15 @@ const TaskCardComponent: React.FC<TaskCardProps> = ({ tasks, exerciseType, isDai
       return;
     }
     
-    // If this is a mental exercise (relax section), navigate to breathing exercises
+    // If this is a mental exercise (relax section), navigate directly to breathing exercise page
     if (exerciseType === 'mental' && !isDaily) {
-      console.log('Navigating to breathing exercises for mental exercise:', task.title);
-      router.push('/(tabs)/breathingExercisePage');
+      console.log('Navigating directly to breathing exercise for mental exercise:', task.title);
+      router.push({
+        pathname: '/(tabs)/breathingExercisePage',
+        params: {
+          exerciseType: 'Deep Breathing' // Use Deep Breathing for all mental exercises
+        }
+      });
       return;
     }
     

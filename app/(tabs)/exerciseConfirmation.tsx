@@ -4,11 +4,12 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo } from 'react';
 
 const ExerciseConfirmationScreen = () => {
-  const { exerciseId, exerciseName, xpReward, duration } = useLocalSearchParams<{ 
+  const { exerciseId, exerciseName, xpReward, duration, isMentalExercise } = useLocalSearchParams<{ 
     exerciseId?: string;
     exerciseName: string; 
     xpReward: string; 
-    duration: string; 
+    duration: string;
+    isMentalExercise?: string;
   }>();
 
   // Get exercise data from exercises.json to ensure we have correct information
@@ -26,6 +27,10 @@ const ExerciseConfirmationScreen = () => {
   // Only use params duration if exercise is not found in JSON
   const displayDuration = exercise?.duration || duration || '2 minutes';
   
+  // For mental exercises (breathing exercises), use the breathing exercise format
+  const isMental = isMentalExercise === 'true' || displayName === 'Stress Relief' || displayName === 'Breathing Exercise';
+  const breathingCycles = 5; // Deep Breathing has 5 cycles
+  
   // Log to verify we're using the correct duration from JSON
   if (exercise) {
     console.log(`📋 Exercise confirmation: ${exercise.name} - Duration from JSON: ${exercise.duration}`);
@@ -37,8 +42,14 @@ const ExerciseConfirmationScreen = () => {
     console.log('Start button pressed for:', displayName);
     
     // Navigate to different pages based on exercise type
-    if (displayName === 'Stress Relief' || displayName === 'Breathing Exercise') {
-      router.push('/(tabs)/breathingExercisePage');
+    // If this is a mental exercise from the relax tab, route to deep breathing exercise
+    if (isMentalExercise === 'true' || displayName === 'Stress Relief' || displayName === 'Breathing Exercise') {
+      router.push({
+        pathname: '/(tabs)/breathingExercisePage',
+        params: {
+          exerciseType: 'Deep Breathing' // Use Deep Breathing for all mental exercises
+        }
+      });
     } else {
       router.push({
         pathname: '/videoPlayer',
@@ -64,10 +75,10 @@ const ExerciseConfirmationScreen = () => {
   return (
     <ExercisePage
       title={displayName}
-      subtitle={`+${displayXpReward} XP`}
+      subtitle={isMental ? `+${displayXpReward} XP • ${breathingCycles} cycles` : `+${displayXpReward} XP`}
       characterImage={require('@/assets/hompageAssets/SollySitting.png')}
-      bottomText={displayDuration}
-      buttonLabel="Start"
+      bottomText={isMental ? "Ready to begin your breathing exercise?" : displayDuration}
+      buttonLabel={isMental ? "Start Exercise" : "Start"}
       onButtonPress={handleStart}
       onBack={handleBack}
       showBackButton={true}

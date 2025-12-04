@@ -391,7 +391,6 @@ function breathingExercise() {
         title={currentExerciseType}
         subtitle={`+5 XP • ${maxCycles} cycles`}
         characterImage={require("@/assets/hompageAssets/SollySitting.png")}
-        bottomText="Ready to begin your breathing exercise?"
         buttonLabel="Start Exercise"
         onButtonPress={handleStartExercise}
         onBack={() => router.back()}
